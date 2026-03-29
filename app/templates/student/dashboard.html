@@ -1,67 +1,201 @@
 {% extends "base.html" %}
 {% block title %}Student dashboard{% endblock %}
-{% block body %}
-<h1>Student dashboard</h1>
-<p><a href="{{ url_for('auth.logout') }}">Log out</a></p>
 
-<h2>Your profile</h2>
-<table>
-  <tr><th>Name</th><td>{{ student.name }}</td></tr>
-  <tr><th>Email</th><td>{{ student.email }}</td></tr>
-  <tr><th>Phone</th><td>{{ student.phone_number }}</td></tr>
-</table>
+{% macro complaint_status_badge(status) %}
+  {% set t = (status|string)|lower|trim %}
+  {% if t == 'open' %}
+    <span class="badge rounded-pill text-bg-warning"><i class="bi bi-exclamation-circle me-1"></i>Open</span>
+  {% elif t == 'resolved' %}
+    <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Resolved</span>
+  {% else %}
+    <span class="badge rounded-pill text-bg-secondary">{{ status }}</span>
+  {% endif %}
+{% endmacro %}
 
-<h2>Complaints</h2>
-{% if complaints %}
-<table>
-  <thead><tr><th>Type</th><th>Status</th><th>Date</th></tr></thead>
-  <tbody>
-    {% for c in complaints %}
-    <tr>
-      <td>{{ c.type }}</td>
-      <td>{{ c.status }}</td>
-      <td>{{ c.issue_date }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p>No complaints filed.</p>
-{% endif %}
+{% macro attendance_badge(rec) %}
+  {% set st = rec.status.value if rec.status else '' %}
+  {% set t = (st|string)|lower %}
+  {% if t == 'present' %}
+    <span class="badge text-bg-success">Present</span>
+  {% elif t == 'absent' %}
+    <span class="badge text-bg-danger">Absent</span>
+  {% elif t == 'leave' %}
+    <span class="badge text-bg-warning">Leave</span>
+  {% else %}
+    <span class="badge text-bg-secondary">{{ st }}</span>
+  {% endif %}
+{% endmacro %}
 
-<h2>Laundry</h2>
-{% if laundry_orders %}
-<table>
-  <thead><tr><th>Date</th><th>Weight</th><th>Status</th><th>Items</th></tr></thead>
-  <tbody>
-    {% for l in laundry_orders %}
-    <tr>
-      <td>{{ l.date }}</td>
-      <td>{{ l.weight }}</td>
-      <td>{{ l.status }}</td>
-      <td>{{ l.items or '—' }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p>No laundry records.</p>
-{% endif %}
+{% block content %}
+<div class="container-fluid px-3 px-lg-4 py-4">
+  <div class="row g-4">
+    <aside class="col-md-4 col-lg-3">
+      <div class="card border-0 shadow-sm student-sidebar">
+        <div class="card-body p-3">
+          <h6 class="text-uppercase text-muted small fw-semibold mb-3"><i class="bi bi-list-nested me-1"></i>Navigation</h6>
+          <nav class="nav flex-column gap-1" id="studentSideNav">
+            <a class="nav-link active" href="#section-profile"><i class="bi bi-person-circle me-2"></i>Profile</a>
+            <a class="nav-link" href="#section-complaints"><i class="bi bi-chat-left-text me-2"></i>Complaints</a>
+            <a class="nav-link" href="#section-laundry"><i class="bi bi-droplet me-2"></i>Laundry</a>
+            <a class="nav-link" href="#section-attendance"><i class="bi bi-calendar-check me-2"></i>Attendance</a>
+          </nav>
+        </div>
+      </div>
+    </aside>
 
-<h2>Attendance (recent)</h2>
-{% if attendance %}
-<table>
-  <thead><tr><th>Date</th><th>Status</th></tr></thead>
-  <tbody>
-    {% for a in attendance %}
-    <tr>
-      <td>{{ a.date }}</td>
-      <td>{{ a.status.value if a.status else a.status }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p>No attendance records.</p>
-{% endif %}
+    <div class="col-md-8 col-lg-9">
+      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
+        <div>
+          <h1 class="h3 mb-0 fw-semibold"><i class="bi bi-speedometer2 text-primary me-2"></i>Student dashboard</h1>
+          <p class="text-muted small mb-0">Welcome back, {{ student.name }}</p>
+        </div>
+      </div>
+
+      <section id="section-profile" class="mb-4">
+        <div class="card border-0 shadow-sm">
+          <div class="card-header bg-white border-0 py-3 d-flex align-items-center gap-2">
+            <i class="bi bi-person-badge text-primary fs-5"></i>
+            <span class="fw-semibold">Your profile</span>
+          </div>
+          <div class="card-body">
+            <div class="row g-3">
+              <div class="col-sm-6 col-lg-4">
+                <div class="p-3 rounded-3 bg-body-secondary bg-opacity-50 h-100">
+                  <div class="text-muted small mb-1"><i class="bi bi-person me-1"></i>Name</div>
+                  <div class="fw-medium">{{ student.name }}</div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-4">
+                <div class="p-3 rounded-3 bg-body-secondary bg-opacity-50 h-100">
+                  <div class="text-muted small mb-1"><i class="bi bi-envelope me-1"></i>Email</div>
+                  <div class="fw-medium text-break">{{ student.email }}</div>
+                </div>
+              </div>
+              <div class="col-sm-6 col-lg-4">
+                <div class="p-3 rounded-3 bg-body-secondary bg-opacity-50 h-100">
+                  <div class="text-muted small mb-1"><i class="bi bi-telephone me-1"></i>Phone</div>
+                  <div class="fw-medium">{{ student.phone_number }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="section-complaints" class="mb-4">
+        <h2 class="h5 fw-semibold mb-3"><i class="bi bi-chat-left-text me-2 text-primary"></i>Complaints</h2>
+        {% if complaints %}
+          <div class="row g-3">
+            {% for c in complaints %}
+            <div class="col-md-6 col-xl-4">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                    <span class="fw-semibold">{{ c.type }}</span>
+                    {{ complaint_status_badge(c.status) }}
+                  </div>
+                  <div class="text-muted small mb-0">
+                    <i class="bi bi-calendar3 me-1"></i>{{ c.issue_date }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card border-0 shadow-sm">
+            <div class="card-body text-center text-muted py-5">
+              <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+              <p class="mb-0">No complaints filed yet.</p>
+            </div>
+          </div>
+        {% endif %}
+      </section>
+
+      <section id="section-laundry" class="mb-4">
+        <h2 class="h5 fw-semibold mb-3"><i class="bi bi-droplet me-2 text-primary"></i>Laundry</h2>
+        {% if laundry_orders %}
+          <div class="row g-3">
+            {% for l in laundry_orders %}
+            <div class="col-md-6 col-xl-4">
+              <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                  <div class="d-flex justify-content-between align-items-start mb-2">
+                    <span class="text-muted small"><i class="bi bi-calendar3 me-1"></i>{{ l.date }}</span>
+                    <span class="badge text-bg-info">{{ l.status }}</span>
+                  </div>
+                  <div class="fw-semibold mb-1">{{ l.weight }} kg</div>
+                  {% if l.items %}
+                    <p class="small text-muted mb-0">{{ l.items }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card border-0 shadow-sm">
+            <div class="card-body text-center text-muted py-5">
+              <i class="bi bi-basket fs-1 d-block mb-2 opacity-50"></i>
+              <p class="mb-0">No laundry records.</p>
+            </div>
+          </div>
+        {% endif %}
+      </section>
+
+      <section id="section-attendance">
+        <h2 class="h5 fw-semibold mb-3"><i class="bi bi-calendar-check me-2 text-primary"></i>Attendance <span class="text-muted fw-normal small">(recent)</span></h2>
+        {% if attendance %}
+          <div class="row g-3">
+            {% for a in attendance %}
+            <div class="col-6 col-md-4 col-lg-3">
+              <div class="card border-0 shadow-sm text-center h-100">
+                <div class="card-body py-3">
+                  <div class="text-muted small mb-2"><i class="bi bi-calendar-event me-1"></i>{{ a.date }}</div>
+                  <div>{{ attendance_badge(a) }}</div>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="card border-0 shadow-sm">
+            <div class="card-body text-center text-muted py-5">
+              <i class="bi bi-calendar-x fs-1 d-block mb-2 opacity-50"></i>
+              <p class="mb-0">No attendance records.</p>
+            </div>
+          </div>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+(function () {
+  var nav = document.getElementById('studentSideNav');
+  if (!nav) return;
+  var links = nav.querySelectorAll('a[href^="#"]');
+  var sections = document.querySelectorAll('section[id^="section-"]');
+  function setActive(hash) {
+    links.forEach(function (a) {
+      a.classList.toggle('active', a.getAttribute('href') === hash);
+    });
+  }
+  links.forEach(function (a) {
+    a.addEventListener('click', function () {
+      setActive(a.getAttribute('href'));
+    });
+  });
+  window.addEventListener('scroll', function () {
+    var mid = window.scrollY + window.innerHeight / 3;
+    sections.forEach(function (sec) {
+      var top = sec.offsetTop, bot = top + sec.offsetHeight;
+      if (mid >= top && mid < bot) setActive('#' + sec.id);
+    });
+  });
+})();
+</script>
 {% endblock %}

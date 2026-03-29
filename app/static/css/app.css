@@ -1,0 +1,32 @@
+/* App layout helpers — Bootstrap 5 base */
+.auth-center {
+  min-height: calc(100vh - 56px);
+}
+
+.student-sidebar {
+  min-height: calc(100vh - 56px);
+}
+
+.student-sidebar .nav-link {
+  border-radius: 0.375rem;
+  color: var(--bs-secondary-color);
+  padding: 0.5rem 0.75rem;
+}
+
+.student-sidebar .nav-link:hover {
+  background-color: var(--bs-secondary-bg);
+  color: var(--bs-emphasis-color);
+}
+
+.student-sidebar .nav-link.active {
+  background-color: var(--bs-primary-bg-subtle);
+  color: var(--bs-primary);
+  font-weight: 500;
+}
+
+@media (min-width: 768px) {
+  .student-sidebar {
+    position: sticky;
+    top: 1rem;
+  }
+}

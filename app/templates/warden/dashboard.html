@@ -1,67 +1,128 @@
 {% extends "base.html" %}
 {% block title %}Warden dashboard{% endblock %}
-{% block body %}
-<h1>Warden dashboard</h1>
-<p><a href="{{ url_for('auth.logout') }}">Log out</a></p>
 
-<h2>All complaints</h2>
-{% if complaints %}
-<table>
-  <thead><tr><th>ID</th><th>Type</th><th>Status</th><th>Date</th><th>Student ID</th><th>Staff ID</th></tr></thead>
-  <tbody>
-    {% for c in complaints %}
-    <tr>
-      <td>{{ c.complaint_id }}</td>
-      <td>{{ c.type }}</td>
-      <td>{{ c.status }}</td>
-      <td>{{ c.issue_date }}</td>
-      <td>{{ c.student_id }}</td>
-      <td>{{ c.staff_id or '—' }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p>No complaints.</p>
-{% endif %}
+{% macro complaint_status_badge(status) %}
+  {% set t = (status|string)|lower|trim %}
+  {% if t == 'open' %}
+    <span class="badge rounded-pill text-bg-warning"><i class="bi bi-exclamation-circle me-1"></i>Open</span>
+  {% elif t == 'resolved' %}
+    <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Resolved</span>
+  {% else %}
+    <span class="badge rounded-pill text-bg-secondary">{{ status }}</span>
+  {% endif %}
+{% endmacro %}
 
-<h2>Room allocations</h2>
-{% if allocations %}
-<table>
-  <thead><tr><th>Alloc ID</th><th>Student</th><th>Room</th><th>From</th><th>Until</th></tr></thead>
-  <tbody>
-    {% for a in allocations %}
-    <tr>
-      <td>{{ a.alloc_id }}</td>
-      <td>{{ a.student_id }}</td>
-      <td>{% if a.room %}{{ a.room.hostel_id }} / {{ a.room.room_no }}{% else %}{{ a.room_id }}{% endif %}</td>
-      <td>{{ a.alloc_date }}</td>
-      <td>{{ a.vacate_date or '—' }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p>No allocations.</p>
-{% endif %}
+{% block content %}
+<div class="container-fluid px-3 px-lg-4 py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="h3 mb-0 fw-semibold"><i class="bi bi-shield-check text-primary me-2"></i>Warden dashboard</h1>
+      <p class="text-muted small mb-0">Complaints, allocations, and staff overview</p>
+    </div>
+  </div>
 
-<h2>Staff list</h2>
-{% if staff_members %}
-<table>
-  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Designation</th><th>Role</th></tr></thead>
-  <tbody>
-    {% for s in staff_members %}
-    <tr>
-      <td>{{ s.staff_id }}</td>
-      <td>{{ s.name }}</td>
-      <td>{{ s.email }}</td>
-      <td>{{ s.designation }}</td>
-      <td>{{ s.role }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p>No staff.</p>
-{% endif %}
+  <section class="mb-5">
+    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-chat-left-text me-2 text-primary"></i>All complaints</h2>
+    {% if complaints %}
+    <div class="row g-3">
+      {% for c in complaints %}
+      <div class="col-md-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+              <span class="badge text-bg-light text-dark">#{{ c.complaint_id }}</span>
+              {{ complaint_status_badge(c.status) }}
+            </div>
+            <div class="fw-semibold mb-2">{{ c.type }}</div>
+            <div class="text-muted small mb-2"><i class="bi bi-calendar3 me-1"></i>{{ c.issue_date }}</div>
+            <div class="small text-body-secondary">
+              <span class="me-3"><i class="bi bi-person me-1"></i>Student {{ c.student_id }}</span>
+              <span><i class="bi bi-person-badge me-1"></i>{% if c.staff_id %}Staff {{ c.staff_id }}{% else %}—{% endif %}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center text-muted py-5">
+        <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+        <p class="mb-0">No complaints.</p>
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  <section class="mb-5">
+    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-door-open me-2 text-primary"></i>Room allocations</h2>
+    {% if allocations %}
+    <div class="row g-3">
+      {% for a in allocations %}
+      <div class="col-md-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <span class="badge text-bg-primary">Alloc #{{ a.alloc_id }}</span>
+              <span class="text-muted small">Student {{ a.student_id }}</span>
+            </div>
+            <div class="fw-medium mb-2">
+              <i class="bi bi-building me-1 text-muted"></i>
+              {% if a.room %}{{ a.room.hostel_id }} / {{ a.room.room_no }}{% else %}{{ a.room_id }}{% endif %}
+            </div>
+            <div class="small text-muted">
+              <div><i class="bi bi-calendar-event me-1"></i>From {{ a.alloc_date }}</div>
+              <div><i class="bi bi-calendar-x me-1"></i>Until {{ a.vacate_date or '—' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center text-muted py-5">
+        <i class="bi bi-house-door fs-1 d-block mb-2 opacity-50"></i>
+        <p class="mb-0">No allocations.</p>
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-people me-2 text-primary"></i>Staff list</h2>
+    {% if staff_members %}
+    <div class="row g-3">
+      {% for s in staff_members %}
+      <div class="col-md-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body d-flex gap-3">
+            <div class="flex-shrink-0">
+              <div class="rounded-circle bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
+                <i class="bi bi-person-fill text-secondary fs-4"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 min-w-0">
+              <div class="fw-semibold text-truncate">{{ s.name }}</div>
+              <div class="small text-muted text-truncate"><i class="bi bi-envelope me-1"></i>{{ s.email }}</div>
+              <div class="small mt-1">
+                <span class="badge text-bg-light text-dark me-1">{{ s.designation }}</span>
+                <span class="badge text-bg-secondary">{{ s.role }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center text-muted py-5">
+        <i class="bi bi-person-x fs-1 d-block mb-2 opacity-50"></i>
+        <p class="mb-0">No staff.</p>
+      </div>
+    </div>
+    {% endif %}
+  </section>
+</div>
 {% endblock %}

@@ -1,45 +1,90 @@
 {% extends "base.html" %}
 {% block title %}Staff dashboard{% endblock %}
-{% block body %}
-<h1>Staff dashboard</h1>
-<p>Logged in as {{ staff.name }} ({{ staff.email }}) · <a href="{{ url_for('auth.logout') }}">Log out</a></p>
 
-<h2>Assigned tasks</h2>
-{% if tasks %}
-<table>
-  <thead><tr><th>Task</th><th>Assigned</th><th>Completed</th><th>Status</th></tr></thead>
-  <tbody>
-    {% for t in tasks %}
-    <tr>
-      <td>{{ t.description }}</td>
-      <td>{{ t.assigned_date }}</td>
-      <td>{{ t.completed_date or '—' }}</td>
-      <td>{{ t.status }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p>No tasks assigned.</p>
-{% endif %}
+{% macro complaint_status_badge(status) %}
+  {% set t = (status|string)|lower|trim %}
+  {% if t == 'open' %}
+    <span class="badge rounded-pill text-bg-warning"><i class="bi bi-exclamation-circle me-1"></i>Open</span>
+  {% elif t == 'resolved' %}
+    <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Resolved</span>
+  {% else %}
+    <span class="badge rounded-pill text-bg-secondary">{{ status }}</span>
+  {% endif %}
+{% endmacro %}
 
-<h2>Complaints assigned to you</h2>
-{% if complaints %}
-<table>
-  <thead><tr><th>ID</th><th>Type</th><th>Status</th><th>Date</th><th>Student</th></tr></thead>
-  <tbody>
-    {% for c in complaints %}
-    <tr>
-      <td>{{ c.complaint_id }}</td>
-      <td>{{ c.type }}</td>
-      <td>{{ c.status }}</td>
-      <td>{{ c.issue_date }}</td>
-      <td>{{ c.student_id }}</td>
-    </tr>
-    {% endfor %}
-  </tbody>
-</table>
-{% else %}
-<p>No complaints assigned.</p>
-{% endif %}
+{% block content %}
+<div class="container-fluid px-3 px-lg-4 py-4">
+  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
+    <div>
+      <h1 class="h3 mb-1 fw-semibold"><i class="bi bi-person-badge text-primary me-2"></i>Staff dashboard</h1>
+      <p class="text-muted small mb-0">
+        <i class="bi bi-person me-1"></i>{{ staff.name }}
+        <span class="mx-2">·</span>
+        <i class="bi bi-envelope me-1"></i>{{ staff.email }}
+      </p>
+    </div>
+  </div>
+
+  <section class="mb-5">
+    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-list-task me-2 text-primary"></i>Assigned tasks</h2>
+    {% if tasks %}
+    <div class="row g-3">
+      {% for t in tasks %}
+      <div class="col-md-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-2">
+              <span class="badge text-bg-dark">Task #{{ t.task_id }}</span>
+              <span class="badge text-bg-info">{{ t.status }}</span>
+            </div>
+            <p class="mb-3">{{ t.description }}</p>
+            <div class="small text-muted">
+              <div><i class="bi bi-calendar-plus me-1"></i>Assigned {{ t.assigned_date }}</div>
+              <div><i class="bi bi-calendar-check me-1"></i>Completed {{ t.completed_date or '—' }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center text-muted py-5">
+        <i class="bi bi-clipboard-x fs-1 d-block mb-2 opacity-50"></i>
+        <p class="mb-0">No tasks assigned.</p>
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-chat-left-text me-2 text-primary"></i>Complaints assigned to you</h2>
+    {% if complaints %}
+    <div class="row g-3">
+      {% for c in complaints %}
+      <div class="col-md-6 col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+              <span class="badge text-bg-light text-dark">#{{ c.complaint_id }}</span>
+              {{ complaint_status_badge(c.status) }}
+            </div>
+            <div class="fw-semibold mb-2">{{ c.type }}</div>
+            <div class="text-muted small"><i class="bi bi-calendar3 me-1"></i>{{ c.issue_date }}</div>
+            <div class="small mt-2 text-body-secondary"><i class="bi bi-person me-1"></i>Student {{ c.student_id }}</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center text-muted py-5">
+        <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+        <p class="mb-0">No complaints assigned.</p>
+      </div>
+    </div>
+    {% endif %}
+  </section>
+</div>
 {% endblock %}
