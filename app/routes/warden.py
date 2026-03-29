@@ -2,8 +2,12 @@ from functools import wraps
 
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from sqlalchemy.orm import joinedload
 
+from app import db
 from app.models import Complaint, RoomAllocation, StaffMember, Warden
+
+COMPLAINT_STATUSES = ('Open', 'In Progress', 'Resolved')
 
 warden_bp = Blueprint('warden', __name__)
 
@@ -30,7 +34,11 @@ def warden_only(view):
 @login_required
 @warden_only
 def dashboard():
-    complaints = Complaint.query.order_by(Complaint.issue_date.desc()).all()
+    complaints = (
+        Complaint.query.options(joinedload(Complaint.student), joinedload(Complaint.staff))
+        .order_by(Complaint.issue_date.desc())
+        .all()
+    )
     allocations = (
         RoomAllocation.query.order_by(RoomAllocation.alloc_date.desc()).all()
     )
@@ -40,4 +48,34 @@ def dashboard():
         complaints=complaints,
         allocations=allocations,
         staff_members=staff_members,
+        complaint_statuses=COMPLAINT_STATUSES,
     )
+
+
+@warden_bp.route('/complaint/<int:complaint_id>/update', methods=['POST'])
+@login_required
+@warden_only
+def update_complaint(complaint_id):
+    c = db.session.get(Complaint, complaint_id)
+    if c is None:
+        abort(404)
+    status = request.form.get('status', '').strip()
+    if status in COMPLAINT_STATUSES:
+        c.status = status
+    staff_raw = request.form.get('staff_id', '').strip()
+    if staff_raw in ('', 'none', '0', 'unassigned'):
+        c.staff_id = None
+    else:
+        try:
+            sid = int(staff_raw)
+        except ValueError:
+            flash('Invalid staff selection.', 'error')
+            return redirect(url_for('warden.dashboard'))
+        staff = db.session.get(StaffMember, sid)
+        if staff is None:
+            flash('That staff member does not exist.', 'error')
+            return redirect(url_for('warden.dashboard'))
+        c.staff_id = sid
+    db.session.commit()
+    flash('Complaint updated.', 'success')
+    return redirect(url_for('warden.dashboard'))

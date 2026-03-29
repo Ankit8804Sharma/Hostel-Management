@@ -1,10 +1,23 @@
 {% extends "base.html" %}
 {% block title %}Staff dashboard{% endblock %}
 
+{% macro task_status_badge(status) %}
+  {% set t = (status|string)|lower|trim %}
+  {% if t == 'pending' %}
+    <span class="badge rounded-pill text-bg-warning"><i class="bi bi-hourglass-split me-1"></i>Pending</span>
+  {% elif t == 'completed' %}
+    <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Completed</span>
+  {% else %}
+    <span class="badge rounded-pill text-bg-secondary">{{ status }}</span>
+  {% endif %}
+{% endmacro %}
+
 {% macro complaint_status_badge(status) %}
   {% set t = (status|string)|lower|trim %}
   {% if t == 'open' %}
     <span class="badge rounded-pill text-bg-warning"><i class="bi bi-exclamation-circle me-1"></i>Open</span>
+  {% elif t == 'in progress' %}
+    <span class="badge rounded-pill text-bg-info"><i class="bi bi-arrow-repeat me-1"></i>In Progress</span>
   {% elif t == 'resolved' %}
     <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Resolved</span>
   {% else %}
@@ -29,18 +42,18 @@
     <h2 class="h5 fw-semibold mb-3"><i class="bi bi-list-task me-2 text-primary"></i>Assigned tasks</h2>
     {% if tasks %}
     <div class="row g-3">
-      {% for t in tasks %}
+      {% for task in tasks %}
       <div class="col-md-6 col-xl-4">
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start mb-2">
-              <span class="badge text-bg-dark">Task #{{ t.task_id }}</span>
-              <span class="badge text-bg-info">{{ t.status }}</span>
+            <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
+              <span class="badge text-bg-dark">Task #{{ task.task_id }}</span>
+              {{ task_status_badge(task.status) }}
             </div>
-            <p class="mb-3">{{ t.description }}</p>
+            <p class="mb-3">{{ task.description }}</p>
             <div class="small text-muted">
-              <div><i class="bi bi-calendar-plus me-1"></i>Assigned {{ t.assigned_date }}</div>
-              <div><i class="bi bi-calendar-check me-1"></i>Completed {{ t.completed_date or '—' }}</div>
+              <div><i class="bi bi-calendar-plus me-1"></i>Assigned {{ task.assigned_date }}</div>
+              <div><i class="bi bi-calendar-check me-1"></i>Completed {{ task.completed_date or '—' }}</div>
             </div>
           </div>
         </div>
@@ -69,9 +82,12 @@
               <span class="badge text-bg-light text-dark">#{{ c.complaint_id }}</span>
               {{ complaint_status_badge(c.status) }}
             </div>
-            <div class="fw-semibold mb-2">{{ c.type }}</div>
+            <div class="fw-semibold mb-1">{{ c.type }}</div>
+            {% if c.description %}
+            <p class="small text-body-secondary mb-2">{{ c.description }}</p>
+            {% endif %}
             <div class="text-muted small"><i class="bi bi-calendar3 me-1"></i>{{ c.issue_date }}</div>
-            <div class="small mt-2 text-body-secondary"><i class="bi bi-person me-1"></i>Student {{ c.student_id }}</div>
+            <div class="small mt-2 text-body-secondary"><i class="bi bi-person me-1"></i>{{ c.student.name if c.student else ('Student ' ~ c.student_id) }}</div>
           </div>
         </div>
       </div>

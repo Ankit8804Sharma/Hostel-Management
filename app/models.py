@@ -195,6 +195,7 @@ class Complaint(db.Model):
 
     complaint_id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(100), nullable=False)
+    description = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(50), nullable=False)
     issue_date = db.Column(db.Date, nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'), nullable=False)

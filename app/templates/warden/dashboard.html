@@ -5,6 +5,8 @@
   {% set t = (status|string)|lower|trim %}
   {% if t == 'open' %}
     <span class="badge rounded-pill text-bg-warning"><i class="bi bi-exclamation-circle me-1"></i>Open</span>
+  {% elif t == 'in progress' %}
+    <span class="badge rounded-pill text-bg-info"><i class="bi bi-arrow-repeat me-1"></i>In Progress</span>
   {% elif t == 'resolved' %}
     <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Resolved</span>
   {% else %}
@@ -17,32 +19,67 @@
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
     <div>
       <h1 class="h3 mb-0 fw-semibold"><i class="bi bi-shield-check text-primary me-2"></i>Warden dashboard</h1>
-      <p class="text-muted small mb-0">Complaints, allocations, and staff overview</p>
+      <p class="text-muted small mb-0">Manage complaints, allocations, and staff</p>
     </div>
   </div>
 
   <section class="mb-5">
     <h2 class="h5 fw-semibold mb-3"><i class="bi bi-chat-left-text me-2 text-primary"></i>All complaints</h2>
     {% if complaints %}
-    <div class="row g-3">
-      {% for c in complaints %}
-      <div class="col-md-6 col-xl-4">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-              <span class="badge text-bg-light text-dark">#{{ c.complaint_id }}</span>
-              {{ complaint_status_badge(c.status) }}
-            </div>
-            <div class="fw-semibold mb-2">{{ c.type }}</div>
-            <div class="text-muted small mb-2"><i class="bi bi-calendar3 me-1"></i>{{ c.issue_date }}</div>
-            <div class="small text-body-secondary">
-              <span class="me-3"><i class="bi bi-person me-1"></i>Student {{ c.student_id }}</span>
-              <span><i class="bi bi-person-badge me-1"></i>{% if c.staff_id %}Staff {{ c.staff_id }}{% else %}—{% endif %}</span>
-            </div>
-          </div>
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Student</th>
+                <th scope="col">Type</th>
+                <th scope="col">Description</th>
+                <th scope="col">Status</th>
+                <th scope="col">Date</th>
+                <th scope="col" class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in complaints %}
+              <tr>
+                <td class="text-muted small">{{ c.complaint_id }}</td>
+                <td>
+                  <div class="fw-medium">{{ c.student.name if c.student else '—' }}</div>
+                  <div class="small text-muted">ID {{ c.student_id }}</div>
+                </td>
+                <td>{{ c.type }}</td>
+                <td style="max-width: 220px;">
+                  {% set desc = c.description or '' %}
+                  <span class="small text-body-secondary">{{ desc[:120] }}{% if desc|length > 120 %}…{% endif %}</span>
+                </td>
+                <td>{{ complaint_status_badge(c.status) }}</td>
+                <td class="text-nowrap small">{{ c.issue_date }}</td>
+                <td class="text-end">
+                  <form method="post" action="{{ url_for('warden.update_complaint', complaint_id=c.complaint_id) }}" class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 justify-content-end flex-wrap">
+                    <select name="status" class="form-select form-select-sm" style="min-width: 9rem;" aria-label="Status">
+                      {% for s in complaint_statuses %}
+                      <option value="{{ s }}" {% if c.status == s %}selected{% endif %}>{{ s }}</option>
+                      {% endfor %}
+                    </select>
+                    <select name="staff_id" class="form-select form-select-sm" style="min-width: 10rem;" aria-label="Assign staff">
+                      <option value="">Unassigned</option>
+                      {% for s in staff_members %}
+                      <option value="{{ s.staff_id }}" {% if c.staff_id == s.staff_id %}selected{% endif %}>{{ s.name }} ({{ s.designation }})</option>
+                      {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-dark text-nowrap">
+                      <i class="bi bi-check-lg me-1"></i>Update
+                    </button>
+                  </form>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
         </div>
       </div>
-      {% endfor %}
     </div>
     {% else %}
     <div class="card border-0 shadow-sm">
