@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Staff registration{% endblock %}
+{% block body %}
+<h1>Staff registration</h1>
+<form method="post">
+  <p><label>Full name<br><input name="name" required></label></p>
+  <p><label>Email<br><input name="email" type="email" required></label></p>
+  <p><label>Contact number<br><input name="contact_no" required></label></p>
+  <p><label>Designation<br><input name="designation" required></label></p>
+  <p><label>Password<br><input name="password" type="password" required minlength="6"></label></p>
+  <p><button type="submit">Register</button></p>
+</form>
+<p><a href="{{ url_for('auth.login_staff') }}">Back to login</a></p>
+{% endblock %}

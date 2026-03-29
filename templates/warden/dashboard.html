@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% block title %}Warden dashboard{% endblock %}
+{% block body %}
+<h1>Warden dashboard</h1>
+<p><a href="{{ url_for('auth.logout') }}">Log out</a></p>
+
+<h2>All complaints</h2>
+{% if complaints %}
+<table>
+  <thead><tr><th>ID</th><th>Type</th><th>Status</th><th>Date</th><th>Student ID</th><th>Staff ID</th></tr></thead>
+  <tbody>
+    {% for c in complaints %}
+    <tr>
+      <td>{{ c.complaint_id }}</td>
+      <td>{{ c.type }}</td>
+      <td>{{ c.status }}</td>
+      <td>{{ c.issue_date }}</td>
+      <td>{{ c.student_id }}</td>
+      <td>{{ c.staff_id or '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No complaints.</p>
+{% endif %}
+
+<h2>Room allocations</h2>
+{% if allocations %}
+<table>
+  <thead><tr><th>Alloc ID</th><th>Student</th><th>Room</th><th>From</th><th>Until</th></tr></thead>
+  <tbody>
+    {% for a in allocations %}
+    <tr>
+      <td>{{ a.alloc_id }}</td>
+      <td>{{ a.student_id }}</td>
+      <td>{% if a.room %}{{ a.room.hostel_id }} / {{ a.room.room_no }}{% else %}{{ a.room_id }}{% endif %}</td>
+      <td>{{ a.alloc_date }}</td>
+      <td>{{ a.vacate_date or '—' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No allocations.</p>
+{% endif %}
+
+<h2>Staff list</h2>
+{% if staff_members %}
+<table>
+  <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Designation</th><th>Role</th></tr></thead>
+  <tbody>
+    {% for s in staff_members %}
+    <tr>
+      <td>{{ s.staff_id }}</td>
+      <td>{{ s.name }}</td>
+      <td>{{ s.email }}</td>
+      <td>{{ s.designation }}</td>
+      <td>{{ s.role }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No staff.</p>
+{% endif %}
+{% endblock %}

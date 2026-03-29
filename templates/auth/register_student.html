@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Student registration{% endblock %}
+{% block body %}
+<h1>Student registration</h1>
+<form method="post">
+  <p><label>Full name<br><input name="name" required></label></p>
+  <p><label>Email<br><input name="email" type="email" required></label></p>
+  <p><label>Phone<br><input name="phone" required></label></p>
+  <p><label>Password<br><input name="password" type="password" required minlength="6"></label></p>
+  <p><button type="submit">Register</button></p>
+</form>
+<p><a href="{{ url_for('auth.login_student') }}">Back to login</a></p>
+{% endblock %}

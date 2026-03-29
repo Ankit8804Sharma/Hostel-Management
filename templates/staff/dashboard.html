@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Staff dashboard{% endblock %}
+{% block body %}
+<h1>Staff dashboard</h1>
+<p>Logged in as {{ staff.name }} ({{ staff.email }}) · <a href="{{ url_for('auth.logout') }}">Log out</a></p>
+
+<h2>Assigned tasks</h2>
+{% if tasks %}
+<table>
+  <thead><tr><th>Task</th><th>Assigned</th><th>Completed</th><th>Status</th></tr></thead>
+  <tbody>
+    {% for t in tasks %}
+    <tr>
+      <td>{{ t.description }}</td>
+      <td>{{ t.assigned_date }}</td>
+      <td>{{ t.completed_date or '—' }}</td>
+      <td>{{ t.status }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No tasks assigned.</p>
+{% endif %}
+
+<h2>Complaints assigned to you</h2>
+{% if complaints %}
+<table>
+  <thead><tr><th>ID</th><th>Type</th><th>Status</th><th>Date</th><th>Student</th></tr></thead>
+  <tbody>
+    {% for c in complaints %}
+    <tr>
+      <td>{{ c.complaint_id }}</td>
+      <td>{{ c.type }}</td>
+      <td>{{ c.status }}</td>
+      <td>{{ c.issue_date }}</td>
+      <td>{{ c.student_id }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>No complaints assigned.</p>
+{% endif %}
+{% endblock %}
