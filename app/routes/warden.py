@@ -1,3 +1,4 @@
+from datetime import date
 from functools import wraps
 
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
@@ -5,7 +6,7 @@ from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
 
 from app import db
-from app.models import Complaint, RoomAllocation, StaffMember, Warden
+from app.models import Attendance, AttendanceStatus, Complaint, RoomAllocation, StaffMember, Student, Warden
 
 COMPLAINT_STATUSES = ('Open', 'In Progress', 'Resolved')
 
@@ -43,12 +44,19 @@ def dashboard():
         RoomAllocation.query.order_by(RoomAllocation.alloc_date.desc()).all()
     )
     staff_members = StaffMember.query.order_by(StaffMember.name).all()
+    today_attendance = (
+        Attendance.query.filter_by(date=date.today())
+        .join(Student)
+        .order_by(Student.name)
+        .all()
+    )
     return render_template(
         'warden/dashboard.html',
         complaints=complaints,
         allocations=allocations,
         staff_members=staff_members,
         complaint_statuses=COMPLAINT_STATUSES,
+        today_attendance=today_attendance,
     )
 
 
@@ -78,4 +86,57 @@ def update_complaint(complaint_id):
         c.staff_id = sid
     db.session.commit()
     flash('Complaint updated.', 'success')
+    return redirect(url_for('warden.dashboard'))
+
+
+@warden_bp.route('/attendance')
+@login_required
+@warden_only
+def attendance():
+    """Form to mark student attendance."""
+    students = Student.query.order_by(Student.name).all()
+    today = date.today()
+    # Fetch already-marked records for today to pre-fill form
+    existing = {
+        a.student_id: a.status.value
+        for a in Attendance.query.filter_by(date=today).all()
+    }
+    return render_template(
+        'warden/attendance.html',
+        students=students,
+        today=today,
+        existing=existing,
+        statuses=[s.value for s in AttendanceStatus],
+    )
+
+
+@warden_bp.route('/attendance/mark', methods=['POST'])
+@login_required
+@warden_only
+def mark_attendance():
+    """Save attendance records for today."""
+    today = date.today()
+    students = Student.query.all()
+    saved = 0
+    for student in students:
+        status_val = request.form.get(f'status_{student.student_id}', '').strip()
+        if not status_val:
+            continue
+        try:
+            status_enum = AttendanceStatus(status_val)
+        except ValueError:
+            continue
+        existing = db.session.get(Attendance, (student.student_id, today))
+        if existing:
+            existing.status = status_enum
+        else:
+            record = Attendance(
+                student_id=student.student_id,
+                date=today,
+                status=status_enum,
+            )
+            db.session.add(record)
+        saved += 1
+    db.session.commit()
+    flash(f'Attendance saved for {saved} student(s).', 'success')
     return redirect(url_for('warden.dashboard'))

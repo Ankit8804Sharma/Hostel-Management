@@ -1,4 +1,4 @@
-from flask import Flask, redirect, request, url_for
+from flask import Flask, redirect, render_template, request, url_for
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -56,6 +56,6 @@ def create_app(config_class=Config):
 
     @app.route('/')
     def index():
-        return redirect(url_for('auth.login_student'))
+        return render_template('index.html')
 
     return app

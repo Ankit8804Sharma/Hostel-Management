@@ -19,9 +19,65 @@
   <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
     <div>
       <h1 class="h3 mb-0 fw-semibold"><i class="bi bi-shield-check text-primary me-2"></i>Warden dashboard</h1>
-      <p class="text-muted small mb-0">Manage complaints, allocations, and staff</p>
+      <p class="text-muted small mb-0">Manage complaints, allocations, attendance, and staff</p>
     </div>
+    <a href="{{ url_for('warden.attendance') }}" class="btn btn-primary" id="btnMarkAttendance">
+      <i class="bi bi-calendar-check me-1"></i>Mark Today's Attendance
+    </a>
   </div>
+
+  <!-- Today's Attendance Summary -->
+  <section class="mb-5">
+    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-calendar-day me-2 text-primary"></i>Today's Attendance</h2>
+    {% if today_attendance %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Student</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for a in today_attendance %}
+              <tr>
+                <td class="text-muted small">{{ loop.index }}</td>
+                <td>
+                  <div class="fw-medium">{{ a.student.name if a.student else 'Student ' ~ a.student_id }}</div>
+                  <div class="small text-muted">ID {{ a.student_id }}</div>
+                </td>
+                <td>
+                  {% set st = a.status.value|lower %}
+                  {% if st == 'present' %}
+                    <span class="badge text-bg-success"><i class="bi bi-check-circle me-1"></i>Present</span>
+                  {% elif st == 'absent' %}
+                    <span class="badge text-bg-danger"><i class="bi bi-x-circle me-1"></i>Absent</span>
+                  {% else %}
+                    <span class="badge text-bg-warning text-dark"><i class="bi bi-arrow-right-circle me-1"></i>Leave</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center text-muted py-4">
+        <i class="bi bi-calendar-x fs-1 d-block mb-2 opacity-50"></i>
+        <p class="mb-2">No attendance marked today yet.</p>
+        <a href="{{ url_for('warden.attendance') }}" class="btn btn-sm btn-primary">
+          <i class="bi bi-calendar-check me-1"></i>Mark Now
+        </a>
+      </div>
+    </div>
+    {% endif %}
+  </section>
 
   <section class="mb-5">
     <h2 class="h5 fw-semibold mb-3"><i class="bi bi-chat-left-text me-2 text-primary"></i>All complaints</h2>

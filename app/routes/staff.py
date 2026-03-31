@@ -1,9 +1,11 @@
+from datetime import date
 from functools import wraps
 
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
 
+from app import db
 from app.models import Complaint, StaffMember, TaskAllocation
 
 staff_bp = Blueprint('staff', __name__)
@@ -44,3 +46,25 @@ def dashboard():
         tasks=tasks,
         complaints=complaints,
     )
+
+
+@staff_bp.route('/task/<int:task_id>/complete', methods=['POST'])
+@login_required
+@staff_only
+def complete_task(task_id):
+    """Mark a task as Completed."""
+    task = db.session.get(TaskAllocation, task_id)
+    if task is None:
+        abort(404)
+    # Only the assigned staff member can mark it complete
+    if task.staff_id != current_user.staff_id:
+        flash('You can only complete tasks assigned to you.', 'error')
+        return redirect(url_for('staff.dashboard'))
+    if task.status == 'Completed':
+        flash('Task is already marked as completed.', 'info')
+        return redirect(url_for('staff.dashboard'))
+    task.status = 'Completed'
+    task.completed_date = date.today()
+    db.session.commit()
+    flash(f'Task #{task.task_id} marked as completed.', 'success')
+    return redirect(url_for('staff.dashboard'))

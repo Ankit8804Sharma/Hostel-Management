@@ -45,16 +45,26 @@
       {% for task in tasks %}
       <div class="col-md-6 col-xl-4">
         <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
+          <div class="card-body d-flex flex-column">
             <div class="d-flex justify-content-between align-items-start mb-2 gap-2">
               <span class="badge text-bg-dark">Task #{{ task.task_id }}</span>
               {{ task_status_badge(task.status) }}
             </div>
             <p class="mb-3">{{ task.description }}</p>
-            <div class="small text-muted">
+            <div class="small text-muted mb-3">
               <div><i class="bi bi-calendar-plus me-1"></i>Assigned {{ task.assigned_date }}</div>
               <div><i class="bi bi-calendar-check me-1"></i>Completed {{ task.completed_date or '—' }}</div>
             </div>
+            {% if task.status|lower != 'completed' %}
+            <div class="mt-auto">
+              <form method="post" action="{{ url_for('staff.complete_task', task_id=task.task_id) }}"
+                    onsubmit="return confirm('Mark Task #{{ task.task_id }} as completed?')">
+                <button type="submit" class="btn btn-success btn-sm w-100 fw-semibold">
+                  <i class="bi bi-check-circle me-1"></i>Mark Complete
+                </button>
+              </form>
+            </div>
+            {% endif %}
           </div>
         </div>
       </div>
