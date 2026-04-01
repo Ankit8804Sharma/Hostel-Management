@@ -1,43 +1,30 @@
 {% extends "base.html" %}
-{% block title %}Welcome{% endblock %}
+{% block title %}Home{% endblock %}
 
 {% block extra_head %}
 <style>
   .hero-section {
     background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #415a77 100%);
-    min-height: 88vh;
+    min-height: 85vh;
     display: flex;
     align-items: center;
     position: relative;
     overflow: hidden;
+    color: #fff;
   }
   .hero-section::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: radial-gradient(ellipse at 70% 50%, rgba(96, 153, 255, 0.12) 0%, transparent 60%);
+    background: radial-gradient(ellipse at 70% 50%, rgba(96, 153, 255, 0.15) 0%, transparent 60%);
     pointer-events: none;
   }
-  .hero-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: .5rem;
-    background: rgba(255,255,255,.1);
-    border: 1px solid rgba(255,255,255,.18);
-    border-radius: 50px;
-    padding: .35rem 1rem;
-    color: rgba(255,255,255,.85);
-    font-size: .82rem;
-    letter-spacing: .04em;
-    margin-bottom: 1.5rem;
-    backdrop-filter: blur(8px);
-  }
   .hero-title {
-    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-size: clamp(2.2rem, 5vw, 3.8rem);
     font-weight: 800;
-    color: #fff;
-    line-height: 1.15;
-    letter-spacing: -.02em;
+    line-height: 1.1;
+    letter-spacing: -.03em;
+    margin-bottom: 1.5rem;
   }
   .hero-title span {
     background: linear-gradient(90deg, #60a5fa, #a78bfa);
@@ -46,316 +33,218 @@
     background-clip: text;
   }
   .hero-subtitle {
-    font-size: 1.1rem;
-    color: rgba(255,255,255,.65);
-    max-width: 520px;
-    line-height: 1.7;
+    font-size: 1.25rem;
+    color: rgba(255,255,255,.75);
+    max-width: 600px;
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
   }
-  .btn-hero-primary {
+  .btn-hero {
+    padding: 0.8rem 2.2rem;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+  }
+  .btn-student {
     background: linear-gradient(90deg, #3b82f6, #6366f1);
     border: none;
     color: #fff;
-    padding: .7rem 1.8rem;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: .95rem;
-    transition: all .25s;
-    box-shadow: 0 4px 20px rgba(99,102,241,.4);
+    box-shadow: 0 4px 15px rgba(99,102,241,0.4);
   }
-  .btn-hero-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 28px rgba(99,102,241,.55);
+  .btn-staff {
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
     color: #fff;
-  }
-  .btn-hero-outline {
-    background: rgba(255,255,255,.07);
-    border: 1.5px solid rgba(255,255,255,.25);
-    color: rgba(255,255,255,.9);
-    padding: .7rem 1.8rem;
-    border-radius: 50px;
-    font-weight: 600;
-    font-size: .95rem;
-    transition: all .25s;
-    backdrop-filter: blur(6px);
-  }
-  .btn-hero-outline:hover {
-    background: rgba(255,255,255,.15);
-    border-color: rgba(255,255,255,.5);
-    color: #fff;
-    transform: translateY(-2px);
-  }
-  .hero-visual {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-    align-items: flex-end;
-  }
-  .stat-pill {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-    background: rgba(255,255,255,.07);
-    border: 1px solid rgba(255,255,255,.12);
-    border-radius: 14px;
-    padding: .85rem 1.25rem;
     backdrop-filter: blur(10px);
-    min-width: 200px;
-    transition: transform .25s;
-    animation: floatUp .6s ease both;
   }
-  .stat-pill:hover { transform: translateX(-4px); }
-  .stat-pill .stat-icon {
-    width: 42px; height: 42px;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem;
-    flex-shrink: 0;
+  .btn-hero:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+    color: #fff;
   }
-  .stat-pill .stat-label { font-size: .75rem; color: rgba(255,255,255,.55); }
-  .stat-pill .stat-value { font-size: 1rem; font-weight: 700; color: #fff; }
-  @keyframes floatUp {
-    from { opacity: 0; transform: translateY(16px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-  .features-section {
-    background: #f8fafc;
-    padding: 5rem 0;
-  }
-  .section-eyebrow {
-    font-size: .8rem;
-    font-weight: 700;
-    letter-spacing: .1em;
-    text-transform: uppercase;
-    color: #6366f1;
-  }
-  .section-title {
-    font-size: clamp(1.6rem, 3vw, 2.2rem);
-    font-weight: 800;
-    color: #0f172a;
-    letter-spacing: -.02em;
-  }
+  .section-padding { padding: 6rem 0; }
   .feature-card {
-    border: 1px solid #e8ecf0;
-    border-radius: 18px;
-    padding: 2rem 1.5rem;
+    border: 1px solid #eef2f6;
+    border-radius: 20px;
+    padding: 2.5rem 2rem;
     background: #fff;
-    transition: all .28s cubic-bezier(.4,0,.2,1);
-    cursor: default;
+    transition: all 0.3s ease;
     height: 100%;
   }
   .feature-card:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 20px 52px rgba(15,23,42,.1);
-    border-color: transparent;
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.06);
   }
-  .feature-icon-wrap {
-    width: 56px; height: 56px;
-    border-radius: 14px;
+  .feature-icon {
+    width: 60px; height: 60px;
+    border-radius: 15px;
     display: flex; align-items: center; justify-content: center;
     font-size: 1.5rem;
-    margin-bottom: 1.1rem;
-    transition: transform .28s;
+    margin-bottom: 1.5rem;
   }
-  .feature-card:hover .feature-icon-wrap { transform: scale(1.1) rotate(-4deg); }
-  .feature-card h3 {
-    font-size: 1.05rem;
-    font-weight: 700;
-    color: #0f172a;
-    margin-bottom: .5rem;
+  .role-card {
+    border-radius: 24px;
+    overflow: hidden;
+    border: none;
+    background: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+    height: 100%;
   }
-  .feature-card p {
-    font-size: .875rem;
-    color: #64748b;
-    margin-bottom: 0;
-    line-height: 1.6;
-  }
-  .cta-section {
-    background: linear-gradient(135deg, #1e3a5f 0%, #3730a3 100%);
-    padding: 5rem 0;
+  .role-header {
+    background: #f8fafc;
+    padding: 2rem;
     text-align: center;
+    border-bottom: 1px solid #f1f5f9;
   }
+  .role-body { padding: 2rem; }
+  .role-list { list-style: none; padding: 0; margin: 0; }
+  .role-list li {
+    padding: 0.6rem 0;
+    color: #64748b;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+  }
+  .role-list li i { color: #6366f1; }
 </style>
 {% endblock %}
 
 {% block content %}
-<!-- ═══ HERO ═══ -->
-<section class="hero-section" aria-labelledby="hero-heading">
+<!-- Hero Section -->
+<section class="hero-section">
   <div class="container">
-    <div class="row align-items-center g-5">
-
-      <!-- Left copy -->
-      <div class="col-lg-6">
-        <div class="hero-badge">
-          <i class="bi bi-building-fill"></i>
-          Smart Hostel Management
-        </div>
-        <h1 class="hero-title" id="hero-heading">
-          Hostel<br>
-          <span>Management</span><br>
-          System
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1 class="hero-title">
+          Hostel Complaint &<br>
+          <span>Maintenance</span><br>
+          Management System
         </h1>
-        <p class="hero-subtitle mt-3 mb-4">
-          A unified platform for students, staff, and wardens — manage complaints, laundry, attendance, gaming, and more from one place.
+        <p class="hero-subtitle">
+          A smart solution for managing hostel complaints, maintenance, laundry, attendance and gaming facilities.
         </p>
         <div class="d-flex flex-wrap gap-3">
-          <a href="{{ url_for('auth.login_student') }}" class="btn btn-hero-primary" id="btn-student-login">
+          <a href="{{ url_for('auth.login_student') }}" class="btn btn-hero btn-student">
             <i class="bi bi-person-fill me-2"></i>Student Login
           </a>
-          <a href="{{ url_for('auth.login_staff') }}" class="btn btn-hero-outline" id="btn-staff-login">
+          <a href="{{ url_for('auth.login_staff') }}" class="btn btn-hero btn-staff">
             <i class="bi bi-briefcase-fill me-2"></i>Staff Login
           </a>
         </div>
-        <div class="mt-4 d-flex align-items-center gap-3">
-          <a href="{{ url_for('auth.register_student') }}" class="text-white-50 small text-decoration-none">
-            <i class="bi bi-person-plus me-1"></i>New student? Register here
-          </a>
-        </div>
       </div>
-
-      <!-- Right stat pills -->
-      <div class="col-lg-6">
-        <div class="hero-visual">
-          <div class="stat-pill" style="animation-delay:.05s">
-            <div class="stat-icon bg-primary bg-opacity-25 text-primary"><i class="bi bi-chat-left-text-fill"></i></div>
-            <div>
-              <div class="stat-label">Complaints</div>
-              <div class="stat-value">Tracked &amp; Resolved</div>
-            </div>
-          </div>
-          <div class="stat-pill" style="animation-delay:.15s">
-            <div class="stat-icon bg-success bg-opacity-25 text-success"><i class="bi bi-calendar-check-fill"></i></div>
-            <div>
-              <div class="stat-label">Attendance</div>
-              <div class="stat-value">Daily Records</div>
-            </div>
-          </div>
-          <div class="stat-pill" style="animation-delay:.25s">
-            <div class="stat-icon bg-warning bg-opacity-25 text-warning"><i class="bi bi-droplet-fill"></i></div>
-            <div>
-              <div class="stat-label">Laundry</div>
-              <div class="stat-value">Order &amp; Track</div>
-            </div>
-          </div>
-          <div class="stat-pill" style="animation-delay:.35s">
-            <div class="stat-icon bg-danger bg-opacity-25 text-danger"><i class="bi bi-controller"></i></div>
-            <div>
-              <div class="stat-label">Gaming</div>
-              <div class="stat-value">Book Equipment</div>
-            </div>
-          </div>
-          <div class="stat-pill" style="animation-delay:.45s">
-            <div class="stat-icon" style="background:rgba(168,139,250,.2); color:#a78bfa;"><i class="bi bi-door-open-fill"></i></div>
-            <div>
-              <div class="stat-label">Room Allocation</div>
-              <div class="stat-value">Smart Assign</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 </section>
 
-<!-- ═══ FEATURES ═══ -->
-<section class="features-section" aria-labelledby="features-heading">
+<!-- Features Section -->
+<section class="section-padding bg-light">
   <div class="container">
     <div class="text-center mb-5">
-      <div class="section-eyebrow mb-2">Everything You Need</div>
-      <h2 class="section-title" id="features-heading">Powerful Features for Every Role</h2>
-      <p class="text-muted mt-2" style="max-width:520px;margin:auto;">
-        From filing a complaint to booking a gaming console — all hostel operations in one system.
-      </p>
+      <h2 class="fw-bold h1 mb-3">Key Features</h2>
+      <p class="text-muted">Explore how our system simplifies daily hostel operations</p>
     </div>
-
     <div class="row g-4">
-
-      <!-- Complaints -->
-      <div class="col-sm-6 col-lg-4">
+      <div class="col-md-4">
         <div class="feature-card">
-          <div class="feature-icon-wrap" style="background:#eff6ff; color:#2563eb;">
-            <i class="bi bi-chat-left-text-fill"></i>
+          <div class="feature-icon bg-primary bg-opacity-10 text-primary">
+            <i class="bi bi-chat-left-dots-fill"></i>
           </div>
-          <h3>Complaints</h3>
-          <p>Students file complaints by category. Wardens assign staff to resolve issues. Real-time status tracking from Open to Resolved.</p>
+          <h3 class="h5 fw-bold mb-3">Complaint Management</h3>
+          <p class="text-muted mb-0">Submit and track complaints with real-time status updates directly from your dashboard.</p>
         </div>
       </div>
-
-      <!-- Laundry -->
-      <div class="col-sm-6 col-lg-4">
+      <div class="col-md-4">
         <div class="feature-card">
-          <div class="feature-icon-wrap" style="background:#f0fdf4; color:#16a34a;">
-            <i class="bi bi-droplet-fill"></i>
+          <div class="feature-icon bg-success bg-opacity-10 text-success">
+            <i class="bi bi-droplet-half"></i>
           </div>
-          <h3>Laundry</h3>
-          <p>Submit laundry requests with item details and weight. Track progress from Pending to Delivered without leaving the portal.</p>
+          <h3 class="h5 fw-bold mb-3">Laundry Tracking</h3>
+          <p class="text-muted mb-0">Schedule and monitor your laundry orders. Stay informed as your clothes move from pending to delivered.</p>
         </div>
       </div>
-
-      <!-- Gaming -->
-      <div class="col-sm-6 col-lg-4">
+      <div class="col-md-4">
         <div class="feature-card">
-          <div class="feature-icon-wrap" style="background:#fff7ed; color:#ea580c;">
-            <i class="bi bi-controller"></i>
-          </div>
-          <h3>Gaming Booking</h3>
-          <p>Browse available gaming equipment, book it instantly, and return with one click. Availability updates in real time.</p>
-        </div>
-      </div>
-
-      <!-- Attendance -->
-      <div class="col-sm-6 col-lg-4">
-        <div class="feature-card">
-          <div class="feature-icon-wrap" style="background:#f5f3ff; color:#7c3aed;">
+          <div class="feature-icon bg-warning bg-opacity-10 text-warning">
             <i class="bi bi-calendar-check-fill"></i>
           </div>
-          <h3>Attendance</h3>
-          <p>Wardens mark daily attendance. Students see their Present / Absent / Leave summary and full 30-day history at a glance.</p>
+          <h3 class="h5 fw-bold mb-3">Attendance Monitoring</h3>
+          <p class="text-muted mb-0">Automated daily attendance tracking for all students, providing full transparency and history.</p>
         </div>
       </div>
-
-      <!-- Tasks -->
-      <div class="col-sm-6 col-lg-4">
-        <div class="feature-card">
-          <div class="feature-icon-wrap" style="background:#fdf4ff; color:#a21caf;">
-            <i class="bi bi-list-task"></i>
-          </div>
-          <h3>Task Management</h3>
-          <p>Wardens assign tasks to staff members. Staff can mark tasks as Completed with a single button, keeping everyone updated.</p>
-        </div>
-      </div>
-
-      <!-- Room Allocation -->
-      <div class="col-sm-6 col-lg-4">
-        <div class="feature-card">
-          <div class="feature-icon-wrap" style="background:#fff1f2; color:#be123c;">
-            <i class="bi bi-door-open-fill"></i>
-          </div>
-          <h3>Room Allocation</h3>
-          <p>Wardens manage room assignments with full visibility of allotted and vacated rooms across AC and Non-AC categories.</p>
-        </div>
-      </div>
-
     </div>
   </div>
 </section>
 
-<!-- ═══ CTA ═══ -->
-<section class="cta-section" aria-labelledby="cta-heading">
+<!-- Roles Section -->
+<section class="section-padding">
   <div class="container">
-    <i class="bi bi-building display-4 text-white opacity-75 d-block mb-3"></i>
-    <h2 class="h2 fw-bold text-white mb-3" id="cta-heading">Ready to get started?</h2>
-    <p class="text-white opacity-75 mb-4" style="max-width:420px;margin:auto;">
-      Log in with your student or staff credentials and access your personalised dashboard instantly.
-    </p>
-    <div class="d-flex flex-wrap justify-content-center gap-3">
-      <a href="{{ url_for('auth.login_student') }}" class="btn btn-light fw-semibold px-4 py-2 rounded-pill" id="cta-student-login">
-        <i class="bi bi-person me-2"></i>Student Login
-      </a>
-      <a href="{{ url_for('auth.login_staff') }}" class="btn btn-outline-light fw-semibold px-4 py-2 rounded-pill" id="cta-staff-login">
-        <i class="bi bi-briefcase me-2"></i>Staff Login
-      </a>
+    <div class="text-center mb-5">
+      <h2 class="fw-bold h1 mb-3">User Roles</h2>
+      <p class="text-muted">A tailor-made experience for everyone in the hostel ecosystem</p>
+    </div>
+    <div class="row g-4">
+      <!-- Student -->
+      <div class="col-lg-4">
+        <div class="role-card">
+          <div class="role-header">
+            <div class="fs-1 mb-2 text-primary"><i class="bi bi-person-circle"></i></div>
+            <h3 class="h5 fw-bold mb-0">Student</h3>
+          </div>
+          <div class="role-body">
+            <ul class="role-list">
+              <li><i class="bi bi-check2-circle"></i> Submit & track complaints</li>
+              <li><i class="bi bi-check2-circle"></i> Monitor laundry requests</li>
+              <li><i class="bi bi-check2-circle"></i> View & book gaming slots</li>
+              <li><i class="bi bi-check2-circle"></i> Track daily attendance</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- Warden -->
+      <div class="col-lg-4">
+        <div class="role-card border-primary" style="border-top: 5px solid #6366f1 !important;">
+          <div class="role-header">
+            <div class="fs-1 mb-2 text-primary"><i class="bi bi-shield-lock-fill"></i></div>
+            <h3 class="h5 fw-bold mb-0">Warden</h3>
+          </div>
+          <div class="role-body">
+            <ul class="role-list">
+              <li><i class="bi bi-check2-circle"></i> Manage student complaints</li>
+              <li><i class="bi bi-check2-circle"></i> Mark & summary attendance</li>
+              <li><i class="bi bi-check2-circle"></i> Assign maintenance tasks</li>
+              <li><i class="bi bi-check2-circle"></i> Manage room allocations</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <!-- Staff -->
+      <div class="col-lg-4">
+        <div class="role-card">
+          <div class="role-header">
+            <div class="fs-1 mb-2 text-primary"><i class="bi bi-tools"></i></div>
+            <h3 class="h5 fw-bold mb-0">Staff</h3>
+          </div>
+          <div class="role-body">
+            <ul class="role-list">
+              <li><i class="bi bi-check2-circle"></i> View assigned maintenance tasks</li>
+              <li><i class="bi bi-check2-circle"></i> Complete tasks with one click</li>
+              <li><i class="bi bi-check2-circle"></i> Access specific complaint data</li>
+              <li><i class="bi bi-check2-circle"></i> Workload overview cards</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer/CTA -->
+<section class="section-padding bg-dark text-white text-center">
+  <div class="container">
+    <h2 class="h2 fw-bold mb-4">Streamline Your Hostel Life</h2>
+    <p class="mb-5 opacity-75" style="max-width: 500px; margin: auto;">Experience a hassle-free environment where every request is tracked and every task is organized.</p>
+    <div class="d-flex justify-content-center gap-3">
+      <a href="{{ url_for('auth.login_student') }}" class="btn btn-outline-light btn-hero px-5 border-2 fw-bold">Sign In</a>
     </div>
   </div>
 </section>
