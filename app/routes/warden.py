@@ -155,54 +155,65 @@ def resolve_complaint(complaint_id):
     return redirect(url_for('warden.dashboard'))
 
 
-@warden_bp.route('/attendance')
+@warden_bp.route('/attendance', methods=['GET', 'POST'])
 @login_required
 @warden_only
 def attendance():
-    """Form to mark student attendance."""
-    students = Student.query.order_by(Student.name).all()
+    """Manage student attendance: mark for today and view history."""
+    from datetime import timedelta
     today = date.today()
+
+    if request.method == 'POST':
+        students = Student.query.all()
+        saved = 0
+        for student in students:
+            status_val = request.form.get(f'status_{student.student_id}', '').strip()
+            if not status_val:
+                continue
+            try:
+                status_enum = AttendanceStatus(status_val)
+            except ValueError:
+                continue
+            
+            # Using tuple for composite PK in db.session.get
+            existing = db.session.get(Attendance, (student.student_id, today))
+            if existing:
+                existing.status = status_enum
+            else:
+                record = Attendance(
+                    student_id=student.student_id,
+                    date=today,
+                    status=status_enum,
+                )
+                db.session.add(record)
+            saved += 1
+        db.session.commit()
+        flash(f'Attendance recorded for {saved} students.', 'success')
+        return redirect(url_for('warden.attendance'))
+
+    # GET: show form and history
+    students = Student.query.order_by(Student.name).all()
     # Fetch already-marked records for today to pre-fill form
-    existing = {
+    today_records = {
         a.student_id: a.status.value
         for a in Attendance.query.filter_by(date=today).all()
     }
+    
+    # Fetch last 7 days of history
+    seven_days_ago = today - timedelta(days=7)
+    history = (
+        Attendance.query.filter(Attendance.date >= seven_days_ago)
+        .options(joinedload(Attendance.student))
+        .order_by(Attendance.date.desc())
+        .limit(100) # Safety limit
+        .all()
+    )
+
     return render_template(
         'warden/attendance.html',
         students=students,
         today=today,
-        existing=existing,
+        existing=today_records,
+        history=history,
         statuses=[s.value for s in AttendanceStatus],
     )
-
-
-@warden_bp.route('/attendance/mark', methods=['POST'])
-@login_required
-@warden_only
-def mark_attendance():
-    """Save attendance records for today."""
-    today = date.today()
-    students = Student.query.all()
-    saved = 0
-    for student in students:
-        status_val = request.form.get(f'status_{student.student_id}', '').strip()
-        if not status_val:
-            continue
-        try:
-            status_enum = AttendanceStatus(status_val)
-        except ValueError:
-            continue
-        existing = db.session.get(Attendance, (student.student_id, today))
-        if existing:
-            existing.status = status_enum
-        else:
-            record = Attendance(
-                student_id=student.student_id,
-                date=today,
-                status=status_enum,
-            )
-            db.session.add(record)
-        saved += 1
-    db.session.commit()
-    flash(f'Attendance saved for {saved} student(s).', 'success')
-    return redirect(url_for('warden.dashboard'))
