@@ -115,6 +115,46 @@ def update_complaint(complaint_id):
     return redirect(url_for('warden.dashboard'))
 
 
+@warden_bp.route('/complaint/<int:complaint_id>/assign', methods=['POST'])
+@login_required
+@warden_only
+def assign_complaint(complaint_id):
+    c = db.session.get(Complaint, complaint_id)
+    if c is None:
+        abort(404)
+    staff_id_raw = request.form.get('staff_id', '').strip()
+    if not staff_id_raw:
+        flash('Please select a staff member.', 'error')
+        return redirect(url_for('warden.dashboard'))
+    try:
+        staff_id = int(staff_id_raw)
+    except ValueError:
+        flash('Invalid staff ID.', 'error')
+        return redirect(url_for('warden.dashboard'))
+    staff = db.session.get(StaffMember, staff_id)
+    if not staff:
+        flash('Staff member not found.', 'error')
+        return redirect(url_for('warden.dashboard'))
+    c.staff_id = staff_id
+    c.status = 'In Progress'
+    db.session.commit()
+    flash(f'Complaint assigned to {staff.name}.', 'success')
+    return redirect(url_for('warden.dashboard'))
+
+
+@warden_bp.route('/complaint/<int:complaint_id>/resolve', methods=['POST'])
+@login_required
+@warden_only
+def resolve_complaint(complaint_id):
+    c = db.session.get(Complaint, complaint_id)
+    if c is None:
+        abort(404)
+    c.status = 'Resolved'
+    db.session.commit()
+    flash('Complaint marked as resolved.', 'success')
+    return redirect(url_for('warden.dashboard'))
+
+
 @warden_bp.route('/attendance')
 @login_required
 @warden_only

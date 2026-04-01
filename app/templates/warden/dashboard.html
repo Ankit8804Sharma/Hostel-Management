@@ -190,22 +190,30 @@
                   {% endif %}
                 </td>
                 <td class="text-end">
-                  <form method="post" action="{{ url_for('warden.update_complaint', complaint_id=c.complaint_id) }}" class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 justify-content-end flex-wrap">
-                    <select name="status" class="form-select form-select-sm shadow-none" style="min-width: 7rem;" aria-label="Status">
-                      {% for s in complaint_statuses %}
-                      <option value="{{ s }}" {% if c.status == s %}selected{% endif %}>{{ s }}</option>
-                      {% endfor %}
-                    </select>
-                    <select name="staff_id" class="form-select form-select-sm shadow-none" style="min-width: 9rem;" aria-label="Assign staff">
-                      <option value="">Unassigned</option>
-                      {% for s in staff_members %}
-                      <option value="{{ s.staff_id }}" {% if c.staff_id == s.staff_id %}selected{% endif %}>{{ s.name }}</option>
-                      {% endfor %}
-                    </select>
-                    <button type="submit" class="btn btn-sm btn-dark text-nowrap">
-                      Update
-                    </button>
-                  </form>
+                  {% set t = (c.status|string)|lower|trim %}
+                  {% if t == 'open' %}
+                    <form method="post" action="{{ url_for('warden.assign_complaint', complaint_id=c.complaint_id) }}" class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 justify-content-end flex-wrap">
+                      <select name="staff_id" class="form-select form-select-sm shadow-none" style="min-width: 9rem;" required aria-label="Select staff">
+                        <option value="" selected disabled>Select staff...</option>
+                        {% for s in staff_members %}
+                        <option value="{{ s.staff_id }}">{{ s.name }} ({{ s.designation }})</option>
+                        {% endfor %}
+                      </select>
+                      <button type="submit" class="btn btn-sm btn-primary text-nowrap">
+                        <i class="bi bi-person-plus-fill me-1"></i>Assign Staff
+                      </button>
+                    </form>
+                  {% elif t == 'in progress' %}
+                    <form method="post" action="{{ url_for('warden.resolve_complaint', complaint_id=c.complaint_id) }}">
+                      <button type="submit" class="btn btn-sm btn-success text-nowrap">
+                        <i class="bi bi-check-lg me-1"></i>Mark Resolved
+                      </button>
+                    </form>
+                  {% else %}
+                    <span class="text-muted small fw-medium">
+                      <i class="bi bi-check-circle-fill me-1"></i>Resolved
+                    </span>
+                  {% endif %}
                 </td>
               </tr>
               {% endfor %}
