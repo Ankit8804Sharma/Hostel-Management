@@ -4,9 +4,9 @@
 {% macro complaint_status_badge(status) %}
   {% set t = (status|string)|lower|trim %}
   {% if t == 'open' %}
-    <span class="badge rounded-pill text-bg-warning"><i class="bi bi-exclamation-circle me-1"></i>Open</span>
+    <span class="badge rounded-pill text-bg-danger"><i class="bi bi-exclamation-circle me-1"></i>Open</span>
   {% elif t == 'in progress' %}
-    <span class="badge rounded-pill text-bg-info"><i class="bi bi-arrow-repeat me-1"></i>In Progress</span>
+    <span class="badge rounded-pill text-bg-warning"><i class="bi bi-arrow-repeat me-1"></i>In Progress</span>
   {% elif t == 'resolved' %}
     <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Resolved</span>
   {% else %}
@@ -14,8 +14,26 @@
   {% endif %}
 {% endmacro %}
 
+{% macro laundry_status_badge(status) %}
+  {% set t = (status|string)|lower|trim %}
+  {% if t == 'pending' %}
+    <span class="badge text-bg-warning">Pending</span>
+  {% elif t == 'in progress' %}
+    <span class="badge text-bg-info">In Progress</span>
+  {% elif t == 'delivered' %}
+    <span class="badge text-bg-success">Delivered</span>
+  {% else %}
+    <span class="badge text-bg-secondary">{{ status }}</span>
+  {% endif %}
+{% endmacro %}
+
 {% macro attendance_badge(rec) %}
-  {% set st = rec.status.value if rec.status else '' %}
+  {% set st = '' %}
+  {% if rec and rec.status %}
+    {% set st = rec.status.value %}
+  {% elif rec and rec is string %}
+    {% set st = rec %}
+  {% endif %}
   {% set t = (st|string)|lower %}
   {% if t == 'present' %}
     <span class="badge text-bg-success">Present</span>
@@ -24,7 +42,7 @@
   {% elif t == 'leave' %}
     <span class="badge text-bg-warning">Leave</span>
   {% else %}
-    <span class="badge text-bg-secondary">{{ st }}</span>
+    <span class="badge text-bg-secondary">{{ st or 'Not Marked' }}</span>
   {% endif %}
 {% endmacro %}
 
@@ -52,6 +70,70 @@
         <div>
           <h1 class="h3 mb-0 fw-semibold"><i class="bi bi-speedometer2 text-primary me-2"></i>Student dashboard</h1>
           <p class="text-muted small mb-0">Welcome back, {{ student.name }}</p>
+        </div>
+      </div>
+
+      <!-- Summary Cards -->
+      <div class="row g-3 mb-4">
+        <div class="col-6 col-lg-3">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3">
+                  <i class="bi bi-chat-left-text fs-4"></i>
+                </div>
+                <div>
+                  <div class="display-6 fw-bold">{{ total_complaints }}</div>
+                  <div class="text-muted small">Total Complaints</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-3">
+                <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-3">
+                  <i class="bi bi-basket fs-4"></i>
+                </div>
+                <div>
+                  <div class="display-6 fw-bold">{{ pending_laundry_count }}</div>
+                  <div class="text-muted small">Pending Laundry</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-3">
+                <div class="bg-info bg-opacity-10 text-info p-3 rounded-3">
+                  <i class="bi bi-controller fs-4"></i>
+                </div>
+                <div>
+                  <div class="display-6 fw-bold">{{ available_gaming_count }}</div>
+                  <div class="text-muted small">Gaming Units Available</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-6 col-lg-3">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <div class="d-flex align-items-center gap-3">
+                <div class="bg-success bg-opacity-10 text-success p-3 rounded-3">
+                  <i class="bi bi-calendar-check fs-4"></i>
+                </div>
+                <div>
+                  <div class="fw-bold fs-4">{{ attendance_badge(today_attendance) }}</div>
+                  <div class="text-muted small">Today's Status</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -88,80 +170,90 @@
 
       <section id="section-complaints" class="mb-4">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-          <h2 class="h5 fw-semibold mb-0"><i class="bi bi-chat-left-text me-2 text-primary"></i>Complaints</h2>
+          <h2 class="h5 fw-semibold mb-0"><i class="bi bi-chat-left-text me-2 text-primary"></i>Recent Complaints</h2>
           <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalComplaint">
             <i class="bi bi-plus-lg me-1"></i>File Complaint
           </button>
         </div>
-        {% if complaints %}
-          <div class="row g-3">
-            {% for c in complaints %}
-            <div class="col-md-6 col-xl-4">
-              <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
-                    <span class="fw-semibold">{{ c.type }}</span>
-                    {{ complaint_status_badge(c.status) }}
-                  </div>
-                  {% if c.description %}
-                  <p class="small text-body-secondary mb-2">{{ c.description }}</p>
-                  {% endif %}
-                  <div class="text-muted small mb-0">
-                    <i class="bi bi-calendar3 me-1"></i>{{ c.issue_date }}
-                  </div>
-                </div>
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-0">
+            {% if complaints %}
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Type</th>
+                      <th>Description</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for c in complaints[:5] %}
+                    <tr>
+                      <td><span class="fw-medium text-dark">{{ c.type }}</span></td>
+                      <td class="text-muted small">{{ c.description }}</td>
+                      <td>{{ complaint_status_badge(c.status) }}</td>
+                      <td><span class="text-muted small text-nowrap"><i class="bi bi-calendar3 me-1"></i>{{ c.issue_date }}</span></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
               </div>
-            </div>
-            {% endfor %}
+            {% else %}
+              <div class="text-center text-muted py-5">
+                <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
+                <p class="mb-0">No complaints filed yet.</p>
+              </div>
+            {% endif %}
           </div>
-        {% else %}
-          <div class="card border-0 shadow-sm">
-            <div class="card-body text-center text-muted py-5">
-              <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
-              <p class="mb-0">No complaints filed yet.</p>
-            </div>
-          </div>
-        {% endif %}
+        </div>
       </section>
 
       <section id="section-laundry" class="mb-4">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-          <h2 class="h5 fw-semibold mb-0"><i class="bi bi-droplet me-2 text-primary"></i>Laundry</h2>
+          <h2 class="h5 fw-semibold mb-0"><i class="bi bi-droplet me-2 text-primary"></i>Recent Laundry Orders</h2>
           <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalLaundry">
             <i class="bi bi-basket me-1"></i>Submit Laundry
           </button>
         </div>
-        {% if laundry_orders %}
-          <div class="row g-3">
-            {% for l in laundry_orders %}
-            <div class="col-md-6 col-xl-4">
-              <div class="card border-0 shadow-sm h-100">
-                <div class="card-body">
-                  <div class="d-flex justify-content-between align-items-start mb-2">
-                    <span class="text-muted small"><i class="bi bi-calendar3 me-1"></i>{{ l.date }}</span>
-                    <span class="badge text-bg-info">{{ l.status }}</span>
-                  </div>
-                  <div class="fw-semibold mb-1">{{ l.weight }} kg</div>
-                  {% if l.items %}
-                    <p class="small text-muted mb-0">{{ l.items }}</p>
-                  {% endif %}
-                </div>
+        <div class="card border-0 shadow-sm">
+          <div class="card-body p-0">
+            {% if laundry_orders %}
+              <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Items</th>
+                      <th>Weight</th>
+                      <th>Status</th>
+                      <th>Date</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for l in laundry_orders[:5] %}
+                    <tr>
+                      <td class="text-muted small">{{ l.items or 'No description' }}</td>
+                      <td><span class="fw-medium">{{ l.weight }} kg</span></td>
+                      <td>{{ laundry_status_badge(l.status) }}</td>
+                      <td><span class="text-muted small text-nowrap"><i class="bi bi-calendar3 me-1"></i>{{ l.date }}</span></td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
               </div>
-            </div>
-            {% endfor %}
+            {% else %}
+              <div class="text-center text-muted py-5">
+                <i class="bi bi-basket fs-1 d-block mb-2 opacity-50"></i>
+                <p class="mb-0">No laundry records.</p>
+              </div>
+            {% endif %}
           </div>
-        {% else %}
-          <div class="card border-0 shadow-sm">
-            <div class="card-body text-center text-muted py-5">
-              <i class="bi bi-basket fs-1 d-block mb-2 opacity-50"></i>
-              <p class="mb-0">No laundry records.</p>
-            </div>
-          </div>
-        {% endif %}
+        </div>
       </section>
 
       <section id="section-attendance">
-        <h2 class="h5 fw-semibold mb-3"><i class="bi bi-calendar-check me-2 text-primary"></i>Attendance <span class="text-muted fw-normal small">(recent 30)</span></h2>
+        <h2 class="h5 fw-semibold mb-3"><i class="bi bi-calendar-check me-2 text-primary"></i>Attendance History <span class="text-muted fw-normal small">(last 30 days)</span></h2>
 
         <!-- Stat cards -->
         <div class="row g-3 mb-4">

@@ -55,15 +55,30 @@ def dashboard():
         .limit(30)
         .all()
     )
+
+    # Summary data
+    total_complaints = len(complaints)
+    pending_laundry_count = sum(1 for l in laundry_orders if l.status == 'Pending')
+    available_gaming_count = GamingFacilities.query.filter_by(availability_status='Available').count()
+    today_attendance = Attendance.query.filter_by(
+        student_id=student.student_id,
+        date=date.today()
+    ).first()
+
     total_present = sum(1 for a in attendance if a.status == AttendanceStatus.PRESENT)
     total_absent  = sum(1 for a in attendance if a.status == AttendanceStatus.ABSENT)
     total_leave   = sum(1 for a in attendance if a.status == AttendanceStatus.LEAVE)
+
     return render_template(
         'student/dashboard.html',
         student=student,
         complaints=complaints,
         laundry_orders=laundry_orders,
         attendance=attendance,
+        total_complaints=total_complaints,
+        pending_laundry_count=pending_laundry_count,
+        available_gaming_count=available_gaming_count,
+        today_attendance=today_attendance,
         total_present=total_present,
         total_absent=total_absent,
         total_leave=total_leave,
