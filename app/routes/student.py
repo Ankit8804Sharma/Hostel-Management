@@ -86,26 +86,34 @@ def dashboard():
     )
 
 
-@student_bp.route('/complaint/new', methods=['POST'])
+@student_bp.route('/complaint/new', methods=['GET', 'POST'])
 @login_required
 @student_only
 def new_complaint():
-    complaint_type = request.form.get('type', '').strip()
-    description = request.form.get('description', '').strip()
-    if complaint_type not in COMPLAINT_CATEGORIES or not description:
-        flash('Please choose a category and enter a description.', 'error')
+    """Submit a house complaint."""
+    if request.method == 'POST':
+        complaint_type = request.form.get('type', '').strip()
+        description = request.form.get('description', '').strip()
+        if complaint_type not in COMPLAINT_CATEGORIES or not description:
+            flash('Please choose a category and enter a description.', 'error')
+            return redirect(url_for('student.new_complaint'))
+        row = Complaint(
+            type=complaint_type,
+            description=description,
+            status='Open',
+            issue_date=date.today(),
+            student_id=current_user.student_id,
+        )
+        db.session.add(row)
+        db.session.commit()
+        flash('Your complaint was submitted successfully.', 'success')
         return redirect(url_for('student.dashboard'))
-    row = Complaint(
-        type=complaint_type,
-        description=description,
-        status='Open',
-        issue_date=date.today(),
-        student_id=current_user.student_id,
+
+    # GET: show form
+    return render_template(
+        'student/new_complaint.html',
+        complaint_categories=sorted(COMPLAINT_CATEGORIES),
     )
-    db.session.add(row)
-    db.session.commit()
-    flash('Your complaint was submitted successfully.', 'success')
-    return redirect(url_for('student.dashboard'))
 
 
 @student_bp.route('/laundry/new', methods=['POST'])

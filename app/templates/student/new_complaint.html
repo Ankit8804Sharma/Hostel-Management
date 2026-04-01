@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}File a Complaint{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+      <!-- Breadcrumb -->
+      <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="{{ url_for('student.dashboard') }}" class="text-decoration-none">Dashboard</a></li>
+          <li class="breadcrumb-item active" aria-current="page">New Complaint</li>
+        </ol>
+      </nav>
+
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="card-header bg-primary py-4 text-center">
+          <h1 class="h4 text-white mb-0 fw-bold">
+            <i class="bi bi-chat-square-text-fill me-2"></i>File a New Complaint
+          </h1>
+          <p class="text-white-50 small mb-0 mt-1">Provide details about the issue you are facing</p>
+        </div>
+        <div class="card-body p-4 p-md-5">
+          <form method="post" action="{{ url_for('student.new_complaint') }}">
+            <!-- Type -->
+            <div class="mb-4">
+              <label for="complaint_type" class="form-label fw-semibold">Complaint Category</label>
+              <div class="input-group">
+                <span class="input-group-text bg-light border-end-0"><i class="bi bi-tag text-muted"></i></span>
+                <select class="form-select border-start-0 ps-0 shadow-none" id="complaint_type" name="type" required>
+                  <option value="" selected disabled>Choose category...</option>
+                  {% for cat in complaint_categories %}
+                  <option value="{{ cat }}">{{ cat }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+              <div class="form-text">Select the category that best fits your issue.</div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-4">
+              <label for="complaint_desc" class="form-label fw-semibold">Description</label>
+              <textarea class="form-control shadow-none" id="complaint_desc" name="description" rows="5" required placeholder="Tell us what's wrong... (e.g. Broken fan in room 101)"></textarea>
+              <div class="form-text">Please be as specific as possible to help our staff resolve it quickly.</div>
+            </div>
+
+            <!-- Rules/Notice -->
+            <div class="alert alert-info border-0 rounded-3 mb-4 small">
+              <i class="bi bi-info-circle-fill me-2"></i>
+              Once submitted, your complaint will be marked as <strong>Open</strong>. A warden will assign a staff member to look into it shortly.
+            </div>
+
+            <!-- Actions -->
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary btn-lg fw-bold rounded-3 py-3">
+                <i class="bi bi-send-fill me-2"></i>Submit Complaint
+              </button>
+              <a href="{{ url_for('student.dashboard') }}" class="btn btn-link text-muted text-decoration-none">
+                Cancel and go back
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
