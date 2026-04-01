@@ -213,9 +213,9 @@
       <section id="section-laundry" class="mb-4">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
           <h2 class="h5 fw-semibold mb-0"><i class="bi bi-droplet me-2 text-primary"></i>Recent Laundry Orders</h2>
-          <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#modalLaundry">
-            <i class="bi bi-basket me-1"></i>Submit Laundry
-          </button>
+          <a href="{{ url_for('student.new_laundry') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i>New Laundry Order
+          </a>
         </div>
         <div class="card border-0 shadow-sm">
           <div class="card-body p-0">
