@@ -116,13 +116,13 @@
                   <td><span class="text-muted small text-nowrap"><i class="bi bi-calendar-check me-1"></i>{{ task.completed_date or '—' }}</span></td>
                   <td class="text-end">
                     {% if task.status|lower != 'completed' %}
-                    <form method="post" action="{{ url_for('staff.complete_task', task_id=task.task_id) }}" onsubmit="return confirm('Mark as completed?')">
-                      <button type="submit" class="btn btn-sm btn-success">
-                        <i class="bi bi-check2-circle"></i> Complete
+                    <form method="post" action="{{ url_for('staff.complete_task', task_id=task.task_id) }}">
+                      <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 shadow-none">
+                        <i class="bi bi-check2-circle me-1"></i>Mark as Complete
                       </button>
                     </form>
                     {% else %}
-                    <span class="text-success small fw-semibold"><i class="bi bi-patch-check"></i> Done</span>
+                    {{ task_status_badge(task.status) }}
                     {% endif %}
                   </td>
                 </tr>
