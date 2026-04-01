@@ -4,13 +4,24 @@
 {% macro complaint_status_badge(status) %}
   {% set t = (status|string)|lower|trim %}
   {% if t == 'open' %}
-    <span class="badge rounded-pill text-bg-warning"><i class="bi bi-exclamation-circle me-1"></i>Open</span>
+    <span class="badge rounded-pill text-bg-danger"><i class="bi bi-exclamation-circle me-1"></i>Open</span>
   {% elif t == 'in progress' %}
-    <span class="badge rounded-pill text-bg-info"><i class="bi bi-arrow-repeat me-1"></i>In Progress</span>
+    <span class="badge rounded-pill text-bg-warning"><i class="bi bi-arrow-repeat me-1"></i>In Progress</span>
   {% elif t == 'resolved' %}
     <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Resolved</span>
   {% else %}
     <span class="badge rounded-pill text-bg-secondary">{{ status }}</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro task_status_badge(status) %}
+  {% set t = (status|string)|lower|trim %}
+  {% if t == 'pending' %}
+    <span class="badge text-bg-warning">Pending</span>
+  {% elif t == 'completed' %}
+    <span class="badge text-bg-success">Completed</span>
+  {% else %}
+    <span class="badge text-bg-secondary">{{ status }}</span>
   {% endif %}
 {% endmacro %}
 
@@ -24,6 +35,70 @@
     <a href="{{ url_for('warden.attendance') }}" class="btn btn-primary" id="btnMarkAttendance">
       <i class="bi bi-calendar-check me-1"></i>Mark Today's Attendance
     </a>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="row g-3 mb-5">
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-3">
+            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3">
+              <i class="bi bi-chat-left-text fs-4"></i>
+            </div>
+            <div>
+              <div class="display-6 fw-bold">{{ total_complaints }}</div>
+              <div class="text-muted small">Total Complaints</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100 border-start border-danger border-4">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-3">
+            <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-3">
+              <i class="bi bi-exclamation-circle fs-4"></i>
+            </div>
+            <div>
+              <div class="display-6 fw-bold text-danger">{{ open_complaints }}</div>
+              <div class="text-muted small">Open</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100 border-start border-warning border-4">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-3">
+            <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-3">
+              <i class="bi bi-arrow-repeat fs-4"></i>
+            </div>
+            <div>
+              <div class="display-6 fw-bold text-warning">{{ in_progress_complaints }}</div>
+              <div class="text-muted small">In Progress</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-6 col-lg-3">
+      <div class="card border-0 shadow-sm h-100 border-start border-success border-4">
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-3">
+            <div class="bg-success bg-opacity-10 text-success p-3 rounded-3">
+              <i class="bi bi-check-circle fs-4"></i>
+            </div>
+            <div>
+              <div class="display-6 fw-bold text-success">{{ resolved_complaints }}</div>
+              <div class="text-muted small">Resolved</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Today's Attendance Summary -->
@@ -45,10 +120,7 @@
               {% for a in today_attendance %}
               <tr>
                 <td class="text-muted small">{{ loop.index }}</td>
-                <td>
-                  <div class="fw-medium">{{ a.student.name if a.student else 'Student ' ~ a.student_id }}</div>
-                  <div class="small text-muted">ID {{ a.student_id }}</div>
-                </td>
+                <td class="fw-medium">{{ a.student.name if a.student else 'Student ' ~ a.student_id }}</td>
                 <td>
                   {% set st = a.status.value|lower %}
                   {% if st == 'present' %}
@@ -89,11 +161,12 @@
             <thead class="table-light">
               <tr>
                 <th scope="col">#</th>
-                <th scope="col">Student</th>
+                <th scope="col">Student Name</th>
                 <th scope="col">Type</th>
                 <th scope="col">Description</th>
                 <th scope="col">Status</th>
                 <th scope="col">Date</th>
+                <th scope="col">Assigned Staff</th>
                 <th scope="col" class="text-end">Actions</th>
               </tr>
             </thead>
@@ -101,32 +174,36 @@
               {% for c in complaints %}
               <tr>
                 <td class="text-muted small">{{ c.complaint_id }}</td>
-                <td>
-                  <div class="fw-medium">{{ c.student.name if c.student else '—' }}</div>
-                  <div class="small text-muted">ID {{ c.student_id }}</div>
-                </td>
+                <td class="fw-medium">{{ c.student.name if c.student else '—' }}</td>
                 <td>{{ c.type }}</td>
                 <td style="max-width: 220px;">
                   {% set desc = c.description or '' %}
-                  <span class="small text-body-secondary">{{ desc[:120] }}{% if desc|length > 120 %}…{% endif %}</span>
+                  <span class="small text-body-secondary">{{ desc[:100] }}{% if desc|length > 100 %}…{% endif %}</span>
                 </td>
                 <td>{{ complaint_status_badge(c.status) }}</td>
                 <td class="text-nowrap small">{{ c.issue_date }}</td>
+                <td>
+                  {% if c.staff %}
+                    <span class="text-dark small"><i class="bi bi-person me-1"></i>{{ c.staff.name }}</span>
+                  {% else %}
+                    <span class="text-muted small">Unassigned</span>
+                  {% endif %}
+                </td>
                 <td class="text-end">
                   <form method="post" action="{{ url_for('warden.update_complaint', complaint_id=c.complaint_id) }}" class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 justify-content-end flex-wrap">
-                    <select name="status" class="form-select form-select-sm" style="min-width: 9rem;" aria-label="Status">
+                    <select name="status" class="form-select form-select-sm shadow-none" style="min-width: 7rem;" aria-label="Status">
                       {% for s in complaint_statuses %}
                       <option value="{{ s }}" {% if c.status == s %}selected{% endif %}>{{ s }}</option>
                       {% endfor %}
                     </select>
-                    <select name="staff_id" class="form-select form-select-sm" style="min-width: 10rem;" aria-label="Assign staff">
+                    <select name="staff_id" class="form-select form-select-sm shadow-none" style="min-width: 9rem;" aria-label="Assign staff">
                       <option value="">Unassigned</option>
                       {% for s in staff_members %}
-                      <option value="{{ s.staff_id }}" {% if c.staff_id == s.staff_id %}selected{% endif %}>{{ s.name }} ({{ s.designation }})</option>
+                      <option value="{{ s.staff_id }}" {% if c.staff_id == s.staff_id %}selected{% endif %}>{{ s.name }}</option>
                       {% endfor %}
                     </select>
                     <button type="submit" class="btn btn-sm btn-dark text-nowrap">
-                      <i class="bi bi-check-lg me-1"></i>Update
+                      Update
                     </button>
                   </form>
                 </td>
@@ -142,6 +219,51 @@
       <div class="card-body text-center text-muted py-5">
         <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
         <p class="mb-0">No complaints.</p>
+      </div>
+    </div>
+    {% endif %}
+  </section>
+
+  <!-- Task Allocations -->
+  <section class="mb-5">
+    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-list-task me-2 text-primary"></i>Task Allocations</h2>
+    {% if tasks %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th>Description</th>
+                <th>Assigned To</th>
+                <th>Status</th>
+                <th>Assigned Date</th>
+                <th>Completed Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for t in tasks %}
+              <tr>
+                <td><span class="small">{{ t.description }}</span></td>
+                <td>
+                  <div class="fw-medium">{{ t.staff.name if t.staff else '—' }}</div>
+                  <div class="small text-muted">{{ t.staff.designation if t.staff else '' }}</div>
+                </td>
+                <td>{{ task_status_badge(t.status) }}</td>
+                <td><span class="text-muted small text-nowrap"><i class="bi bi-calendar3 me-1"></i>{{ t.assigned_date }}</span></td>
+                <td><span class="text-muted small text-nowrap"><i class="bi bi-calendar-check me-1"></i>{{ t.completed_date or '—' }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body text-center text-muted py-4">
+        <i class="bi bi-clipboard-x fs-1 d-block mb-2 opacity-50"></i>
+        <p class="mb-0">No tasks allocated yet.</p>
       </div>
     </div>
     {% endif %}

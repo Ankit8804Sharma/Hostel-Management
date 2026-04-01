@@ -6,7 +6,16 @@ from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
 
 from app import db
-from app.models import Attendance, AttendanceStatus, Complaint, RoomAllocation, StaffMember, Student, Warden
+from app.models import (
+    Attendance,
+    AttendanceStatus,
+    Complaint,
+    RoomAllocation,
+    StaffMember,
+    Student,
+    TaskAllocation,
+    Warden,
+)
 
 COMPLAINT_STATUSES = ('Open', 'In Progress', 'Resolved')
 
@@ -40,6 +49,18 @@ def dashboard():
         .order_by(Complaint.issue_date.desc())
         .all()
     )
+    # Summary counts for complaints
+    total_complaints = len(complaints)
+    open_complaints = sum(1 for c in complaints if c.status == 'Open')
+    in_progress_complaints = sum(1 for c in complaints if c.status == 'In Progress')
+    resolved_complaints = sum(1 for c in complaints if c.status == 'Resolved')
+
+    tasks = (
+        TaskAllocation.query.options(joinedload(TaskAllocation.staff))
+        .order_by(TaskAllocation.assigned_date.desc())
+        .all()
+    )
+
     allocations = (
         RoomAllocation.query.order_by(RoomAllocation.alloc_date.desc()).all()
     )
@@ -53,6 +74,11 @@ def dashboard():
     return render_template(
         'warden/dashboard.html',
         complaints=complaints,
+        total_complaints=total_complaints,
+        open_complaints=open_complaints,
+        in_progress_complaints=in_progress_complaints,
+        resolved_complaints=resolved_complaints,
+        tasks=tasks,
         allocations=allocations,
         staff_members=staff_members,
         complaint_statuses=COMPLAINT_STATUSES,
