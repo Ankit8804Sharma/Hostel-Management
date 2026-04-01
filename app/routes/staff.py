@@ -40,11 +40,20 @@ def dashboard():
         .order_by(Complaint.issue_date.desc())
         .all()
     )
+
+    # Summary data
+    total_tasks = len(tasks)
+    pending_tasks = sum(1 for t in tasks if t.status == 'Pending')
+    completed_tasks = sum(1 for t in tasks if t.status == 'Completed')
+
     return render_template(
         'staff/dashboard.html',
         staff=staff,
         tasks=tasks,
         complaints=complaints,
+        total_tasks=total_tasks,
+        pending_tasks=pending_tasks,
+        completed_tasks=completed_tasks,
     )
 
 
