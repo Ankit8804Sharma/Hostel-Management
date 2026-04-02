@@ -169,3 +169,92 @@ body {
   top: 0; left: 0; right: 0; bottom: 0;
   background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }
+/* Vertical Timeline for Tracking */
+.hms-timeline {
+    position: relative;
+    padding-left: 3rem;
+    list-style: none;
+}
+
+.hms-timeline::before {
+    content: '';
+    position: absolute;
+    left: 0.95rem;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: #e2e8f0;
+}
+
+.hms-timeline-item {
+    position: relative;
+    margin-bottom: 2.5rem;
+}
+
+.hms-timeline-icon {
+    position: absolute;
+    left: -2.05rem;
+    width: 1.5rem;
+    height: 1.5rem;
+    background: #fff;
+    border: 2px solid #cbd5e1;
+    border-radius: 50%;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+}
+
+.hms-timeline-item.active .hms-timeline-icon {
+    background: var(--hms-primary);
+    border-color: var(--hms-primary);
+    color: #fff;
+}
+
+.hms-timeline-item.completed .hms-timeline-icon {
+    background: #10b981;
+    border-color: #10b981;
+    color: #fff;
+}
+
+.hms-timeline-item.completed::after {
+    content: '';
+    position: absolute;
+    left: -2.05rem;
+    top: 1.5rem;
+    bottom: -2.5rem;
+    width: 2px;
+    background: #10b981;
+    z-index: 0;
+}
+
+/* Print Media Query */
+@media print {
+    .hms-sidebar, 
+    .hms-navbar, 
+    .btn, 
+    .hms-welcome-header,
+    nav[aria-label="breadcrumb"],
+    footer {
+        display: none !important;
+    }
+    .hms-main-content {
+        margin-left: 0 !important;
+        padding-top: 0 !important;
+    }
+    body {
+        background-color: white !important;
+    }
+    .card {
+        border: 1px solid #dee2e6 !important;
+        box-shadow: none !important;
+    }
+    .print-only {
+        display: block !important;
+    }
+}
+
+.print-only {
+    display: none;
+}

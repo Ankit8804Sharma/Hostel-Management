@@ -1,8 +1,10 @@
+import json
 from datetime import date
 from functools import wraps
 
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
+from sqlalchemy import or_
 from sqlalchemy.orm import joinedload
 
 from app import db
@@ -48,36 +50,66 @@ def warden_only(view):
 @login_required
 @warden_only
 def dashboard():
-    complaints = (
-        Complaint.query.options(joinedload(Complaint.student), joinedload(Complaint.staff))
-        .order_by(Complaint.issue_date.desc())
-        .all()
-    )
-    # Summary counts for complaints
-    total_complaints = len(complaints)
-    open_complaints = sum(1 for c in complaints if c.status == 'Open')
-    in_progress_complaints = sum(1 for c in complaints if c.status == 'In Progress')
-    resolved_complaints = sum(1 for c in complaints if c.status == 'Resolved')
+    # 1. Get stats for summary cards (Unfiltered)
+    all_complaints = Complaint.query.all()
+    total_complaints = len(all_complaints)
+    open_complaints = sum(1 for c in all_complaints if c.status == 'Open')
+    in_progress_complaints = sum(1 for c in all_complaints if c.status == 'In Progress')
+    resolved_complaints = sum(1 for c in all_complaints if c.status == 'Resolved')
 
+    # Status Data for Chart
+    status_data = {
+        'labels': ['Open', 'In Progress', 'Resolved'],
+        'counts': [open_complaints, in_progress_complaints, resolved_complaints]
+    }
+
+    # Type Data for Chart
+    complaint_types = ['Electrical', 'Plumbing', 'Internet', 'Cleanliness', 'Furniture', 'Other']
+    type_counts = []
+    for t in complaint_types:
+        type_counts.append(sum(1 for c in all_complaints if c.type == t))
+    
+    type_data = {
+        'labels': complaint_types,
+        'counts': type_counts
+    }
+
+    # 2. Apply Filters for the Table
+    search = request.args.get('search', '').strip()
+    status_filter = request.args.get('status', 'All')
+    type_filter = request.args.get('type', 'All')
+
+    query = Complaint.query.options(joinedload(Complaint.student), joinedload(Complaint.staff))
+
+    if search:
+        query = query.join(Student).filter(
+            or_(
+                Student.name.ilike(f'%{search}%'),
+                Complaint.description.ilike(f'%{search}%')
+            )
+        )
+    
+    if status_filter != 'All':
+        query = query.filter(Complaint.status == status_filter)
+    
+    if type_filter != 'All':
+        query = query.filter(Complaint.type == type_filter)
+
+    filtered_complaints = query.order_by(Complaint.issue_date.desc()).all()
+
+    # Generic dashboard data
     tasks = (
         TaskAllocation.query.options(joinedload(TaskAllocation.staff))
         .order_by(TaskAllocation.assigned_date.desc())
         .all()
     )
-
-    allocations = (
-        RoomAllocation.query.order_by(RoomAllocation.alloc_date.desc()).all()
-    )
+    allocations = RoomAllocation.query.order_by(RoomAllocation.alloc_date.desc()).all()
     staff_members = StaffMember.query.order_by(StaffMember.name).all()
-    today_attendance = (
-        Attendance.query.filter_by(date=date.today())
-        .join(Student)
-        .order_by(Student.name)
-        .all()
-    )
+    today_attendance = Attendance.query.filter_by(date=date.today()).join(Student).order_by(Student.name).all()
+
     return render_template(
         'warden/dashboard.html',
-        complaints=complaints,
+        complaints=filtered_complaints,
         total_complaints=total_complaints,
         open_complaints=open_complaints,
         in_progress_complaints=in_progress_complaints,
@@ -86,7 +118,11 @@ def dashboard():
         allocations=allocations,
         staff_members=staff_members,
         complaint_statuses=COMPLAINT_STATUSES,
+        complaint_types=complaint_types,
         today_attendance=today_attendance,
+        status_chart_json=json.dumps(status_data),
+        type_chart_json=json.dumps(type_data),
+        filters={'search': search, 'status': status_filter, 'type': type_filter}
     )
 
 

@@ -4,6 +4,11 @@
 {% block content %}
 <div class="container-fluid px-3 px-lg-4 py-4">
 
+  <div class="print-only mb-4 text-center border-bottom pb-3">
+    <h1 class="h2 fw-bold mb-1">Hostel Management System</h1>
+    <h2 class="h4 text-muted">Attendance Report - {{ today.strftime('%d %B %Y') }}</h2>
+  </div>
+
   <div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
     <div>
       <h1 class="h3 mb-0 fw-semibold"><i class="bi bi-calendar-check text-primary me-2"></i>Mark Attendance</h1>
@@ -12,9 +17,14 @@
         {{ today.strftime('%A, %d %B %Y') }}
       </p>
     </div>
-    <a href="{{ url_for('warden.dashboard') }}" class="btn btn-sm btn-outline-secondary">
-      <i class="bi bi-arrow-left me-1"></i>Back to dashboard
-    </a>
+    <div class="d-flex gap-2">
+      <button onclick="window.print()" class="btn btn-sm btn-dark px-3 rounded-pill shadow-none">
+        <i class="bi bi-printer me-1"></i>Print Report
+      </button>
+      <a href="{{ url_for('warden.dashboard') }}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill">
+        <i class="bi bi-arrow-left me-1"></i>Back to dashboard
+      </a>
+    </div>
   </div>
 
   {% if students %}

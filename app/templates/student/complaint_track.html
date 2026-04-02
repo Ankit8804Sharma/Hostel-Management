@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Track Complaint #{{ complaint.complaint_id }}{% endblock %}
+
+{% block content %}
+<div class="hms-welcome-header">
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <h1 class="h3 mb-0 fw-bold">Track Complaint #{{ complaint.complaint_id }}</h1>
+      <p class="text-muted small mb-0">Follow the real-time progress of your maintenance request.</p>
+    </div>
+    <a href="{{ url_for('student.complaints_history') }}" class="btn btn-outline-secondary rounded-pill px-4">
+      <i class="bi bi-arrow-left me-1"></i>Back to History
+    </a>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card hms-card mb-4">
+      <div class="card-header bg-white border-0 py-3">
+        <h5 class="fw-bold mb-0">Live Status Timeline</h5>
+      </div>
+      <div class="card-body py-5 px-md-5">
+        <ul class="hms-timeline">
+          <!-- Step 1: Submitted -->
+          <li class="hms-timeline-item completed">
+            <div class="hms-timeline-icon">
+              <i class="bi bi-check-lg"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="fw-bold mb-1">Complaint Submitted</h6>
+              <p class="text-muted small mb-0">Your issue was recorded in the system.</p>
+              <div class="smallest text-primary mt-1 fw-medium">{{ complaint.issue_date }}</div>
+            </div>
+          </li>
+
+          <!-- Step 2: Assigned -->
+          {% set is_assigned = complaint.staff_id is not none %}
+          <li class="hms-timeline-item {% if is_assigned %}completed{% else %}active{% endif %}">
+            <div class="hms-timeline-icon">
+              <i class="bi {% if is_assigned %}bi-check-lg{% else %}bi-person-gear{% endif %}"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="fw-bold mb-1">Assigned to Staff</h6>
+              {% if is_assigned %}
+                <p class="text-muted small mb-0">Assigned to: <strong>{{ complaint.staff.name }}</strong></p>
+                <div class="smallest text-primary mt-1 fw-medium">Resolution in progress.</div>
+              {% else %}
+                <p class="text-muted small mb-0">Awaiting warden to assign a staff member.</p>
+              {% endif %}
+            </div>
+          </li>
+
+          <!-- Step 3: In Progress -->
+          {% set in_progress = complaint.status|lower in ['in progress', 'resolved'] %}
+          <li class="hms-timeline-item {% if in_progress %}completed{% elif is_assigned %}active{% endif %}">
+            <div class="hms-timeline-icon">
+              <i class="bi {% if in_progress %}bi-check-lg{% else %}bi-tools{% endif %}"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="fw-bold mb-1">In Progress</h6>
+              {% if in_progress %}
+                <p class="text-muted small mb-0">Technical team is actively working on the resolution.</p>
+              {% else %}
+                <p class="text-muted small mb-0">Pending work initiation.</p>
+              {% endif %}
+            </div>
+          </li>
+
+          <!-- Step 4: Resolved -->
+          {% set is_resolved = complaint.status|lower == 'resolved' %}
+          <li class="hms-timeline-item {% if is_resolved %}completed{% elif in_progress %}active{% endif %}" style="margin-bottom: 0;">
+            <div class="hms-timeline-icon">
+              <i class="bi {% if is_resolved %}bi-check-lg{% else %}bi-flag{% endif %}"></i>
+            </div>
+            <div class="ms-3">
+              <h6 class="fw-bold mb-1">Resolved</h6>
+              {% if is_resolved %}
+                <p class="text-muted small mb-0 text-success fw-medium">Successfully completed and verified.</p>
+              {% else %}
+                <p class="text-muted small mb-0">Final verification pending.</p>
+              {% endif %}
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card hms-card mb-4 bg-primary bg-opacity-10 border-0 shadow-none">
+      <div class="card-body">
+        <h6 class="fw-bold mb-3"><i class="bi bi-info-circle me-2"></i>Complaint Summary</h6>
+        <div class="mb-3">
+          <label class="smallest text-muted text-uppercase fw-bold d-block">Category</label>
+          <div class="fw-medium text-dark">{{ complaint.type }}</div>
+        </div>
+        <div class="mb-3">
+          <label class="smallest text-muted text-uppercase fw-bold d-block">Description</label>
+          <p class="small text-dark mb-0">{{ complaint.description }}</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card hms-card border-0 shadow-sm overflow-hidden">
+      <div class="card-body p-4 text-center">
+        <div class="bg-primary bg-opacity-10 text-primary mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle" style="width: 60px; height: 60px;">
+          <i class="bi bi-headset fs-3"></i>
+        </div>
+        <h6 class="fw-bold mb-2">Need more help?</h6>
+        <p class="smallest text-muted mb-3">If you have specific questions about this resolution, please visit the Warden's office.</p>
+        <button class="btn btn-sm btn-primary rounded-pill px-4">Contact Support</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

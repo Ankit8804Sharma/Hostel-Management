@@ -94,6 +94,29 @@
     </div>
   </div>
 </div>
+<!-- Charts Row -->
+<div class="row g-4 mb-5">
+  <div class="col-lg-6">
+    <div class="card hms-card h-100">
+      <div class="card-header bg-white border-0 py-3">
+        <h5 class="fw-bold mb-0"><i class="bi bi-pie-chart me-2 text-primary"></i>Status Distribution</h5>
+      </div>
+      <div class="card-body">
+        <div style="height: 250px;"><canvas id="statusChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="card hms-card h-100">
+      <div class="card-header bg-white border-0 py-3">
+        <h5 class="fw-bold mb-0"><i class="bi bi-bar-chart me-2 text-primary"></i>Category Breakdown</h5>
+      </div>
+      <div class="card-body">
+        <div style="height: 250px;"><canvas id="typeChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- Attendance Summary Card -->
 <section class="mb-5">
@@ -150,6 +173,44 @@
   <div class="card hms-card">
     <div class="card-header bg-white border-0 py-3">
       <h5 class="fw-bold mb-0"><i class="bi bi-chat-left-text me-2 text-primary"></i>Manage Complaints</h5>
+    </div>
+    <div class="px-4 py-3 border-bottom bg-light bg-opacity-50">
+      <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-4">
+          <label class="form-label smallest text-muted text-uppercase fw-bold">Search</label>
+          <div class="input-group input-group-sm">
+            <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+            <input type="text" name="search" class="form-control border-start-0 shadow-none ps-0" placeholder="Student name or description..." value="{{ filters.search }}">
+          </div>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label smallest text-muted text-uppercase fw-bold">Status</label>
+          <select name="status" class="form-select form-select-sm shadow-none">
+            <option value="All">All Statuses</option>
+            {% for s in complaint_statuses %}
+            <option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ s }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <label class="form-label smallest text-muted text-uppercase fw-bold">Category</label>
+          <select name="type" class="form-select form-select-sm shadow-none">
+            <option value="All">All Categories</option>
+            {% for t in complaint_types %}
+            <option value="{{ t }}" {% if filters.type == t %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="col-md-4 d-flex gap-2">
+          <button type="submit" class="btn btn-sm btn-primary px-3 rounded-pill shadow-none flex-grow-1">Apply Filters</button>
+          <a href="{{ url_for('warden.dashboard') }}" class="btn btn-sm btn-outline-secondary px-3 rounded-pill shadow-none">Clear</a>
+        </div>
+      </form>
+      {% if filters.search or filters.status != 'All' or filters.type != 'All' %}
+      <div class="mt-2 smallest text-primary fw-medium">
+        <i class="bi bi-filter me-1"></i>Found {{ complaints|length }} results for current filters.
+      </div>
+      {% endif %}
     </div>
     <div class="card-body p-0">
       {% if complaints %}
@@ -335,4 +396,60 @@
   </div>
 </div>
 
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const statusData = {{ status_chart_json | safe }};
+    const typeData = {{ type_chart_json | safe }};
+
+    // Status Doughnut Chart
+    new Chart(document.getElementById('statusChart'), {
+      type: 'doughnut',
+      data: {
+        labels: statusData.labels,
+        datasets: [{
+          data: statusData.counts,
+          backgroundColor: ['#ef4444', '#f59e0b', '#10b981'],
+          borderWidth: 0,
+          hoverOffset: 10
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom' }
+        },
+        cutout: '70%'
+      }
+    });
+
+    // Type Bar Chart
+    new Chart(document.getElementById('typeChart'), {
+      type: 'bar',
+      data: {
+        labels: typeData.labels,
+        datasets: [{
+          label: 'Number of Complaints',
+          data: typeData.counts,
+          backgroundColor: '#3b82f6',
+          borderRadius: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: { beginAtZero: true, grid: { display: false } },
+          x: { grid: { display: false } }
+        },
+        plugins: {
+          legend: { display: false }
+        }
+      }
+    });
+  });
+</script>
 {% endblock %}

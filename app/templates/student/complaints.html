@@ -61,16 +61,21 @@
                 {% endif %}
               </td>
               <td class="text-end">
-                {% if c.status|lower == 'resolved' %}
-                  {% set feedback_given = c.feedback_entries.first() %}
-                  {% if feedback_given %}
-                    <span class="badge bg-light text-success border small"><i class="bi bi-check-circle-fill me-1"></i>Feedback Submitted</span>
-                  {% else %}
-                    <a href="{{ url_for('student.complaint_feedback', complaint_id=c.complaint_id) }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-none">
-                      <i class="bi bi-star me-1"></i>Give Feedback
-                    </a>
+                <div class="d-flex align-items-center justify-content-end gap-2">
+                  <a href="{{ url_for('student.track_complaint', complaint_id=c.complaint_id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-none">
+                    <i class="bi bi-geo-alt me-1"></i>Track
+                  </a>
+                  {% if c.status|lower == 'resolved' %}
+                    {% set feedback_given = c.feedback_entries.first() %}
+                    {% if feedback_given %}
+                      <span class="badge bg-light text-success border small px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i>Feedback Submitted</span>
+                    {% else %}
+                      <a href="{{ url_for('student.complaint_feedback', complaint_id=c.complaint_id) }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-none">
+                        <i class="bi bi-star me-1"></i>Give Feedback
+                      </a>
+                    {% endif %}
                   {% endif %}
-                {% endif %}
+                </div>
               </td>
             </tr>
             {% endfor %}

@@ -66,4 +66,13 @@ def create_app(config_class=Config):
     def internal_server_error(e):
         return render_template('500.html'), 500
 
+    @app.context_processor
+    def inject_warden_stats():
+        from flask_login import current_user
+        from app.models import Complaint
+        if current_user.is_authenticated and (current_user.role in ('warden', 'chief_warden')):
+            count = Complaint.query.filter_by(status='Open').count()
+            return dict(open_complaints_count=count)
+        return dict(open_complaints_count=0)
+
     return app

@@ -315,3 +315,16 @@ def complaint_feedback(complaint_id):
         return redirect(url_for('student.dashboard'))
 
     return render_template('student/complaint_feedback.html', complaint=complaint)
+
+
+@student_bp.route('/complaint/<int:complaint_id>/track')
+@login_required
+@student_only
+def track_complaint(complaint_id):
+    """View the tracking timeline for a specific complaint."""
+    complaint = Complaint.query.options(joinedload(Complaint.student), joinedload(Complaint.staff)).get_or_404(complaint_id)
+    if complaint.student_id != current_user.student_id:
+        flash('Access denied.', 'danger')
+        return redirect(url_for('student.dashboard'))
+    
+    return render_template('student/complaint_track.html', complaint=complaint)

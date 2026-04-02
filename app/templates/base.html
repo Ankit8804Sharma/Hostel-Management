@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   {% block extra_head %}{% endblock %}
 </head>
 <body class="bg-light">
@@ -49,8 +50,12 @@
           </a>
 
         {% elif current_user.role == 'warden' or current_user.role == 'chief_warden' %}
-          <a class="nav-link {% if request.endpoint == 'warden.dashboard' %}active{% endif %}" href="{{ url_for('warden.dashboard') }}">
-            <i class="bi bi-house"></i>Dashboard
+          <a class="nav-link {% if request.endpoint == 'warden.dashboard' %}active{% endif %} d-flex align-items-center" href="{{ url_for('warden.dashboard') }}">
+            <i class="bi bi-house"></i>
+            <span>Dashboard</span>
+            {% if open_complaints_count > 0 %}
+              <span class="badge bg-danger rounded-pill ms-auto smallest px-2" style="font-size: 0.65rem;">{{ open_complaints_count }}</span>
+            {% endif %}
           </a>
           <a class="nav-link" href="{{ url_for('warden.dashboard') }}#section-complaints">
             <i class="bi bi-chat-left-text"></i>Complaints
