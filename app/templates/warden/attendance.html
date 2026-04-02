@@ -30,9 +30,16 @@
   {% if students %}
   <form method="post" action="{{ url_for('warden.attendance') }}" id="attendanceForm">
     <div class="card border-0 shadow-sm mb-5">
-      <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between">
-        <span class="fw-semibold"><i class="bi bi-person-check me-2 text-primary"></i>Mark Today's Attendance</span>
-        <div class="small text-muted"><i class="bi bi-info-circle me-1"></i>Select status for each student</div>
+      <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between flex-wrap gap-3">
+        <div>
+          <span class="fw-semibold"><i class="bi bi-person-check me-2 text-primary"></i>Mark Today's Attendance</span>
+          <div class="small text-muted"><i class="bi bi-info-circle me-1"></i>Select status for each student</div>
+        </div>
+        <div class="d-flex gap-2">
+          <span class="smallest text-muted fw-bold text-uppercase d-none d-sm-inline align-self-center me-1">Bulk Mark:</span>
+          <button type="button" onclick="setAll('Present')" class="btn btn-xs btn-outline-success rounded-pill px-3 py-1" style="font-size: 0.7rem;">All Present</button>
+          <button type="button" onclick="setAll('Absent')" class="btn btn-xs btn-outline-danger rounded-pill px-3 py-1" style="font-size: 0.7rem;">All Absent</button>
+        </div>
       </div>
       <div class="card-body p-0">
         <div class="table-responsive">
@@ -140,8 +147,8 @@
 {% block extra_scripts %}
 <script>
 function setAll(status) {
-  document.querySelectorAll('input[type="radio"]').forEach(function(radio) {
-    if (radio.value === status) radio.checked = true;
+  document.querySelectorAll('select[name^="status_"]').forEach(function(select) {
+    select.value = status;
   });
 }
 </script>

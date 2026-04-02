@@ -101,28 +101,29 @@
             </tr>
           </thead>
           <tbody>
-            {% set my_actives = equipment_list | selectattr('serial_no', 'in', active_serials) | list %}
-            {% if my_actives %}
-              {% for eq in my_actives %}
-              {% set usage = active_usage_map[eq.serial_no] %}
-              <tr>
-                <td>
-                  <span class="fw-medium text-dark">{{ eq.equipment_name }}</span>
-                  <div class="text-muted small">Serial #{{ eq.serial_no }}</div>
-                </td>
-                <td>
-                  <span class="text-muted small">
-                    <i class="bi bi-clock me-1"></i>{{ usage.issued_time.strftime('%I:%M %p, %d %b %Y') }}
-                  </span>
-                </td>
-                <td class="text-end">
-                  <form method="post" action="{{ url_for('student.gaming_return', serial_no=eq.serial_no) }}">
-                    <button type="submit" class="btn btn-outline-warning btn-sm px-3 rounded-pill">
-                      <i class="bi bi-arrow-return-left me-1"></i>Return
-                    </button>
-                  </form>
-                </td>
-              </tr>
+            {% if active_serials %}
+              {% for eq in equipment_list %}
+                {% if eq.serial_no in active_serials %}
+                  {% set usage = active_usage_map[eq.serial_no] %}
+                  <tr>
+                    <td>
+                      <span class="fw-medium text-dark">{{ eq.equipment_name }}</span>
+                      <div class="text-muted small">Serial #{{ eq.serial_no }}</div>
+                    </td>
+                    <td>
+                      <span class="text-muted small">
+                        <i class="bi bi-clock me-1"></i>{{ usage.issued_time.strftime('%I:%M %p, %d %b %Y') }}
+                      </span>
+                    </td>
+                    <td class="text-end">
+                      <form method="post" action="{{ url_for('student.gaming_return', serial_no=eq.serial_no) }}">
+                        <button type="submit" class="btn btn-outline-warning btn-sm px-3 rounded-pill">
+                          <i class="bi bi-arrow-return-left me-1"></i>Return
+                        </button>
+                      </form>
+                    </td>
+                  </tr>
+                {% endif %}
               {% endfor %}
             {% else %}
               <tr>
