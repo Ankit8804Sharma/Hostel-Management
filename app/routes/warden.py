@@ -195,7 +195,7 @@ def overview():
 @warden_only
 def students():
     search = request.args.get('search', '').strip()
-    query = Student.query.options(joinedload(Student.room_allocations).joinedload(RoomAllocation.room))
+    query = Student.query
     
     if search:
         query = query.filter(or_(

@@ -60,6 +60,15 @@ def create_app(config_name=None):
 
     @app.route('/')
     def index():
+        from flask_login import current_user
+        from app.models import Student, StaffMember
+        if current_user.is_authenticated:
+            if isinstance(current_user, Student):
+                return redirect(url_for('student.dashboard'))
+            elif isinstance(current_user, StaffMember):
+                if current_user.role in ('warden', 'chief_warden'):
+                    return redirect(url_for('warden.dashboard'))
+                return redirect(url_for('staff.dashboard'))
         return render_template('index.html')
 
     @app.errorhandler(404)
