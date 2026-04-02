@@ -5,7 +5,18 @@ from flask import Blueprint, abort, flash, redirect, render_template, request, u
 from flask_login import current_user, login_required
 
 from app import db
-from app.models import Attendance, AttendanceStatus, Complaint, EquipmentUsage, GamingFacilities, Laundry, Student
+from app.models import (
+    Attendance,
+    AttendanceStatus,
+    Complaint,
+    EquipmentUsage,
+    GamingFacilities,
+    Laundry,
+    Room,
+    RoomAllocation,
+    Student,
+)
+from sqlalchemy.orm import joinedload
 
 COMPLAINT_CATEGORIES = frozenset(
     {
@@ -73,6 +84,41 @@ def dashboard():
     total_absent  = sum(1 for a in attendance if a.status == AttendanceStatus.ABSENT)
     total_leave   = sum(1 for a in attendance if a.status == AttendanceStatus.LEAVE)
 
+    # Combined activity log (Top 5)
+    activities = []
+    for c in complaints[:5]:
+        activities.append({
+            'type': 'complaint',
+            'date': c.issue_date,
+            'desc': f"Submitted {c.type} complaint",
+            'status': c.status,
+            'icon': 'bi-chat-left-text',
+            'cls': 'text-primary'
+        })
+    for l in laundry_orders[:5]:
+        activities.append({
+            'type': 'laundry',
+            'date': l.date,
+            'desc': f"Laundry order ({l.weight}kg)",
+            'status': l.status,
+            'icon': 'bi-basket',
+            'cls': 'text-success'
+        })
+    
+    usages = EquipmentUsage.query.filter_by(student_id=student.student_id).order_by(EquipmentUsage.issued_time.desc()).limit(5).all()
+    for u in usages:
+        activities.append({
+            'type': 'gaming',
+            'date': u.issued_time.date(),
+            'desc': f"Borrowed {u.equipment.equipment_name}",
+            'status': 'Returned' if u.submission_time else 'Issued',
+            'icon': 'bi-controller',
+            'cls': 'text-info'
+        })
+    
+    activities.sort(key=lambda x: x['date'], reverse=True)
+    recent_activities = activities[:5]
+
     return render_template(
         'student/dashboard.html',
         student=student,
@@ -87,7 +133,20 @@ def dashboard():
         total_absent=total_absent,
         total_leave=total_leave,
         complaint_categories=sorted(COMPLAINT_CATEGORIES),
+        recent_activities=recent_activities,
     )
+
+
+@student_bp.route('/room')
+@login_required
+@student_only
+def room():
+    """View student's current room allocation."""
+    alloc = RoomAllocation.query.filter_by(
+        student_id=current_user.student_id, 
+        vacate_date=None
+    ).options(joinedload(RoomAllocation.room).joinedload(Room.hostel)).first()
+    return render_template('student/room.html', allocation=alloc)
 
 
 @student_bp.route('/complaint/new', methods=['GET', 'POST'])

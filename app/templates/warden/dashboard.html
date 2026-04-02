@@ -171,8 +171,11 @@
 <!-- Complaints Section -->
 <section id="section-complaints" class="mb-5">
   <div class="card hms-card">
-    <div class="card-header bg-white border-0 py-3">
+    <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
       <h5 class="fw-bold mb-0"><i class="bi bi-chat-left-text me-2 text-primary"></i>Manage Complaints</h5>
+      <a href="{{ url_for('warden.export_complaints') }}" class="btn btn-sm btn-outline-success rounded-pill px-3 shadow-none">
+        <i class="bi bi-file-earmark-excel me-1"></i>Export CSV
+      </a>
     </div>
     <div class="px-4 py-3 border-bottom bg-light bg-opacity-50">
       <form method="get" class="row g-3 align-items-end">

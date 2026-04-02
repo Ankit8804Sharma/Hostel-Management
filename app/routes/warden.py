@@ -1,10 +1,12 @@
+import csv
+import io
 import json
-from datetime import date
+from datetime import date, timedelta
 from functools import wraps
 
-from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
+from flask import Blueprint, Response, abort, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
-from sqlalchemy import or_
+from sqlalchemy import func, or_
 from sqlalchemy.orm import joinedload
 
 from app import db
@@ -12,6 +14,8 @@ from app.models import (
     Attendance,
     AttendanceStatus,
     Complaint,
+    Hostel,
+    Room,
     RoomAllocation,
     StaffMember,
     Student,
@@ -123,6 +127,123 @@ def dashboard():
         status_chart_json=json.dumps(status_data),
         type_chart_json=json.dumps(type_data),
         filters={'search': search, 'status': status_filter, 'type': type_filter}
+    )
+
+
+@warden_bp.route('/overview')
+@login_required
+@warden_only
+def overview():
+    total_students = Student.query.count()
+    total_staff = StaffMember.query.count()
+    total_rooms = Room.query.count()
+    total_complaints = Complaint.query.count()
+
+    # Room Occupancy
+    occupied_room_ids = db.session.query(RoomAllocation.room_id).filter(RoomAllocation.vacate_date == None).distinct().all()
+    occupied_room_count = len(occupied_room_ids)
+    occupancy_rate = (occupied_room_count / total_rooms * 100) if total_rooms > 0 else 0
+
+    # Staff Performance
+    staff_perf = []
+    all_staff = StaffMember.query.all()
+    for s in all_staff:
+        total = s.tasks.count()
+        completed = s.tasks.filter(TaskAllocation.completed_date != None).count()
+        pending = total - completed
+        rate = (completed / total * 100) if total > 0 else 0
+        staff_perf.append({
+            'name': s.name,
+            'total': total,
+            'completed': completed,
+            'pending': pending,
+            'rate': round(rate, 1)
+        })
+
+    # Top 3 Complaints
+    top_complaints = db.session.query(Complaint.type, func.count(Complaint.complaint_id).label('count'))\
+        .group_by(Complaint.type).order_by(func.count(Complaint.complaint_id).desc()).limit(3).all()
+
+    # Monthly Trend (Last 30 days)
+    last_30_days = date.today() - timedelta(days=30)
+    history = db.session.query(Complaint.issue_date, func.count(Complaint.complaint_id))\
+        .filter(Complaint.issue_date >= last_30_days)\
+        .group_by(Complaint.issue_date).order_by(Complaint.issue_date).all()
+    
+    trend_labels = [h[0].strftime('%b %d') for h in history]
+    trend_counts = [h[1] for h in history]
+
+    return render_template('warden/overview.html',
+        total_students=total_students,
+        total_staff=total_staff,
+        total_rooms=total_rooms,
+        total_complaints=total_complaints,
+        occupied_room_count=occupied_room_count,
+        occupancy_rate=round(occupancy_rate, 1),
+        staff_performance=staff_perf,
+        top_complaints=top_complaints,
+        trend_json=json.dumps({'labels': trend_labels, 'counts': trend_counts})
+    )
+
+
+@warden_bp.route('/students')
+@login_required
+@warden_only
+def students():
+    search = request.args.get('search', '').strip()
+    query = Student.query.options(joinedload(Student.room_allocations).joinedload(RoomAllocation.room))
+    
+    if search:
+        query = query.filter(or_(
+            Student.name.ilike(f'%{search}%'),
+            Student.email.ilike(f'%{search}%')
+        ))
+    
+    all_students = query.all()
+    student_data = []
+    for s in all_students:
+        alloc = s.room_allocations.filter(RoomAllocation.vacate_date == None).first()
+        student_data.append({
+            'name': s.name,
+            'email': s.email,
+            'phone': s.phone_number,
+            'room_no': alloc.room.room_no if alloc and alloc.room else 'Not Allocated',
+            'room_type': alloc.room.room_type.value if alloc and alloc.room else '—',
+            'alloc_date': alloc.alloc_date if alloc else '—'
+        })
+
+    return render_template('warden/students.html', 
+        students=student_data, 
+        search=search,
+        total_count=len(student_data))
+
+
+@warden_bp.route('/complaints/export')
+@login_required
+@warden_only
+def export_complaints():
+    complaints = Complaint.query.options(joinedload(Complaint.student), joinedload(Complaint.staff)).all()
+    
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Complaint ID', 'Student Name', 'Type', 'Description', 'Status', 'Date', 'Assigned Staff'])
+    
+    for c in complaints:
+        writer.writerow([
+            c.complaint_id,
+            c.student.name if c.student else '—',
+            c.type,
+            c.description,
+            c.status,
+            c.issue_date,
+            c.staff.name if c.staff else 'Unassigned'
+        ])
+    
+    output.seek(0)
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-disposition": "attachment; filename=complaints_export.csv"}
     )
 
 

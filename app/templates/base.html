@@ -30,6 +30,9 @@
           <a class="nav-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}" href="{{ url_for('student.dashboard') }}">
             <i class="bi bi-house"></i>Dashboard
           </a>
+          <a class="nav-link {% if request.endpoint == 'student.room' %}active{% endif %}" href="{{ url_for('student.room') }}">
+            <i class="bi bi-door-open"></i>My Room
+          </a>
           <a class="nav-link {% if request.endpoint == 'student.complaints_history' %}active{% endif %}" href="{{ url_for('student.complaints_history') }}">
             <i class="bi bi-chat-left-text"></i>My Complaints
           </a>
@@ -57,14 +60,14 @@
               <span class="badge bg-danger rounded-pill ms-auto smallest px-2" style="font-size: 0.65rem;">{{ open_complaints_count }}</span>
             {% endif %}
           </a>
-          <a class="nav-link" href="{{ url_for('warden.dashboard') }}#section-complaints">
-            <i class="bi bi-chat-left-text"></i>Complaints
+          <a class="nav-link {% if request.endpoint == 'warden.overview' %}active{% endif %}" href="{{ url_for('warden.overview') }}">
+            <i class="bi bi-graph-up"></i>Overview
+          </a>
+          <a class="nav-link {% if request.endpoint == 'warden.students' %}active{% endif %}" href="{{ url_for('warden.students') }}">
+            <i class="bi bi-people"></i>Students
           </a>
           <a class="nav-link {% if request.endpoint == 'warden.attendance' %}active{% endif %}" href="{{ url_for('warden.attendance') }}">
             <i class="bi bi-calendar-check"></i>Attendance
-          </a>
-          <a class="nav-link" href="{{ url_for('warden.dashboard') }}#section-tasks">
-            <i class="bi bi-list-task"></i>Task Allocations
           </a>
 
         {% elif current_user.role == 'staff' %}

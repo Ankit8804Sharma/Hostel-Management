@@ -1,0 +1,108 @@
+{% extends "base.html" %}
+{% block title %}My Room Details{% endblock %}
+
+{% block content %}
+<div class="hms-welcome-header">
+  <h2 class="fw-bold mb-1">My Room Allocation</h2>
+  <p class="text-muted mb-0">Detailed information about your current stay at the hostel.</p>
+</div>
+
+<div class="row g-4">
+  <div class="col-lg-8">
+    {% if allocation %}
+    <div class="card hms-card border-0 shadow-sm overflow-hidden mb-4">
+      <div class="card-header bg-primary text-white py-4 px-4 border-0">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <div class="smallest text-white text-opacity-75 text-uppercase fw-bold mb-1">Room Number</div>
+            <div class="h1 fw-bold mb-0">{{ allocation.room.room_no }}</div>
+          </div>
+          <div class="bg-white bg-opacity-20 p-3 rounded-circle">
+            <i class="bi bi-door-open fs-1"></i>
+          </div>
+        </div>
+      </div>
+      <div class="card-body p-4">
+        <div class="row g-4">
+          <div class="col-md-6">
+            <label class="smallest text-muted text-uppercase fw-bold d-block mb-1">Hostel Name</label>
+            <div class="h5 fw-bold text-dark mb-0">{{ allocation.room.hostel.type }}</div>
+          </div>
+          <div class="col-md-6">
+            <label class="smallest text-muted text-uppercase fw-bold d-block mb-1">Room Type</label>
+            <div class="h5 fw-bold text-dark mb-0">
+                <span class="badge bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 rounded-pill px-3">
+                    {{ allocation.room.room_type.value }}
+                </span>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <label class="smallest text-muted text-uppercase fw-bold d-block mb-1">Capacity</label>
+            <div class="h5 fw-bold text-dark mb-0">{{ allocation.room.capacity }} Persons</div>
+          </div>
+          <div class="col-md-6">
+            <label class="smallest text-muted text-uppercase fw-bold d-block mb-1">Allocation Date</label>
+            <div class="h5 fw-bold text-dark mb-0">{{ allocation.alloc_date.strftime('%d %B %Y') }}</div>
+          </div>
+        </div>
+        
+        <hr class="my-4 opacity-10">
+        
+        <div class="p-3 bg-light rounded-3 d-flex align-items-center gap-3">
+          <div class="bg-white p-2 rounded-2 shadow-sm">
+            <i class="bi bi-shield-check text-success fs-4"></i>
+          </div>
+          <div>
+            <div class="fw-bold small">Current Status: Active</div>
+            <div class="smallest text-muted">Your allocation is valid and active.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% else %}
+    <div class="card hms-card border-0 shadow-sm">
+        <div class="card-body py-5 text-center">
+            <div class="bg-secondary bg-opacity-10 text-secondary mx-auto mb-4 d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px;">
+                <i class="bi bi-house-slash fs-1"></i>
+            </div>
+            <h4 class="fw-bold text-dark mb-2">No Room Allocated</h4>
+            <p class="text-muted mb-4 mx-auto" style="max-width: 400px;">Our records show that you are not currently assigned to any room. Please contact the Warden's office for allocation details.</p>
+            <div class="d-flex justify-content-center gap-2">
+                <button class="btn btn-primary rounded-pill px-4">Contact Warden</button>
+                <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary rounded-pill px-4">Back Home</a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+  </div>
+
+  <div class="col-lg-4">
+    <div class="card hms-card bg-dark text-white border-0 shadow mb-4">
+        <div class="card-body p-4">
+            <h6 class="fw-bold mb-4 d-flex align-items-center gap-2">
+                <i class="bi bi-info-circle"></i>
+                Hostel Guidelines
+            </h6>
+            <ul class="list-unstyled smallest text-white text-opacity-75 d-grid gap-3">
+                <li class="d-flex align-items-start gap-2">
+                    <i class="bi bi-check2-circle text-success fw-bold"></i>
+                    <span>Maintain cleanliness in the room and corridors.</span>
+                </li>
+                <li class="d-flex align-items-start gap-2">
+                    <i class="bi bi-check2-circle text-success fw-bold"></i>
+                    <span>Guests are not allowed after 8:00 PM.</span>
+                </li>
+                <li class="d-flex align-items-start gap-2">
+                    <i class="bi bi-check2-circle text-success fw-bold"></i>
+                    <span>Switch off lights and fans when leaving the room.</span>
+                </li>
+                <li class="d-flex align-items-start gap-2">
+                    <i class="bi bi-check2-circle text-success fw-bold"></i>
+                    <span>Report any damages immediately via the complaints portal.</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

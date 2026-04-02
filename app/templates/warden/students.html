@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Student Management{% endblock %}
+
+{% block content %}
+<div class="hms-welcome-header">
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3">
+    <div>
+      <h1 class="h3 mb-0 fw-bold">Student Management</h1>
+      <p class="text-muted small mb-0">Total of <strong>{{ total_count }}</strong> students registered in the system.</p>
+    </div>
+  </div>
+</div>
+
+<div class="card hms-card mb-5">
+  <div class="card-header bg-white border-bottom py-3">
+    <form method="get" class="row g-2 align-items-center">
+      <div class="col-md-6 col-lg-4">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-light border-end-0"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" name="search" class="form-control border-start-0 shadow-none ps-0" placeholder="Filter by name or email..." value="{{ search }}">
+        </div>
+      </div>
+      <div class="col-auto">
+        <button type="submit" class="btn btn-sm btn-dark rounded-pill px-4 shadow-none">Search</button>
+      </div>
+      {% if search %}
+      <div class="col-auto">
+        <a href="{{ url_for('warden.students') }}" class="btn btn-sm btn-outline-secondary rounded-pill px-4 shadow-none">Clear</a>
+      </div>
+      {% endif %}
+    </form>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table hms-table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Contact Details</th>
+            <th class="text-center">Room No</th>
+            <th class="text-center">Room Type</th>
+            <th class="text-end">Allocation Date</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for s in students %}
+          <tr>
+            <td>
+              <div class="d-flex align-items-center gap-3">
+                <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 38px; height: 38px;">
+                  {{ s.name[0]|upper }}
+                </div>
+                <div>
+                  <div class="fw-bold text-dark">{{ s.name }}</div>
+                  <div class="smallest text-muted">ID: #{{ loop.index }}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div class="small fw-medium"><i class="bi bi-envelope me-2 text-muted"></i>{{ s.email }}</div>
+              <div class="smallest text-muted mt-1"><i class="bi bi-telephone me-2 text-muted"></i>{{ s.phone }}</div>
+            </td>
+            <td class="text-center">
+              <span class="badge {% if s.room_no == 'Not Allocated' %}bg-light text-muted{% else %}bg-info bg-opacity-10 text-info border border-info border-opacity-10{% endif %} rounded-pill px-3 py-2">
+                {{ s.room_no }}
+              </span>
+            </td>
+            <td class="text-center small text-muted">
+              {{ s.room_type }}
+            </td>
+            <td class="text-end fw-medium small text-dark">
+              {{ s.alloc_date }}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="py-5 text-center text-muted">
+              <i class="bi bi-person-x fs-1 opacity-25 d-block mb-3"></i>
+              <p class="mb-0">No students found matching your criteria.</p>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
