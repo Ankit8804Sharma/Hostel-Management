@@ -1,9 +1,10 @@
+import os
 from flask import Flask, redirect, render_template, request, url_for
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
 
-from config import Config
+from config import config_by_name
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -34,9 +35,12 @@ def unauthorized():
     return redirect(url_for('auth.login_student', next=request.url))
 
 
-def create_app(config_class=Config):
+def create_app(config_name=None):
+    if not config_name:
+        config_name = os.environ.get('FLASK_ENV', 'development')
+
     app = Flask(__name__)
-    app.config.from_object(config_class)
+    app.config.from_object(config_by_name[config_name])
 
     db.init_app(app)
     migrate.init_app(app, db)

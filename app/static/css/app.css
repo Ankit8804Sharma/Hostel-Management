@@ -258,3 +258,44 @@ body {
 .print-only {
     display: none;
 }
+
+/* Back to Top Button */
+#back-to-top {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  display: none;
+  z-index: 1050;
+  width: 45px;
+  height: 45px;
+  transition: all 0.3s ease;
+  padding: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+#back-to-top:hover {
+  transform: translateY(-5px);
+  background-color: #1a1d20 !important;
+  color: #fff !important;
+}
+
+/* Global Page Loader */
+#loader-wrapper {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #f8f9fa;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
+}
+
+#loader-wrapper.fade-out {
+  opacity: 0;
+  visibility: hidden;
+}
