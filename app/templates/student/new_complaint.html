@@ -21,10 +21,10 @@
           <p class="text-white-50 small mb-0 mt-1">Provide details about the issue you are facing</p>
         </div>
         <div class="card-body p-4 p-md-5">
-          <form method="post" action="{{ url_for('student.new_complaint') }}">
+          <form method="post" action="{{ url_for('student.new_complaint') }}" class="needs-validation" novalidate>
             <!-- Type -->
             <div class="mb-4">
-              <label for="complaint_type" class="form-label fw-semibold">Complaint Category</label>
+              <label for="complaint_type" class="form-label fw-semibold text-dark">Complaint Category</label>
               <div class="input-group">
                 <span class="input-group-text bg-light border-end-0"><i class="bi bi-tag text-muted"></i></span>
                 <select class="form-select border-start-0 ps-0 shadow-none" id="complaint_type" name="type" required>
@@ -33,14 +33,18 @@
                   <option value="{{ cat }}">{{ cat }}</option>
                   {% endfor %}
                 </select>
+                <div class="invalid-feedback">Please select a category for your complaint.</div>
+                <div class="valid-feedback">Category selected.</div>
               </div>
               <div class="form-text">Select the category that best fits your issue.</div>
             </div>
 
             <!-- Description -->
             <div class="mb-4">
-              <label for="complaint_desc" class="form-label fw-semibold">Description</label>
-              <textarea class="form-control shadow-none" id="complaint_desc" name="description" rows="5" required placeholder="Tell us what's wrong... (e.g. Broken fan in room 101)"></textarea>
+              <label for="complaint_desc" class="form-label fw-semibold text-dark">Description</label>
+              <textarea class="form-control shadow-none" id="complaint_desc" name="description" rows="5" required minlength="10" placeholder="Tell us what's wrong... (e.g. Broken fan in room 101)"></textarea>
+              <div class="invalid-feedback">Please describe your issue in at least 10 characters.</div>
+              <div class="valid-feedback">Looks good!</div>
               <div class="form-text">Please be as specific as possible to help our staff resolve it quickly.</div>
             </div>
 

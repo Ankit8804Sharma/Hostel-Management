@@ -136,11 +136,20 @@
       <div class="{% if not current_user.is_authenticated %}container pt-5{% endif %}">
         {% with messages = get_flashed_messages(with_categories=true) %}
           {% if messages %}
-            <div class="{% if not current_user.is_authenticated %}mt-5{% endif %}">
+            <div class="{% if not current_user.is_authenticated %}mt-5{% endif %}" id="flash-container">
               {% for category, message in messages %}
-                {% set cls = 'info' if category == 'info' else ('danger' if category == 'error' else category) %}
-                <div class="alert alert-{{ cls }} alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4" role="alert">
-                  <i class="bi bi-info-circle me-2"></i>{{ message }}
+                {% set cls = 'info' if category == 'info' else ('danger' if category == 'error' or category == 'danger' else ('success' if category == 'success' else ('warning' if category == 'warning' else 'primary'))) %}
+                <div class="alert alert-{{ cls }} alert-dismissible fade show border-0 shadow-sm rounded-3 mb-4 d-flex align-items-center" role="alert">
+                  {% if cls == 'success' %}
+                    <i class="bi bi-check-circle-fill me-2 fs-5"></i>
+                  {% elif cls == 'danger' %}
+                    <i class="bi bi-x-circle-fill me-2 fs-5"></i>
+                  {% elif cls == 'warning' %}
+                    <i class="bi bi-exclamation-triangle-fill me-2 fs-5"></i>
+                  {% else %}
+                    <i class="bi bi-info-circle-fill me-2 fs-5"></i>
+                  {% endif %}
+                  <div>{{ message }}</div>
                   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
               {% endfor %}
@@ -162,6 +171,7 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Sidebar Toggle
       const toggle = document.getElementById('sidebarToggle');
       const sidebar = document.getElementById('hmsSidebar');
       if (toggle && sidebar) {
@@ -169,6 +179,27 @@
           sidebar.classList.toggle('show');
         });
       }
+
+      // Auto-dismiss Alerts
+      const alerts = document.querySelectorAll('.alert');
+      alerts.forEach(alert => {
+        setTimeout(() => {
+          const bsAlert = new bootstrap.Alert(alert);
+          bsAlert.close();
+        }, 4000);
+      });
+
+      // Bootstrap Validation
+      const forms = document.querySelectorAll('.needs-validation');
+      Array.from(forms).forEach(form => {
+        form.addEventListener('submit', event => {
+          if (!form.checkValidity()) {
+            event.preventDefault();
+            event.stopPropagation();
+          }
+          form.classList.add('was-validated');
+        }, false);
+      });
     });
   </script>
   {% block extra_scripts %}{% endblock %}

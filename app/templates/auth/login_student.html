@@ -14,30 +14,68 @@
               <h1 class="h4 fw-semibold mb-1">Student login</h1>
               <p class="text-muted small mb-0">Sign in to your hostel account</p>
             </div>
-            <form method="post" novalidate>
+            <form method="post" class="needs-validation" novalidate id="loginForm">
               {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
               <div class="mb-3">
-                <label class="form-label" for="email">Email</label>
-                <div class="input-group">
-                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope"></i></span>
-                  <input class="form-control border-start-0" id="email" name="email" type="email" required autocomplete="username" placeholder="you@example.com">
+                <label class="form-label fw-medium text-muted small" for="email">Email Address</label>
+                <div class="input-group has-validation">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-envelope text-muted"></i></span>
+                  <input class="form-control border-start-0 shadow-none ps-0" id="email" name="email" type="email" required autocomplete="username" placeholder="you@example.com">
+                  <div class="invalid-feedback">Please enter a valid email address.</div>
                 </div>
               </div>
               <div class="mb-3">
-                <label class="form-label" for="password">Password</label>
-                <div class="input-group">
-                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock"></i></span>
-                  <input class="form-control border-start-0" id="password" name="password" type="password" required autocomplete="current-password" placeholder="••••••••">
+                <label class="form-label fw-medium text-muted small" for="password">Password</label>
+                <div class="input-group has-validation">
+                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-lock text-muted"></i></span>
+                  <input class="form-control border-start-0 border-end-0 shadow-none ps-0" id="password" name="password" type="password" required autocomplete="current-password" placeholder="••••••••">
+                  <button class="btn btn-outline-light border border-start-0 text-muted" type="button" id="togglePassword">
+                    <i class="bi bi-eye" id="toggleIcon"></i>
+                  </button>
+                  <div class="invalid-feedback">Please enter your password.</div>
                 </div>
               </div>
               <div class="mb-4 form-check">
                 <input class="form-check-input" type="checkbox" name="remember" value="1" id="remember">
-                <label class="form-check-label" for="remember">Remember me</label>
+                <label class="form-check-label small text-muted" for="remember">Keep me logged in</label>
               </div>
-              <button type="submit" class="btn btn-primary w-100 py-2">
-                <i class="bi bi-box-arrow-in-right me-2"></i>Log in
+              <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm d-flex align-items-center justify-content-center gap-2" id="loginBtn">
+                <span class="spinner-border spinner-border-sm d-none" id="loginSpinner" role="status" aria-hidden="true"></span>
+                <span id="loginText"><i class="bi bi-box-arrow-in-right me-1"></i>Log in</span>
               </button>
             </form>
+
+            <script>
+              document.addEventListener('DOMContentLoaded', function() {
+                const toggle = document.getElementById('togglePassword');
+                const password = document.getElementById('password');
+                const icon = document.getElementById('toggleIcon');
+                
+                if (toggle) {
+                  toggle.addEventListener('click', function() {
+                    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+                    password.setAttribute('type', type);
+                    icon.classList.toggle('bi-eye');
+                    icon.classList.toggle('bi-eye-slash');
+                  });
+                }
+
+                const loginForm = document.getElementById('loginForm');
+                const loginBtn = document.getElementById('loginBtn');
+                const spinner = document.getElementById('loginSpinner');
+                const text = document.getElementById('loginText');
+
+                if (loginForm) {
+                  loginForm.addEventListener('submit', function() {
+                    if (loginForm.checkValidity()) {
+                      loginBtn.disabled = true;
+                      spinner.classList.remove('d-none');
+                      text.classList.add('small');
+                    }
+                  });
+                }
+              });
+            </script>
             <hr class="my-4">
             <p class="text-center text-muted small mb-0">
               <a href="{{ url_for('auth.register_student') }}" class="text-decoration-none">Create an account</a>

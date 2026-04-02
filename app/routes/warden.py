@@ -33,7 +33,11 @@ def warden_only(view):
         warden_row = Warden.query.filter_by(staff_id=current_user.staff_id).first()
         role = getattr(current_user, 'role', None)
         if warden_row is None and role not in ('warden', 'chief_warden'):
-            flash('Warden access only.', 'error')
+            flash('Access denied. Warden access only.', 'danger')
+            if current_user.get_id().startswith('student_'):
+                return redirect(url_for('student.dashboard'))
+            elif role == 'staff':
+                return redirect(url_for('staff.dashboard'))
             abort(403)
         return view(*args, **kwargs)
 

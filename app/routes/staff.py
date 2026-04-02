@@ -17,7 +17,9 @@ def staff_only(view):
         if not current_user.is_authenticated:
             return redirect(url_for('auth.login_staff', next=request.url))
         if not current_user.get_id().startswith('staff_'):
-            flash('This area is for staff only.', 'error')
+            flash('Access denied. Staff access only.', 'danger')
+            if current_user.get_id().startswith('student_'):
+                return redirect(url_for('student.dashboard'))
             abort(403)
         return view(*args, **kwargs)
 

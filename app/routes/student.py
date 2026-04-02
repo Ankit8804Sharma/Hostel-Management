@@ -27,7 +27,11 @@ def student_only(view):
         if not current_user.is_authenticated:
             return redirect(url_for('auth.login_student', next=request.url))
         if not current_user.get_id().startswith('student_'):
-            flash('This area is for students only.', 'error')
+            flash('Access denied. This area is for students only.', 'danger')
+            if current_user.role in ('warden', 'chief_warden'):
+                return redirect(url_for('warden.dashboard'))
+            elif current_user.role == 'staff':
+                return redirect(url_for('staff.dashboard'))
             abort(403)
         return view(*args, **kwargs)
 
