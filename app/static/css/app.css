@@ -1,32 +1,171 @@
-/* App layout helpers — Bootstrap 5 base */
-.auth-center {
-  min-height: calc(100vh - 56px);
+/* HMS UI Overhaul Styles */
+
+:root {
+  --hms-primary: #3b82f6;
+  --hms-primary-dark: #2563eb;
+  --hms-sidebar-bg: #1e293b;
+  --hms-sidebar-hover: #334155;
+  --hms-sidebar-active: #3b82f6;
+  --hms-light-bg: #f8fafc;
+  --hms-card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --hms-radius: 12px;
 }
 
-.student-sidebar {
-  min-height: calc(100vh - 56px);
+body {
+  background-color: var(--hms-light-bg);
+  color: #1e293b;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow-x: hidden;
 }
 
-.student-sidebar .nav-link {
-  border-radius: 0.375rem;
-  color: var(--bs-secondary-color);
-  padding: 0.5rem 0.75rem;
+/* Sidebar Navigation */
+.hms-sidebar {
+  width: 260px;
+  background-color: var(--hms-sidebar-bg);
+  min-height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  transition: all 0.3s ease;
 }
 
-.student-sidebar .nav-link:hover {
-  background-color: var(--bs-secondary-bg);
-  color: var(--bs-emphasis-color);
+.hms-sidebar .nav-link {
+  color: #94a3b8;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  border-radius: 8px;
+  margin: 0.25rem 0.75rem;
+  transition: all 0.2s ease;
 }
 
-.student-sidebar .nav-link.active {
-  background-color: var(--bs-primary-bg-subtle);
-  color: var(--bs-primary);
+.hms-sidebar .nav-link:hover {
+  background-color: var(--hms-sidebar-hover);
+  color: #f8fafc;
+}
+
+.hms-sidebar .nav-link.active {
+  background-color: var(--hms-sidebar-active);
+  color: #fff;
   font-weight: 500;
 }
 
-@media (min-width: 768px) {
-  .student-sidebar {
-    position: sticky;
-    top: 1rem;
+.hms-sidebar .sidebar-logo {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Top Navbar */
+.hms-navbar {
+  height: 64px;
+  background-color: #fff;
+  border-bottom: 1px solid #e2e8f0;
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 260px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  padding: 0 1.5rem;
+  transition: all 0.3s ease;
+}
+
+/* Main Content Area */
+.hms-main-content {
+  margin-left: 260px;
+  padding-top: 64px;
+  min-height: 100vh;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 991.98px) {
+  .hms-sidebar {
+    left: -260px;
   }
+  .hms-sidebar.show {
+    left: 0;
+  }
+  .hms-navbar {
+    left: 0;
+  }
+  .hms-main-content {
+    margin-left: 0;
+  }
+}
+
+/* UI Components */
+.hms-card {
+  background: #fff;
+  border-radius: var(--hms-radius);
+  border: none;
+  box-shadow: var(--hms-card-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.hms-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+}
+
+.hms-welcome-header {
+  margin: 2rem 0;
+}
+
+.hms-table {
+  border-radius: var(--hms-radius);
+  overflow: hidden;
+}
+
+.hms-table thead th {
+  background-color: #f8fafc;
+  color: #64748b;
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+  padding: 1rem;
+}
+
+.hms-table tbody td {
+  padding: 1rem;
+  vertical-align: middle;
+}
+
+.hms-empty-state {
+  padding: 3rem 1rem;
+  text-align: center;
+  color: #94a3b8;
+}
+
+.hms-empty-state i {
+  font-size: 3.5rem;
+  opacity: 0.3;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+/* Role Badges */
+.badge-role-student { background-color: #e0f2fe; color: #0369a1; }
+.badge-role-warden { background-color: #fef3c7; color: #92400e; }
+.badge-role-staff { background-color: #f0fdf4; color: #166534; }
+
+/* Landing Page Hero */
+.hms-hero {
+  min-height: 100vh;
+  background: radial-gradient(circle at top right, #3b82f6, #1d4ed8);
+  display: flex;
+  align-items: center;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.hms-hero::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
 }

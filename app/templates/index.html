@@ -1,134 +1,116 @@
 {% extends "base.html" %}
-{% block title %}Home{% endblock %}
+{% block title %}Welcome to HMS Portal{% endblock %}
 
 {% block extra_head %}
 <style>
-  .hero-section {
-    background: linear-gradient(135deg, #0d1b2a 0%, #1b263b 50%, #415a77 100%);
-    min-height: 85vh;
-    display: flex;
-    align-items: center;
+  .hms-hero {
     position: relative;
-    overflow: hidden;
-    color: #fff;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
   }
-  .hero-section::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 70% 50%, rgba(96, 153, 255, 0.15) 0%, transparent 60%);
-    pointer-events: none;
-  }
-  .hero-title {
-    font-size: clamp(2.2rem, 5vw, 3.8rem);
+
+  .hms-hero-title {
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
     font-weight: 800;
     line-height: 1.1;
-    letter-spacing: -.03em;
     margin-bottom: 1.5rem;
+    color: white;
   }
-  .hero-title span {
-    background: linear-gradient(90deg, #60a5fa, #a78bfa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+
+  .hms-hero-subtitle {
+     font-size: clamp(1.1rem, 2vw, 1.35rem);
+     color: rgba(255,255,255,0.85);
+     max-width: 650px;
+     margin-bottom: 3rem;
   }
-  .hero-subtitle {
-    font-size: 1.25rem;
-    color: rgba(255,255,255,.75);
-    max-width: 600px;
-    margin-bottom: 2.5rem;
-    line-height: 1.6;
+
+  .hms-how-it-works {
+    padding: 6rem 0;
+    background: white;
   }
-  .btn-hero {
-    padding: 0.8rem 2.2rem;
-    font-weight: 600;
-    border-radius: 50px;
-    transition: all 0.3s ease;
-  }
-  .btn-student {
-    background: linear-gradient(90deg, #3b82f6, #6366f1);
-    border: none;
-    color: #fff;
-    box-shadow: 0 4px 15px rgba(99,102,241,0.4);
-  }
-  .btn-staff {
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: #fff;
-    backdrop-filter: blur(10px);
-  }
-  .btn-hero:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-    color: #fff;
-  }
-  .section-padding { padding: 6rem 0; }
-  .feature-card {
-    border: 1px solid #eef2f6;
-    border-radius: 20px;
-    padding: 2.5rem 2rem;
-    background: #fff;
-    transition: all 0.3s ease;
-    height: 100%;
-  }
-  .feature-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.06);
-  }
-  .feature-icon {
-    width: 60px; height: 60px;
-    border-radius: 15px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
-  .role-card {
-    border-radius: 24px;
-    overflow: hidden;
-    border: none;
-    background: #fff;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    height: 100%;
-  }
-  .role-header {
+
+  .hms-step-card {
     background: #f8fafc;
-    padding: 2rem;
-    text-align: center;
-    border-bottom: 1px solid #f1f5f9;
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    height: 100%;
+    position: relative;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
   }
-  .role-body { padding: 2rem; }
-  .role-list { list-style: none; padding: 0; margin: 0; }
-  .role-list li {
-    padding: 0.6rem 0;
-    color: #64748b;
+
+  .hms-step-card:hover {
+    background: white;
+    transform: translateY(-8px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    border-color: #3b82f6;
+  }
+
+  .hms-step-number {
+    position: absolute;
+    top: -20px;
+    left: 2rem;
+    background: #3b82f6;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    justify-content: center;
+    font-weight: 800;
+    box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5);
   }
-  .role-list li i { color: #6366f1; }
+
+  .hms-feature-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 24px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    height: 100%;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hms-feature-card:hover {
+    transform: scale(1.03);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+  }
+
+  .hms-feature-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.75rem;
+    margin-bottom: 1.5rem;
+  }
 </style>
 {% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
-<section class="hero-section">
-  <div class="container">
-    <div class="row align-items-center">
-      <div class="col-lg-8">
-        <h1 class="hero-title">
-          Hostel Complaint &<br>
-          <span>Maintenance</span><br>
-          Management System
+<section class="hms-hero">
+  <div class="container h-100">
+    <div class="row align-items-center h-100">
+      <div class="col-lg-8 py-5">
+        <div class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2 mb-4">
+          <i class="bi bi-stars me-2"></i>Smart Hostel Management
+        </div>
+        <h1 class="hms-hero-title">
+          Manage your<br>
+          <span style="color: #bfdbfe;">Hostel Life</span><br>
+          efficiently.
         </h1>
-        <p class="hero-subtitle">
-          A smart solution for managing hostel complaints, maintenance, laundry, attendance and gaming facilities.
-        </p>
+        <p class="hms-hero-subtitle">The ultimate platform to bridge the gap between students, wardens, and maintenance staff for a seamless living experience.</p>
         <div class="d-flex flex-wrap gap-3">
-          <a href="{{ url_for('auth.login_student') }}" class="btn btn-hero btn-student">
-            <i class="bi bi-person-fill me-2"></i>Student Login
+          <a href="{{ url_for('auth.login_student') }}" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary shadow">
+            Get Started
           </a>
-          <a href="{{ url_for('auth.login_staff') }}" class="btn btn-hero btn-staff">
-            <i class="bi bi-briefcase-fill me-2"></i>Staff Login
+          <a href="#how-it-works" class="btn btn-outline-light btn-lg rounded-pill px-5 fw-bold">
+            Learn More
           </a>
         </div>
       </div>
@@ -136,116 +118,92 @@
   </div>
 </section>
 
-<!-- Features Section -->
-<section class="section-padding bg-light">
+<!-- Features Grid -->
+<section class="py-5" style="background: #f8fafc; margin-top: -4rem; position: relative; z-index: 2;">
   <div class="container">
-    <div class="text-center mb-5">
-      <h2 class="fw-bold h1 mb-3">Key Features</h2>
-      <p class="text-muted">Explore how our system simplifies daily hostel operations</p>
-    </div>
     <div class="row g-4">
       <div class="col-md-4">
-        <div class="feature-card">
-          <div class="feature-icon bg-primary bg-opacity-10 text-primary">
-            <i class="bi bi-chat-left-dots-fill"></i>
+        <div class="hms-feature-card">
+          <div class="hms-feature-icon bg-primary bg-opacity-10 text-primary">
+             <i class="bi bi-chat-heart-fill"></i>
           </div>
-          <h3 class="h5 fw-bold mb-3">Complaint Management</h3>
-          <p class="text-muted mb-0">Submit and track complaints with real-time status updates directly from your dashboard.</p>
+          <h4 class="fw-bold">Fast Complaints</h4>
+          <p class="text-muted mb-0">File maintenance requests in seconds. Our staff reacts instantly to resolve your issues.</p>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="feature-card">
-          <div class="feature-icon bg-success bg-opacity-10 text-success">
-            <i class="bi bi-droplet-half"></i>
+        <div class="hms-feature-card">
+          <div class="hms-feature-icon bg-success bg-opacity-10 text-success">
+             <i class="bi bi-droplet-fill"></i>
           </div>
-          <h3 class="h5 fw-bold mb-3">Laundry Tracking</h3>
-          <p class="text-muted mb-0">Schedule and monitor your laundry orders. Stay informed as your clothes move from pending to delivered.</p>
+          <h4 class="fw-bold">Laundry Track</h4>
+          <p class="text-muted mb-0">Stay updated on your laundry status. Never miss a pickup again with real-time notifications.</p>
         </div>
       </div>
       <div class="col-md-4">
-        <div class="feature-card">
-          <div class="feature-icon bg-warning bg-opacity-10 text-warning">
-            <i class="bi bi-calendar-check-fill"></i>
+        <div class="hms-feature-card">
+          <div class="hms-feature-icon bg-info bg-opacity-10 text-info">
+             <i class="bi bi-controller"></i>
           </div>
-          <h3 class="h5 fw-bold mb-3">Attendance Monitoring</h3>
-          <p class="text-muted mb-0">Automated daily attendance tracking for all students, providing full transparency and history.</p>
+          <h4 class="fw-bold">Gaming Access</h4>
+          <p class="text-muted mb-0">Book PlayStation, Xbox, and Chess slots online. Manage your entertainment time hassle-free.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Roles Section -->
-<section class="section-padding">
+<!-- How it works -->
+<section class="hms-how-it-works" id="how-it-works">
   <div class="container">
     <div class="text-center mb-5">
-      <h2 class="fw-bold h1 mb-3">User Roles</h2>
-      <p class="text-muted">A tailor-made experience for everyone in the hostel ecosystem</p>
+      <h6 class="text-primary fw-bold text-uppercase tracking-widest small mb-2">Process</h6>
+      <h2 class="fw-bold h1">How it works</h2>
+      <p class="text-muted mx-auto" style="max-width: 500px;">Getting tasks done has never been this organized and simple. Follow these three easy steps.</p>
     </div>
-    <div class="row g-4">
-      <!-- Student -->
-      <div class="col-lg-4">
-        <div class="role-card">
-          <div class="role-header">
-            <div class="fs-1 mb-2 text-primary"><i class="bi bi-person-circle"></i></div>
-            <h3 class="h5 fw-bold mb-0">Student</h3>
-          </div>
-          <div class="role-body">
-            <ul class="role-list">
-              <li><i class="bi bi-check2-circle"></i> Submit & track complaints</li>
-              <li><i class="bi bi-check2-circle"></i> Monitor laundry requests</li>
-              <li><i class="bi bi-check2-circle"></i> View & book gaming slots</li>
-              <li><i class="bi bi-check2-circle"></i> Track daily attendance</li>
-            </ul>
-          </div>
+    <div class="row g-5 mt-4">
+      <div class="col-md-4">
+        <div class="hms-step-card">
+          <div class="hms-step-number">1</div>
+          <div class="fs-1 text-primary mb-3"><i class="bi bi-person-plus"></i></div>
+          <h5 class="fw-bold">Register</h5>
+          <p class="text-muted small mb-0">Sign up with your student or staff credentials. Verify your details and access your personalized portal.</p>
         </div>
       </div>
-      <!-- Warden -->
-      <div class="col-lg-4">
-        <div class="role-card border-primary" style="border-top: 5px solid #6366f1 !important;">
-          <div class="role-header">
-            <div class="fs-1 mb-2 text-primary"><i class="bi bi-shield-lock-fill"></i></div>
-            <h3 class="h5 fw-bold mb-0">Warden</h3>
-          </div>
-          <div class="role-body">
-            <ul class="role-list">
-              <li><i class="bi bi-check2-circle"></i> Manage student complaints</li>
-              <li><i class="bi bi-check2-circle"></i> Mark & summary attendance</li>
-              <li><i class="bi bi-check2-circle"></i> Assign maintenance tasks</li>
-              <li><i class="bi bi-check2-circle"></i> Manage room allocations</li>
-            </ul>
-          </div>
+      <div class="col-md-4">
+        <div class="hms-step-card">
+          <div class="hms-step-number">2</div>
+          <div class="fs-1 text-primary mb-3"><i class="bi bi-send-plus"></i></div>
+          <h5 class="fw-bold">Submit Complaint</h5>
+          <p class="text-muted small mb-0">Experience a localized submission process. Select categories, add details, and attach descriptions instantly.</p>
         </div>
       </div>
-      <!-- Staff -->
-      <div class="col-lg-4">
-        <div class="role-card">
-          <div class="role-header">
-            <div class="fs-1 mb-2 text-primary"><i class="bi bi-tools"></i></div>
-            <h3 class="h5 fw-bold mb-0">Staff</h3>
-          </div>
-          <div class="role-body">
-            <ul class="role-list">
-              <li><i class="bi bi-check2-circle"></i> View assigned maintenance tasks</li>
-              <li><i class="bi bi-check2-circle"></i> Complete tasks with one click</li>
-              <li><i class="bi bi-check2-circle"></i> Access specific complaint data</li>
-              <li><i class="bi bi-check2-circle"></i> Workload overview cards</li>
-            </ul>
-          </div>
+      <div class="col-md-4">
+        <div class="hms-step-card">
+          <div class="hms-step-number">3</div>
+          <div class="fs-1 text-primary mb-3"><i class="bi bi-graph-up-arrow"></i></div>
+          <h5 class="fw-bold">Track Status</h5>
+          <p class="text-muted small mb-0">Watch your tickets move from 'Open' to 'Resolved' in real-time. Transparent maintenance tracking for all.</p>
         </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- Footer/CTA -->
-<section class="section-padding bg-dark text-white text-center">
-  <div class="container">
-    <h2 class="h2 fw-bold mb-4">Streamline Your Hostel Life</h2>
-    <p class="mb-5 opacity-75" style="max-width: 500px; margin: auto;">Experience a hassle-free environment where every request is tracked and every task is organized.</p>
-    <div class="d-flex justify-content-center gap-3">
-      <a href="{{ url_for('auth.login_student') }}" class="btn btn-outline-light btn-hero px-5 border-2 fw-bold">Sign In</a>
+<!-- Final CTA -->
+<section class="py-5" style="background: white;">
+  <div class="container py-5">
+    <div class="bg-primary rounded-4 p-5 text-center text-white shadow-lg overflow-hidden position-relative">
+       <div class="position-absolute top-0 end-0 m-n5 opacity-10" style="font-size: 20rem; transform: rotate(15deg);">
+          <i class="bi bi-building"></i>
+       </div>
+       <div class="position-relative z-1">
+          <h2 class="h1 fw-bold mb-3">Ready to transform your hostel experience?</h2>
+          <p class="mb-4 opacity-75 mx-auto" style="max-width: 600px;">Join hundreds of students already using HMS to manage their daily hostel operations seamlessly.</p>
+          <a href="{{ url_for('auth.login_student') }}" class="btn btn-light btn-lg px-5 rounded-pill fw-bold text-primary">Get Started Now</a>
+       </div>
     </div>
   </div>
 </section>
+
 {% endblock %}

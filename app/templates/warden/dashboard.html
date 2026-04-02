@@ -1,351 +1,335 @@
 {% extends "base.html" %}
-{% block title %}Warden dashboard{% endblock %}
+{% block title %}Warden Dashboard{% endblock %}
 
 {% macro complaint_status_badge(status) %}
   {% set t = (status|string)|lower|trim %}
   {% if t == 'open' %}
-    <span class="badge rounded-pill text-bg-danger"><i class="bi bi-exclamation-circle me-1"></i>Open</span>
+    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-10"><i class="bi bi-exclamation-circle me-1"></i>Open</span>
   {% elif t == 'in progress' %}
-    <span class="badge rounded-pill text-bg-warning"><i class="bi bi-arrow-repeat me-1"></i>In Progress</span>
+    <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10"><i class="bi bi-arrow-repeat me-1"></i>In Progress</span>
   {% elif t == 'resolved' %}
-    <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Resolved</span>
+    <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-10"><i class="bi bi-check-circle me-1"></i>Resolved</span>
   {% else %}
-    <span class="badge rounded-pill text-bg-secondary">{{ status }}</span>
+    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-10">{{ status }}</span>
   {% endif %}
 {% endmacro %}
 
 {% macro task_status_badge(status) %}
   {% set t = (status|string)|lower|trim %}
   {% if t == 'pending' %}
-    <span class="badge text-bg-warning">Pending</span>
+    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10">Pending</span>
   {% elif t == 'completed' %}
-    <span class="badge text-bg-success">Completed</span>
+    <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10">Completed</span>
   {% else %}
-    <span class="badge text-bg-secondary">{{ status }}</span>
+    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-10">{{ status }}</span>
   {% endif %}
 {% endmacro %}
 
 {% block content %}
-<div class="container-fluid px-3 px-lg-4 py-4">
-  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-    <div>
-      <h1 class="h3 mb-0 fw-semibold"><i class="bi bi-shield-check text-primary me-2"></i>Warden dashboard</h1>
-      <p class="text-muted small mb-0">Manage complaints, allocations, attendance, and staff</p>
-    </div>
-    <a href="{{ url_for('warden.attendance') }}" class="btn btn-primary" id="btnMarkAttendance">
-      <i class="bi bi-calendar-check me-1"></i>Mark Today's Attendance
-    </a>
-  </div>
+<div class="hms-welcome-header">
+  <h2 class="fw-bold mb-1">Welcome back, Warden!</h2>
+  <p class="text-muted mb-0">Overview of hostel maintenance, student complaints, and attendance.</p>
+</div>
 
-  <!-- Summary Cards -->
-  <div class="row g-3 mb-5">
-    <div class="col-6 col-lg-3">
-      <div class="card border-0 shadow-sm h-100">
-        <div class="card-body">
-          <div class="d-flex align-items-center gap-3">
-            <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3">
-              <i class="bi bi-chat-left-text fs-4"></i>
-            </div>
-            <div>
-              <div class="display-6 fw-bold">{{ total_complaints }}</div>
-              <div class="text-muted small">Total Complaints</div>
-            </div>
+<!-- Summary Cards -->
+<div class="row g-4 mb-5">
+  <div class="col-6 col-lg-3">
+    <div class="card hms-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3">
+            <i class="bi bi-chat-left-text fs-4"></i>
           </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-lg-3">
-      <div class="card border-0 shadow-sm h-100 border-start border-danger border-4">
-        <div class="card-body">
-          <div class="d-flex align-items-center gap-3">
-            <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-3">
-              <i class="bi bi-exclamation-circle fs-4"></i>
-            </div>
-            <div>
-              <div class="display-6 fw-bold text-danger">{{ open_complaints }}</div>
-              <div class="text-muted small">Open</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-lg-3">
-      <div class="card border-0 shadow-sm h-100 border-start border-warning border-4">
-        <div class="card-body">
-          <div class="d-flex align-items-center gap-3">
-            <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-3">
-              <i class="bi bi-arrow-repeat fs-4"></i>
-            </div>
-            <div>
-              <div class="display-6 fw-bold text-warning">{{ in_progress_complaints }}</div>
-              <div class="text-muted small">In Progress</div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-6 col-lg-3">
-      <div class="card border-0 shadow-sm h-100 border-start border-success border-4">
-        <div class="card-body">
-          <div class="d-flex align-items-center gap-3">
-            <div class="bg-success bg-opacity-10 text-success p-3 rounded-3">
-              <i class="bi bi-check-circle fs-4"></i>
-            </div>
-            <div>
-              <div class="display-6 fw-bold text-success">{{ resolved_complaints }}</div>
-              <div class="text-muted small">Resolved</div>
-            </div>
+          <div>
+            <div class="h3 fw-bold mb-0">{{ total_complaints }}</div>
+            <div class="text-muted small">Total Complaints</div>
           </div>
         </div>
       </div>
     </div>
   </div>
-
-  <!-- Today's Attendance Summary -->
-  <section class="mb-5">
-    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-calendar-day me-2 text-primary"></i>Today's Attendance</h2>
-    {% if today_attendance %}
-    <div class="card border-0 shadow-sm">
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Student</th>
-                <th scope="col">Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for a in today_attendance %}
-              <tr>
-                <td class="text-muted small">{{ loop.index }}</td>
-                <td class="fw-medium">{{ a.student.name if a.student else 'Student ' ~ a.student_id }}</td>
-                <td>
-                  {% set st = a.status.value|lower %}
-                  {% if st == 'present' %}
-                    <span class="badge text-bg-success"><i class="bi bi-check-circle me-1"></i>Present</span>
-                  {% elif st == 'absent' %}
-                    <span class="badge text-bg-danger"><i class="bi bi-x-circle me-1"></i>Absent</span>
-                  {% else %}
-                    <span class="badge text-bg-warning text-dark"><i class="bi bi-arrow-right-circle me-1"></i>Leave</span>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+  <div class="col-6 col-lg-3">
+    <div class="card hms-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-danger bg-opacity-10 text-danger p-3 rounded-3">
+            <i class="bi bi-exclamation-circle fs-4"></i>
+          </div>
+          <div>
+            <div class="h3 fw-bold mb-0">{{ open_complaints }}</div>
+            <div class="text-muted small">Open</div>
+          </div>
         </div>
       </div>
     </div>
-    {% else %}
-    <div class="card border-0 shadow-sm">
-      <div class="card-body text-center text-muted py-4">
-        <i class="bi bi-calendar-x fs-1 d-block mb-2 opacity-50"></i>
-        <p class="mb-2">No attendance marked today yet.</p>
-        <a href="{{ url_for('warden.attendance') }}" class="btn btn-sm btn-primary">
-          <i class="bi bi-calendar-check me-1"></i>Mark Now
-        </a>
-      </div>
-    </div>
-    {% endif %}
-  </section>
-
-  <section class="mb-5">
-    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-chat-left-text me-2 text-primary"></i>All complaints</h2>
-    {% if complaints %}
-    <div class="card border-0 shadow-sm">
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Student Name</th>
-                <th scope="col">Type</th>
-                <th scope="col">Description</th>
-                <th scope="col">Status</th>
-                <th scope="col">Date</th>
-                <th scope="col">Assigned Staff</th>
-                <th scope="col" class="text-end">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for c in complaints %}
-              <tr>
-                <td class="text-muted small">{{ c.complaint_id }}</td>
-                <td class="fw-medium">{{ c.student.name if c.student else '—' }}</td>
-                <td>{{ c.type }}</td>
-                <td style="max-width: 220px;">
-                  {% set desc = c.description or '' %}
-                  <span class="small text-body-secondary">{{ desc[:100] }}{% if desc|length > 100 %}…{% endif %}</span>
-                </td>
-                <td>{{ complaint_status_badge(c.status) }}</td>
-                <td class="text-nowrap small">{{ c.issue_date }}</td>
-                <td>
-                  {% if c.staff %}
-                    <span class="text-dark small"><i class="bi bi-person me-1"></i>{{ c.staff.name }}</span>
-                  {% else %}
-                    <span class="text-muted small">Unassigned</span>
-                  {% endif %}
-                </td>
-                <td class="text-end">
-                  {% set t = (c.status|string)|lower|trim %}
-                  {% if t == 'open' %}
-                    <form method="post" action="{{ url_for('warden.assign_complaint', complaint_id=c.complaint_id) }}" class="d-flex flex-column flex-xl-row align-items-stretch align-items-xl-center gap-2 justify-content-end flex-wrap">
-                      <select name="staff_id" class="form-select form-select-sm shadow-none" style="min-width: 9rem;" required aria-label="Select staff">
-                        <option value="" selected disabled>Select staff...</option>
-                        {% for s in staff_members %}
-                        <option value="{{ s.staff_id }}">{{ s.name }} ({{ s.designation }})</option>
-                        {% endfor %}
-                      </select>
-                      <button type="submit" class="btn btn-sm btn-primary text-nowrap">
-                        <i class="bi bi-person-plus-fill me-1"></i>Assign Staff
-                      </button>
-                    </form>
-                  {% elif t == 'in progress' %}
-                    <form method="post" action="{{ url_for('warden.resolve_complaint', complaint_id=c.complaint_id) }}">
-                      <button type="submit" class="btn btn-sm btn-success text-nowrap">
-                        <i class="bi bi-check-lg me-1"></i>Mark Resolved
-                      </button>
-                    </form>
-                  {% else %}
-                    <span class="text-muted small fw-medium">
-                      <i class="bi bi-check-circle-fill me-1"></i>Resolved
-                    </span>
-                  {% endif %}
-                </td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card hms-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-3">
+            <i class="bi bi-arrow-repeat fs-4"></i>
+          </div>
+          <div>
+            <div class="h3 fw-bold mb-0">{{ in_progress_complaints }}</div>
+            <div class="text-muted small">In Progress</div>
+          </div>
         </div>
       </div>
     </div>
-    {% else %}
-    <div class="card border-0 shadow-sm">
-      <div class="card-body text-center text-muted py-5">
-        <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
-        <p class="mb-0">No complaints.</p>
-      </div>
-    </div>
-    {% endif %}
-  </section>
-
-  <!-- Task Allocations -->
-  <section class="mb-5">
-    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-list-task me-2 text-primary"></i>Task Allocations</h2>
-    {% if tasks %}
-    <div class="card border-0 shadow-sm">
-      <div class="card-body p-0">
-        <div class="table-responsive">
-          <table class="table table-hover align-middle mb-0">
-            <thead class="table-light">
-              <tr>
-                <th>Description</th>
-                <th>Assigned To</th>
-                <th>Status</th>
-                <th>Assigned Date</th>
-                <th>Completed Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for t in tasks %}
-              <tr>
-                <td><span class="small">{{ t.description }}</span></td>
-                <td>
-                  <div class="fw-medium">{{ t.staff.name if t.staff else '—' }}</div>
-                  <div class="small text-muted">{{ t.staff.designation if t.staff else '' }}</div>
-                </td>
-                <td>{{ task_status_badge(t.status) }}</td>
-                <td><span class="text-muted small text-nowrap"><i class="bi bi-calendar3 me-1"></i>{{ t.assigned_date }}</span></td>
-                <td><span class="text-muted small text-nowrap"><i class="bi bi-calendar-check me-1"></i>{{ t.completed_date or '—' }}</span></td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+  </div>
+  <div class="col-6 col-lg-3">
+    <div class="card hms-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-success bg-opacity-10 text-success p-3 rounded-3">
+            <i class="bi bi-check-circle fs-4"></i>
+          </div>
+          <div>
+            <div class="h3 fw-bold mb-0">{{ resolved_complaints }}</div>
+            <div class="text-muted small">Resolved</div>
+          </div>
         </div>
       </div>
     </div>
-    {% else %}
-    <div class="card border-0 shadow-sm">
-      <div class="card-body text-center text-muted py-4">
-        <i class="bi bi-clipboard-x fs-1 d-block mb-2 opacity-50"></i>
+  </div>
+</div>
+
+<!-- Attendance Summary Card -->
+<section class="mb-5">
+  <div class="card hms-card">
+    <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
+      <h5 class="fw-bold mb-0"><i class="bi bi-calendar-check me-2 text-primary"></i>Today's Attendance Summary</h5>
+      <a href="{{ url_for('warden.attendance') }}" class="btn btn-primary btn-sm rounded-pill px-3 shadow-none">
+        <i class="bi bi-calendar-check me-1"></i>Mark Attendance
+      </a>
+    </div>
+    <div class="card-body p-0">
+      {% if today_attendance %}
+      <div class="table-responsive">
+        <table class="table hms-table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in today_attendance[:10] %}
+            <tr>
+              <td class="fw-medium">{{ a.student.name if a.student else 'Student ' ~ a.student_id }}</td>
+              <td>
+                {% set st = a.status.value|lower %}
+                {% if st == 'present' %}
+                  <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10">Present</span>
+                {% elif st == 'absent' %}
+                  <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-10">Absent</span>
+                {% else %}
+                  <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10">Leave</span>
+                {% endif %}
+              </td>
+              <td><span class="text-muted small">{{ a.date }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="hms-empty-state">
+        <i class="bi bi-calendar-x"></i>
+        <p class="mb-0">No attendance marked today yet.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Complaints Section -->
+<section id="section-complaints" class="mb-5">
+  <div class="card hms-card">
+    <div class="card-header bg-white border-0 py-3">
+      <h5 class="fw-bold mb-0"><i class="bi bi-chat-left-text me-2 text-primary"></i>Manage Complaints</h5>
+    </div>
+    <div class="card-body p-0">
+      {% if complaints %}
+      <div class="table-responsive">
+        <table class="table hms-table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Student</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Status</th>
+              <th>Staff</th>
+              <th class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in complaints %}
+            <tr>
+              <td class="fw-medium small">{{ c.student.name if c.student else '—' }}</td>
+              <td><span class="small">{{ c.type }}</span></td>
+              <td style="max-width: 200px;"><div class="text-muted small text-truncate">{{ c.description }}</div></td>
+              <td>{{ complaint_status_badge(c.status) }}</td>
+              <td>
+                {% if c.staff %}
+                   <span class="text-dark small"><i class="bi bi-person me-1"></i>{{ c.staff.name }}</span>
+                {% else %}
+                  <span class="badge bg-light text-muted fw-normal">Unassigned</span>
+                {% endif %}
+              </td>
+              <td class="text-end">
+                {% set t = (c.status|string)|lower|trim %}
+                {% if t == 'open' %}
+                  <form method="post" action="{{ url_for('warden.assign_complaint', complaint_id=c.complaint_id) }}" class="d-flex align-items-center gap-2 justify-content-end">
+                    <select name="staff_id" class="form-select form-select-sm bg-light border-0" style="width: auto;" required>
+                      <option value="" selected disabled>Select staff...</option>
+                      {% for s in staff_members %}
+                      <option value="{{ s.staff_id }}">{{ s.name }}</option>
+                      {% endfor %}
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 shadow-none">Assign</button>
+                  </form>
+                {% elif t == 'in progress' %}
+                  <form method="post" action="{{ url_for('warden.resolve_complaint', complaint_id=c.complaint_id) }}">
+                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 shadow-none">Resolve</button>
+                  </form>
+                {% else %}
+                  <span class="text-muted small"><i class="bi bi-check-circle-fill me-1"></i>Resolved</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="hms-empty-state">
+        <i class="bi bi-inbox text-muted"></i>
+        <p class="mb-0">No complaints available.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Tasks Section -->
+<section id="section-tasks" class="mb-5">
+  <div class="card hms-card">
+    <div class="card-header bg-white border-0 py-3">
+      <h5 class="fw-bold mb-0"><i class="bi bi-list-task me-2 text-primary"></i>Task Allocations</h5>
+    </div>
+    <div class="card-body p-0">
+      {% if tasks %}
+      <div class="table-responsive">
+        <table class="table hms-table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Assigned To</th>
+              <th>Status</th>
+              <th>Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for t in tasks %}
+            <tr>
+              <td><span class="small">{{ t.description }}</span></td>
+              <td><span class="fw-medium small">{{ t.staff.name if t.staff else '—' }}</span></td>
+              <td>{{ task_status_badge(t.status) }}</td>
+              <td><span class="text-muted small">{{ t.assigned_date }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="hms-empty-state">
+        <i class="bi bi-clipboard-x"></i>
         <p class="mb-0">No tasks allocated yet.</p>
       </div>
+      {% endif %}
     </div>
-    {% endif %}
-  </section>
+  </div>
+</section>
 
-  <section class="mb-5">
-    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-door-open me-2 text-primary"></i>Room allocations</h2>
-    {% if allocations %}
-    <div class="row g-3">
-      {% for a in allocations %}
-      <div class="col-md-6 col-xl-4">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body">
-            <div class="d-flex justify-content-between align-items-center mb-2">
-              <span class="badge text-bg-primary">Alloc #{{ a.alloc_id }}</span>
-              <span class="text-muted small">Student {{ a.student_id }}</span>
-            </div>
-            <div class="fw-medium mb-2">
-              <i class="bi bi-building me-1 text-muted"></i>
-              {% if a.room %}{{ a.room.hostel_id }} / {{ a.room.room_no }}{% else %}{{ a.room_id }}{% endif %}
-            </div>
-            <div class="small text-muted">
-              <div><i class="bi bi-calendar-event me-1"></i>From {{ a.alloc_date }}</div>
-              <div><i class="bi bi-calendar-x me-1"></i>Until {{ a.vacate_date or '—' }}</div>
-            </div>
+<div class="row g-4">
+  <!-- Room Allocations -->
+  <div class="col-lg-6">
+    <div class="card hms-card h-100">
+      <div class="card-header bg-white border-0 py-3">
+        <h5 class="fw-bold mb-0"><i class="bi bi-door-open me-2 text-primary"></i>Recent Room Allocations</h5>
+      </div>
+      <div class="card-body p-0">
+        {% if allocations %}
+          <div class="table-responsive">
+            <table class="table hms-table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>S-ID</th>
+                  <th>Room</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for a in allocations[:5] %}
+                <tr>
+                  <td><span class="badge badge-role-student px-2">#{{ a.student_id }}</span></td>
+                  <td><span class="fw-medium small">{{ a.room.room_no if a.room else a.room_id }}</span></td>
+                  <td><span class="text-muted small">{{ a.alloc_date }}</span></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <div class="card border-0 shadow-sm">
-      <div class="card-body text-center text-muted py-5">
-        <i class="bi bi-house-door fs-1 d-block mb-2 opacity-50"></i>
-        <p class="mb-0">No allocations.</p>
+        {% else %}
+          <div class="hms-empty-state py-4">
+            <i class="bi bi-house-door" style="font-size: 2.5rem;"></i>
+            <p class="mb-0 fs-7">No allocations.</p>
+          </div>
+        {% endif %}
       </div>
     </div>
-    {% endif %}
-  </section>
+  </div>
 
-  <section>
-    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-people me-2 text-primary"></i>Staff list</h2>
-    {% if staff_members %}
-    <div class="row g-3">
-      {% for s in staff_members %}
-      <div class="col-md-6 col-xl-4">
-        <div class="card border-0 shadow-sm h-100">
-          <div class="card-body d-flex gap-3">
-            <div class="flex-shrink-0">
-              <div class="rounded-circle bg-secondary bg-opacity-10 d-flex align-items-center justify-content-center" style="width:48px;height:48px;">
-                <i class="bi bi-person-fill text-secondary fs-4"></i>
-              </div>
-            </div>
-            <div class="flex-grow-1 min-w-0">
-              <div class="fw-semibold text-truncate">{{ s.name }}</div>
-              <div class="small text-muted text-truncate"><i class="bi bi-envelope me-1"></i>{{ s.email }}</div>
-              <div class="small mt-1">
-                <span class="badge text-bg-light text-dark me-1">{{ s.designation }}</span>
-                <span class="badge text-bg-secondary">{{ s.role }}</span>
-              </div>
-            </div>
+  <!-- Staff Member List -->
+  <div class="col-lg-6">
+    <div class="card hms-card h-100">
+      <div class="card-header bg-white border-0 py-3">
+        <h5 class="fw-bold mb-0"><i class="bi bi-people me-2 text-primary"></i>Staff Directory</h5>
+      </div>
+      <div class="card-body p-0">
+        {% if staff_members %}
+          <div class="table-responsive">
+            <table class="table hms-table table-hover align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Role</th>
+                  <th>Contact</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for s in staff_members[:5] %}
+                <tr>
+                  <td class="fw-medium small">{{ s.name }}</td>
+                  <td><span class="badge badge-role-staff">{{ s.designation }}</span></td>
+                  <td><span class="text-muted small">{{ s.contact_no }}</span></td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
           </div>
-        </div>
-      </div>
-      {% endfor %}
-    </div>
-    {% else %}
-    <div class="card border-0 shadow-sm">
-      <div class="card-body text-center text-muted py-5">
-        <i class="bi bi-person-x fs-1 d-block mb-2 opacity-50"></i>
-        <p class="mb-0">No staff.</p>
+        {% else %}
+          <div class="hms-empty-state py-4">
+             <i class="bi bi-person-x" style="font-size: 2.5rem;"></i>
+             <p class="mb-0 fs-7">No staff entries.</p>
+          </div>
+        {% endif %}
       </div>
     </div>
-    {% endif %}
-  </section>
+  </div>
 </div>
+
 {% endblock %}

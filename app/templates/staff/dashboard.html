@@ -1,187 +1,180 @@
 {% extends "base.html" %}
-{% block title %}Staff dashboard{% endblock %}
+{% block title %}Staff Dashboard{% endblock %}
 
 {% macro task_status_badge(status) %}
   {% set t = (status|string)|lower|trim %}
   {% if t == 'pending' %}
-    <span class="badge rounded-pill text-bg-warning"><i class="bi bi-hourglass-split me-1"></i>Pending</span>
+    <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10"><i class="bi bi-hourglass-split me-1"></i>Pending</span>
   {% elif t == 'completed' %}
-    <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Completed</span>
+    <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-10"><i class="bi bi-check-circle me-1"></i>Completed</span>
   {% else %}
-    <span class="badge rounded-pill text-bg-secondary">{{ status }}</span>
+    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-10">{{ status }}</span>
   {% endif %}
 {% endmacro %}
 
 {% macro complaint_status_badge(status) %}
   {% set t = (status|string)|lower|trim %}
   {% if t == 'open' %}
-    <span class="badge rounded-pill text-bg-danger"><i class="bi bi-exclamation-circle me-1"></i>Open</span>
+    <span class="badge rounded-pill bg-danger bg-opacity-10 text-danger border border-danger border-opacity-10">Open</span>
   {% elif t == 'in progress' %}
-    <span class="badge rounded-pill text-bg-warning"><i class="bi bi-arrow-repeat me-1"></i>In Progress</span>
+    <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10">In Progress</span>
   {% elif t == 'resolved' %}
-    <span class="badge rounded-pill text-bg-success"><i class="bi bi-check-circle me-1"></i>Resolved</span>
+    <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-10">Resolved</span>
   {% else %}
-    <span class="badge rounded-pill text-bg-secondary">{{ status }}</span>
+    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-10">{{ status }}</span>
   {% endif %}
 {% endmacro %}
 
 {% block content %}
-<div class="container-fluid px-3 px-lg-4 py-4">
-  <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-4">
-    <div>
-      <h1 class="h3 mb-1 fw-semibold"><i class="bi bi-person-badge text-primary me-2"></i>Staff dashboard</h1>
-      <p class="text-muted small mb-0">
-        <i class="bi bi-person me-1"></i>{{ staff.name }}
-        <span class="mx-2">·</span>
-        <i class="bi bi-envelope me-1"></i>{{ staff.email }}
-      </p>
+<div class="hms-welcome-header">
+  <h2 class="fw-bold mb-1">Welcome back, {{ staff.name }}!</h2>
+  <p class="text-muted mb-0">View assigned maintenance tasks and related complaints.</p>
+</div>
+
+<!-- Summary Cards -->
+<div class="row g-4 mb-5">
+  <div class="col-4">
+    <div class="card hms-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3 d-none d-md-block">
+            <i class="bi bi-list-task fs-4"></i>
+          </div>
+          <div>
+            <div class="h3 fw-bold mb-0">{{ total_tasks }}</div>
+            <div class="text-muted small">Total Tasks</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-
-  <section class="mb-4">
-    <div class="row g-3">
-      <div class="col-4 col-md-4">
-        <div class="card border-0 shadow-sm h-100 border-start border-primary border-4">
-          <div class="card-body">
-            <div class="d-flex align-items-center gap-3">
-              <div class="bg-primary bg-opacity-10 text-primary p-3 rounded-3 d-none d-md-block">
-                <i class="bi bi-list-task fs-4"></i>
-              </div>
-              <div>
-                <div class="display-6 fw-bold">{{ total_tasks }}</div>
-                <div class="text-muted small">Total Tasks</div>
-              </div>
-            </div>
+  <div class="col-4">
+    <div class="card hms-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-3 d-none d-md-block">
+            <i class="bi bi-hourglass-split fs-4"></i>
           </div>
-        </div>
-      </div>
-      <div class="col-4 col-md-4">
-        <div class="card border-0 shadow-sm h-100 border-start border-warning border-4">
-          <div class="card-body">
-            <div class="d-flex align-items-center gap-3">
-              <div class="bg-warning bg-opacity-10 text-warning p-3 rounded-3 d-none d-md-block">
-                <i class="bi bi-hourglass-split fs-4"></i>
-              </div>
-              <div>
-                <div class="display-6 fw-bold">{{ pending_tasks }}</div>
-                <div class="text-muted small text-nowrap">Pending</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-4 col-md-4">
-        <div class="card border-0 shadow-sm h-100 border-start border-success border-4">
-          <div class="card-body">
-            <div class="d-flex align-items-center gap-3">
-              <div class="bg-success bg-opacity-10 text-success p-3 rounded-3 d-none d-md-block">
-                <i class="bi bi-check-all fs-4"></i>
-              </div>
-              <div>
-                <div class="display-6 fw-bold">{{ completed_tasks }}</div>
-                <div class="text-muted small text-nowrap">Completed</div>
-              </div>
-            </div>
+          <div>
+            <div class="h3 fw-bold mb-0 text-warning">{{ pending_tasks }}</div>
+            <div class="text-muted small text-nowrap">Pending</div>
           </div>
         </div>
       </div>
     </div>
-  </section>
-
-  <section class="mb-5">
-    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-clipboard-check me-2 text-primary"></i>Assigned Tasks</h2>
-    <div class="card border-0 shadow-sm">
-      <div class="card-body p-0">
-        {% if tasks %}
-          <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>Description</th>
-                  <th>Status</th>
-                  <th>Assigned Date</th>
-                  <th>Completed Date</th>
-                  <th class="text-end">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for task in tasks %}
-                <tr>
-                  <td style="max-width: 300px;">
-                    <span class="small fw-medium text-dark">{{ task.description }}</span>
-                    <div class="text-muted smallest">Task #{{ task.task_id }}</div>
-                  </td>
-                  <td>{{ task_status_badge(task.status) }}</td>
-                  <td><span class="text-muted small text-nowrap"><i class="bi bi-calendar-plus me-1"></i>{{ task.assigned_date }}</span></td>
-                  <td><span class="text-muted small text-nowrap"><i class="bi bi-calendar-check me-1"></i>{{ task.completed_date or '—' }}</span></td>
-                  <td class="text-end">
-                    {% if task.status|lower != 'completed' %}
-                    <form method="post" action="{{ url_for('staff.complete_task', task_id=task.task_id) }}">
-                      <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 shadow-none">
-                        <i class="bi bi-check2-circle me-1"></i>Mark as Complete
-                      </button>
-                    </form>
-                    {% else %}
-                    {{ task_status_badge(task.status) }}
-                    {% endif %}
-                  </td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
+  </div>
+  <div class="col-4">
+    <div class="card hms-card h-100">
+      <div class="card-body">
+        <div class="d-flex align-items-center gap-3">
+          <div class="bg-success bg-opacity-10 text-success p-3 rounded-3 d-none d-md-block">
+            <i class="bi bi-check-all fs-4"></i>
           </div>
-        {% else %}
-          <div class="text-center text-muted py-5">
-            <i class="bi bi-clipboard-x fs-1 d-block mb-2 opacity-50"></i>
-            <p class="mb-0">No tasks assigned.</p>
+          <div>
+            <div class="h3 fw-bold mb-0 text-success">{{ completed_tasks }}</div>
+            <div class="text-muted small text-nowrap">Completed</div>
           </div>
-        {% endif %}
+        </div>
       </div>
     </div>
-  </section>
-
-  <section>
-    <h2 class="h5 fw-semibold mb-3"><i class="bi bi-chat-left-dots me-2 text-primary"></i>Complaints Assigned to You</h2>
-    <div class="card border-0 shadow-sm">
-      <div class="card-body p-0">
-        {% if complaints %}
-          <div class="table-responsive">
-            <table class="table table-hover align-middle mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th>Student</th>
-                  <th>Type</th>
-                  <th>Description</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for c in complaints %}
-                <tr>
-                  <td>
-                    <div class="fw-medium">{{ c.student.name if c.student else '—' }}</div>
-                    <div class="small text-muted">ID {{ c.student_id }}</div>
-                  </td>
-                  <td><span class="small">{{ c.type }}</span></td>
-                  <td style="max-width: 300px;">
-                    <span class="small text-body-secondary">{{ c.description[:120] }}{% if c.description|length > 120 %}...{% endif %}</span>
-                  </td>
-                  <td>{{ complaint_status_badge(c.status) }}</td>
-                  <td><span class="text-muted small text-nowrap"><i class="bi bi-calendar3 me-1"></i>{{ c.issue_date }}</span></td>
-                </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          </div>
-        {% else %}
-          <div class="text-center text-muted py-5">
-            <i class="bi bi-inbox fs-1 d-block mb-2 opacity-50"></i>
-            <p class="mb-0">No complaints assigned.</p>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-  </section>
+  </div>
 </div>
+
+<!-- Tasks Section -->
+<section id="section-tasks" class="mb-5">
+  <div class="card hms-card">
+    <div class="card-header bg-white border-0 py-3">
+      <h5 class="fw-bold mb-0"><i class="bi bi-clipboard-check me-2 text-primary"></i>Assigned Tasks</h5>
+    </div>
+    <div class="card-body p-0">
+      {% if tasks %}
+        <div class="table-responsive">
+          <table class="table hms-table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Task Details</th>
+                <th>Status</th>
+                <th>Assigned Date</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for task in tasks %}
+              <tr>
+                <td>
+                  <span class="small fw-medium text-dark d-block text-truncate" style="max-width: 250px;">{{ task.description }}</span>
+                  <span class="text-muted smallest text-uppercase">Task #{{ task.task_id }}</span>
+                </td>
+                <td>{{ task_status_badge(task.status) }}</td>
+                <td><span class="text-muted small">{{ task.assigned_date }}</span></td>
+                <td class="text-end">
+                  {% if task.status|lower != 'completed' %}
+                  <form method="post" action="{{ url_for('staff.complete_task', task_id=task.task_id) }}">
+                    <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 shadow-none">
+                      <i class="bi bi-check2-circle me-1"></i>Mark Complete
+                    </button>
+                  </form>
+                  {% else %}
+                  <span class="text-muted small"><i class="bi bi-check-circle-fill me-1"></i>Completed</span>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="hms-empty-state">
+          <i class="bi bi-clipboard-x"></i>
+          <p class="mb-0">You have no maintenance tasks assigned at the moment.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Complaints Section -->
+<section id="section-complaints">
+  <div class="card hms-card">
+    <div class="card-header bg-white border-0 py-3">
+      <h5 class="fw-bold mb-0"><i class="bi bi-chat-left-dots me-2 text-primary"></i>Linked Complaints</h5>
+    </div>
+    <div class="card-body p-0">
+      {% if complaints %}
+        <div class="table-responsive">
+          <table class="table hms-table table-hover align-middle mb-0">
+            <thead>
+              <tr>
+                <th>Student</th>
+                <th>Type</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for c in complaints %}
+              <tr>
+                <td>
+                   <div class="fw-medium small">{{ c.student.name if c.student else '—' }}</div>
+                   <div class="text-muted smallest">ID {{ c.student_id }}</div>
+                </td>
+                <td><span class="small">{{ c.type }}</span></td>
+                <td><div class="text-muted small text-truncate" style="max-width: 250px;">{{ c.description }}</div></td>
+                <td>{{ complaint_status_badge(c.status) }}</td>
+                <td><span class="text-muted small">{{ c.issue_date }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      {% else %}
+        <div class="hms-empty-state">
+          <i class="bi bi-chat-left-x"></i>
+          <p class="mb-0">No complaints have been assigned to you yet.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
 {% endblock %}
