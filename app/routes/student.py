@@ -201,21 +201,23 @@ def gaming_book(serial_no):
     return redirect(url_for('student.gaming'))
 
 
-@student_bp.route('/gaming/return/<int:usage_id>', methods=['POST'])
+@student_bp.route('/gaming/return/<int:serial_no>', methods=['POST'])
 @login_required
 @student_only
-def gaming_return(usage_id):
+def gaming_return(serial_no):
     """Return gaming equipment."""
     from datetime import datetime
-    usage = EquipmentUsage.query.get_or_404(usage_id)
-    if usage.student_id != current_user.student_id:
-        abort(403)
-    if usage.submission_time is not None:
-        flash('This equipment has already been returned.', 'info')
-        return redirect(url_for('student.gaming'))
+    usage = (
+        EquipmentUsage.query.filter_by(
+            student_id=current_user.student_id,
+            serial_no=serial_no,
+            submission_time=None,
+        )
+        .first_or_404()
+    )
     usage.submission_time = datetime.now()
     if usage.equipment:
         usage.equipment.availability_status = 'Available'
     db.session.commit()
-    flash('Equipment returned. Thanks!', 'success')
+    flash('Equipment returned successfully.', 'success')
     return redirect(url_for('student.gaming'))
