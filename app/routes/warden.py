@@ -217,3 +217,36 @@ def attendance():
         history=history,
         statuses=[s.value for s in AttendanceStatus],
     )
+@warden_bp.route('/task/new', methods=['GET', 'POST'])
+@login_required
+@warden_only
+def new_task():
+    """Create a new maintenance task for staff."""
+    if request.method == 'POST':
+        description = request.form.get('description', '').strip()
+        staff_id_raw = request.form.get('staff_id', '').strip()
+        
+        if not description or not staff_id_raw:
+            flash('Description and staff assigned are required.', 'error')
+            return redirect(url_for('warden.new_task'))
+        
+        try:
+            staff_id = int(staff_id_raw)
+        except ValueError:
+            flash('Invalid staff ID.', 'error')
+            return redirect(url_for('warden.new_task'))
+            
+        task = TaskAllocation(
+            description=description,
+            staff_id=staff_id,
+            assigned_date=date.today(),
+            status='Pending'
+        )
+        db.session.add(task)
+        db.session.commit()
+        flash('Task created and assigned successfully.', 'success')
+        return redirect(url_for('warden.dashboard'))
+
+    # GET: show form
+    staff_members = StaffMember.query.order_by(StaffMember.name).all()
+    return render_template('warden/new_task.html', staff_members=staff_members)

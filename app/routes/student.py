@@ -246,3 +246,68 @@ def profile():
         'gaming': EquipmentUsage.query.filter_by(student_id=student.student_id).count(),
     }
     return render_template('student/profile.html', student=student, stats=stats)
+@student_bp.route('/complaints')
+@login_required
+@student_only
+def complaints_history():
+    """View all complaints submitted by the student."""
+    student = Student.query.get_or_404(current_user.student_id)
+    complaints = (
+        Complaint.query.filter_by(student_id=student.student_id)
+        .order_by(Complaint.issue_date.desc())
+        .all()
+    )
+    return render_template('student/complaints.html', student=student, complaints=complaints)
+
+
+@student_bp.route('/laundry')
+@login_required
+@student_only
+def laundry_history():
+    """View all laundry orders submitted by the student."""
+    student = Student.query.get_or_404(current_user.student_id)
+    laundry_orders = (
+        Laundry.query.filter_by(student_id=student.student_id)
+        .order_by(Laundry.date.desc())
+        .all()
+    )
+    return render_template('student/laundry.html', student=student, laundry_orders=laundry_orders)
+
+
+@student_bp.route('/complaint/<int:complaint_id>/feedback', methods=['GET', 'POST'])
+@login_required
+@student_only
+def complaint_feedback(complaint_id):
+    """Submit feedback for a resolved complaint."""
+    from app.models import Feedback
+    complaint = Complaint.query.get_or_404(complaint_id)
+    
+    # Ensure complaint belongs to student and is resolved
+    if complaint.student_id != current_user.student_id:
+        flash('You can only give feedback for your own complaints.', 'error')
+        return redirect(url_for('student.dashboard'))
+    if complaint.status != 'Resolved':
+        flash('Feedback can only be provided for resolved complaints.', 'error')
+        return redirect(url_for('student.dashboard'))
+
+    if request.method == 'POST':
+        comments = request.form.get('comments', '').strip()
+        if not comments:
+            flash('Please enter your feedback comments.', 'error')
+            return redirect(url_for('student.complaint_feedback', complaint_id=complaint_id))
+        
+        # Calculate serial_no (weak entity relative to Complaint)
+        from sqlalchemy import func
+        max_serial = db.session.query(func.max(Feedback.serial_no)).filter_by(complaint_id=complaint_id).scalar() or 0
+        
+        feedback = Feedback(
+            complaint_id=complaint_id,
+            serial_no=max_serial + 1,
+            comments=comments,
+        )
+        db.session.add(feedback)
+        db.session.commit()
+        flash('Thank you for your feedback!', 'success')
+        return redirect(url_for('student.dashboard'))
+
+    return render_template('student/complaint_feedback.html', complaint=complaint)

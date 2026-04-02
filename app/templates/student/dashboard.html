@@ -136,16 +136,29 @@
                     <th>Type</th>
                     <th>Description</th>
                     <th>Status</th>
-                    <th>Date</th>
+                    <th class="text-end">Date / Action</th>
                   </tr>
                 </thead>
                 <tbody>
                   {% for c in complaints[:5] %}
                   <tr>
-                    <td><span class="fw-medium">{{ c.type }}</span></td>
-                    <td><div class="text-muted small text-truncate" style="max-width: 250px;">{{ c.description }}</div></td>
+                    <td><span class="fw-medium text-dark">{{ c.type }}</span></td>
+                    <td><div class="text-muted small text-truncate" style="max-width: 200px;">{{ c.description }}</div></td>
                     <td>{{ complaint_status_badge(c.status) }}</td>
-                    <td><span class="text-muted small">{{ c.issue_date }}</span></td>
+                    <td class="text-end">
+                      {% if c.status|lower == 'resolved' %}
+                        {% set feedback = c.feedback_entries.first() %}
+                        {% if not feedback %}
+                          <a href="{{ url_for('student.complaint_feedback', complaint_id=c.complaint_id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-2 py-0" style="font-size: 0.7rem;">
+                            <i class="bi bi-star me-1"></i>Feedback
+                          </a>
+                        {% else %}
+                          <span class="text-success small"><i class="bi bi-check-circle me-1"></i>Sent</span>
+                        {% endif %}
+                      {% else %}
+                        <span class="text-muted small">{{ c.issue_date }}</span>
+                      {% endif %}
+                    </td>
                   </tr>
                   {% endfor %}
                 </tbody>

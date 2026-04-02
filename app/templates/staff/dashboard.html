@@ -150,6 +150,7 @@
                 <th>Description</th>
                 <th>Status</th>
                 <th>Date</th>
+                <th class="text-end">Action</th>
               </tr>
             </thead>
             <tbody>
@@ -163,6 +164,19 @@
                 <td><div class="text-muted small text-truncate" style="max-width: 250px;">{{ c.description }}</div></td>
                 <td>{{ complaint_status_badge(c.status) }}</td>
                 <td><span class="text-muted small">{{ c.issue_date }}</span></td>
+                <td class="text-end">
+                  {% if c.status|lower != 'resolved' %}
+                  <form method="post" action="{{ url_for('staff.update_complaint_status', complaint_id=c.complaint_id) }}" class="d-flex align-items-center gap-2 justify-content-end">
+                    <select name="status" class="form-select form-select-sm bg-light border-0" style="width: auto;" required>
+                      <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>
+                      <option value="Resolved">Resolved</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 shadow-none">Update</button>
+                  </form>
+                  {% else %}
+                  <span class="text-success small"><i class="bi bi-check-circle-fill me-1"></i>Resolved</span>
+                  {% endif %}
+                </td>
               </tr>
               {% endfor %}
             </tbody>

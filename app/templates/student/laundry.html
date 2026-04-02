@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Laundry History{% endblock %}
+
+{% macro status_badge(status) %}
+  {% set s = (status|string)|lower|trim %}
+  {% if s == 'pending' %}
+    <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10">Pending</span>
+  {% elif s == 'in progress' %}
+    <span class="badge rounded-pill bg-info bg-opacity-10 text-info border border-info border-opacity-10">In Progress</span>
+  {% elif s == 'delivered' %}
+    <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-10">Delivered</span>
+  {% else %}
+    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-10">{{ status }}</span>
+  {% endif %}
+{% endmacro %}
+
+{% block content %}
+<div class="hms-welcome-header">
+  <h2 class="fw-bold mb-1">Your Laundry History</h2>
+  <p class="text-muted mb-0">Track all your laundry orders and their current status.</p>
+</div>
+
+<div class="card hms-card">
+  <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
+    <h5 class="fw-bold mb-0">Total Orders: {{ laundry_orders|length }}</h5>
+    <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+       <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+    </a>
+  </div>
+  <div class="card-body p-0">
+    {% if laundry_orders %}
+      <div class="table-responsive">
+        <table class="table hms-table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Order Date</th>
+              <th>Items</th>
+              <th>Weight (kg)</th>
+              <th>Status</th>
+              <th class="text-end">Details</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for l in laundry_orders %}
+            <tr>
+              <td><span class="fw-bold text-dark"><i class="bi bi-calendar3 me-2 text-primary"></i>{{ l.date }}</span></td>
+              <td style="max-width: 300px;"><div class="small text-muted">{{ l.items or '—' }}</div></td>
+              <td><span class="badge bg-light text-dark border px-3">{{ l.weight }} kg</span></td>
+              <td>{{ status_badge(l.status) }}</td>
+              <td class="text-end small text-muted">Order ID: #{{ l.laundry_id }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <div class="hms-empty-state">
+        <i class="bi bi-basket"></i>
+        <p class="mb-0">You have no laundry history.</p>
+        <a href="{{ url_for('student.new_laundry') }}" class="btn btn-primary btn-sm rounded-pill px-4 mt-3">Start Your First Request</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

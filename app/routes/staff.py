@@ -77,3 +77,22 @@ def complete_task(task_id):
     db.session.commit()
     flash(f'Task #{task.task_id} marked as completed.', 'success')
     return redirect(url_for('staff.dashboard'))
+@staff_bp.route('/complaint/<int:complaint_id>/update', methods=['POST'])
+@login_required
+@staff_only
+def update_complaint_status(complaint_id):
+    """Update the status of an assigned complaint."""
+    complaint = Complaint.query.get_or_404(complaint_id)
+    if complaint.staff_id != current_user.staff_id:
+        flash('You can only update complaints assigned to you.', 'error')
+        return redirect(url_for('staff.dashboard'))
+    
+    new_status = request.form.get('status', '').strip()
+    if new_status in ['In Progress', 'Resolved']:
+        complaint.status = new_status
+        db.session.commit()
+        flash(f'Complaint status updated to {new_status}.', 'success')
+    else:
+        flash('Invalid status selected.', 'error')
+        
+    return redirect(url_for('staff.dashboard'))

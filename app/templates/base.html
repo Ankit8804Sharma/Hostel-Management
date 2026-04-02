@@ -29,13 +29,13 @@
           <a class="nav-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}" href="{{ url_for('student.dashboard') }}">
             <i class="bi bi-house"></i>Dashboard
           </a>
-          <a class="nav-link" href="{{ url_for('student.dashboard') }}#section-complaints">
+          <a class="nav-link {% if request.endpoint == 'student.complaints_history' %}active{% endif %}" href="{{ url_for('student.complaints_history') }}">
             <i class="bi bi-chat-left-text"></i>My Complaints
           </a>
           <a class="nav-link" href="{{ url_for('student.new_complaint') }}">
             <i class="bi bi-plus-circle"></i>New Complaint
           </a>
-          <a class="nav-link" href="{{ url_for('student.dashboard') }}#section-laundry">
+          <a class="nav-link {% if request.endpoint == 'student.laundry_history' %}active{% endif %}" href="{{ url_for('student.laundry_history') }}">
             <i class="bi bi-basket"></i>Laundry Orders
           </a>
           <a class="nav-link" href="{{ url_for('student.new_laundry') }}">
