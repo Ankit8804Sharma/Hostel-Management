@@ -16,11 +16,17 @@ def staff_only(view):
     def wrapped(*args, **kwargs):
         if not current_user.is_authenticated:
             return redirect(url_for('auth.login_staff', next=request.url))
-        if not current_user.get_id().startswith('staff_'):
+        
+        if isinstance(current_user, StaffMember):
+            # All staff roles (warden, chief_warden, staff) can view staff dashboard
+            # as it contains basic task views
+            pass
+        else:
             flash('Access denied. Staff access only.', 'danger')
-            if current_user.get_id().startswith('student_'):
+            if isinstance(current_user, Student):
                 return redirect(url_for('student.dashboard'))
             abort(403)
+            
         return view(*args, **kwargs)
 
     return wrapped

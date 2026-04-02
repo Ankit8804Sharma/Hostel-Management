@@ -33,18 +33,22 @@ def warden_only(view):
     def wrapped(*args, **kwargs):
         if not current_user.is_authenticated:
             return redirect(url_for('auth.login_staff', next=request.url))
-        if not current_user.get_id().startswith('staff_'):
-            flash('This area is for wardens (staff login).', 'error')
-            abort(403)
-        warden_row = Warden.query.filter_by(staff_id=current_user.staff_id).first()
-        role = getattr(current_user, 'role', None)
-        if warden_row is None and role not in ('warden', 'chief_warden'):
-            flash('Access denied. Warden access only.', 'danger')
-            if current_user.get_id().startswith('student_'):
+        
+        # Must be staff a member and have a warden role
+        if isinstance(current_user, StaffMember):
+            # Check if this staff member has warden role or is listed in warden table
+            is_warden = current_user.role in ('warden', 'chief_warden')
+            if not is_warden:
+                flash('Access denied. Warden access only.', 'danger')
+                if current_user.role == 'staff':
+                    return redirect(url_for('staff.dashboard'))
+                abort(403)
+        else:
+            flash('This area is for wardens only.', 'error')
+            if isinstance(current_user, Student):
                 return redirect(url_for('student.dashboard'))
-            elif role == 'staff':
-                return redirect(url_for('staff.dashboard'))
             abort(403)
+            
         return view(*args, **kwargs)
 
     return wrapped

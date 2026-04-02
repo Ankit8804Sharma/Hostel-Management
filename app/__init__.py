@@ -73,10 +73,11 @@ def create_app(config_name=None):
     @app.context_processor
     def inject_warden_stats():
         from flask_login import current_user
-        from app.models import Complaint
-        if current_user.is_authenticated and (current_user.role in ('warden', 'chief_warden')):
-            count = Complaint.query.filter_by(status='Open').count()
-            return dict(open_complaints_count=count)
+        from app.models import Complaint, StaffMember
+        if current_user.is_authenticated and isinstance(current_user, StaffMember):
+            if current_user.role in ('warden', 'chief_warden'):
+                count = Complaint.query.filter_by(status='Open').count()
+                return dict(open_complaints_count=count)
         return dict(open_complaints_count=0)
 
     return app

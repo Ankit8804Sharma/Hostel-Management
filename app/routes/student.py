@@ -14,6 +14,7 @@ from app.models import (
     Laundry,
     Room,
     RoomAllocation,
+    StaffMember,
     Student,
 )
 from sqlalchemy.orm import joinedload
@@ -37,12 +38,13 @@ def student_only(view):
     def wrapped(*args, **kwargs):
         if not current_user.is_authenticated:
             return redirect(url_for('auth.login_student', next=request.url))
-        if not current_user.get_id().startswith('student_'):
+        if not isinstance(current_user, Student):
             flash('Access denied. This area is for students only.', 'danger')
-            if current_user.role in ('warden', 'chief_warden'):
-                return redirect(url_for('warden.dashboard'))
-            elif current_user.role == 'staff':
-                return redirect(url_for('staff.dashboard'))
+            if isinstance(current_user, StaffMember):
+                if current_user.role in ('warden', 'chief_warden'):
+                    return redirect(url_for('warden.dashboard'))
+                elif current_user.role == 'staff':
+                    return redirect(url_for('staff.dashboard'))
             abort(403)
         return view(*args, **kwargs)
 
