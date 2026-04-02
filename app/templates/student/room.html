@@ -26,7 +26,7 @@
         <div class="row g-4">
           <div class="col-md-6">
             <label class="smallest text-muted text-uppercase fw-bold d-block mb-1">Hostel Name</label>
-            <div class="h5 fw-bold text-dark mb-0">{{ allocation.room.hostel.type }}</div>
+            <div class="h5 fw-bold text-dark mb-0">{{ allocation.room.hostel.type if allocation.room.hostel else 'Unknown Hostel' }}</div>
           </div>
           <div class="col-md-6">
             <label class="smallest text-muted text-uppercase fw-bold d-block mb-1">Room Type</label>
