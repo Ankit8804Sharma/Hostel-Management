@@ -221,3 +221,28 @@ def gaming_return(serial_no):
     db.session.commit()
     flash('Equipment returned successfully.', 'success')
     return redirect(url_for('student.gaming'))
+@student_bp.route('/profile', methods=['GET', 'POST'])
+@login_required
+@student_only
+def profile():
+    """View and update student profile."""
+    student = Student.query.get_or_404(current_user.student_id)
+    if request.method == 'POST':
+        name = request.form.get('name', '').strip()
+        phone = request.form.get('phone_number', '').strip()
+        if not name or not phone:
+            flash('Name and phone number are required.', 'error')
+            return redirect(url_for('student.profile'))
+        student.name = name
+        student.phone_number = phone
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('student.profile'))
+
+    # Statistics for the student
+    stats = {
+        'complaints': Complaint.query.filter_by(student_id=student.student_id).count(),
+        'laundry': Laundry.query.filter_by(student_id=student.student_id).count(),
+        'gaming': EquipmentUsage.query.filter_by(student_id=student.student_id).count(),
+    }
+    return render_template('student/profile.html', student=student, stats=stats)
