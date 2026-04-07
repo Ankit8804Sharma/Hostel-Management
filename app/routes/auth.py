@@ -132,3 +132,81 @@ def logout():
     logout_user()
     flash('You have been logged out.', 'info')
     return redirect(url_for('auth.login_student'))
+
+
+from app import generate_reset_token, verify_reset_token
+from app.utils.email import send_password_reset
+
+@auth_bp.route('/forgot-password/student', methods=['GET', 'POST'])
+def forgot_password_student():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        if not email:
+            flash('Email is required.', 'error')
+            return redirect(url_for('auth.forgot_password_student'))
+        student = Student.query.filter_by(email=email).first()
+        if student:
+            token = generate_reset_token(student.email)
+            reset_url = url_for('auth.reset_password_student', token=token, _external=True)
+            send_password_reset(student.email, student.name, reset_url)
+        flash('If that email exists, a reset link has been sent.', 'info')
+        return redirect(url_for('auth.login_student'))
+    return render_template('auth/forgot_password.html', user_type='student')
+
+@auth_bp.route('/reset-password/student/<token>', methods=['GET', 'POST'])
+def reset_password_student(token):
+    email = verify_reset_token(token)
+    if not email:
+        flash('Invalid or expired link.', 'error')
+        return redirect(url_for('auth.forgot_password_student'))
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if not password:
+            flash('Password is required.', 'error')
+            return redirect(url_for('auth.reset_password_student', token=token))
+        student = Student.query.filter_by(email=email).first()
+        if not student:
+            flash('Invalid user.', 'error')
+            return redirect(url_for('auth.login_student'))
+        student.set_password(password)
+        db.session.commit()
+        flash('Password updated successfully. Please log in.', 'success')
+        return redirect(url_for('auth.login_student'))
+    return render_template('auth/reset_password.html')
+
+@auth_bp.route('/forgot-password/staff', methods=['GET', 'POST'])
+def forgot_password_staff():
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip().lower()
+        if not email:
+            flash('Email is required.', 'error')
+            return redirect(url_for('auth.forgot_password_staff'))
+        staff = StaffMember.query.filter_by(email=email).first()
+        if staff:
+            token = generate_reset_token(staff.email)
+            reset_url = url_for('auth.reset_password_staff', token=token, _external=True)
+            send_password_reset(staff.email, staff.name, reset_url)
+        flash('If that email exists, a reset link has been sent.', 'info')
+        return redirect(url_for('auth.login_staff'))
+    return render_template('auth/forgot_password.html', user_type='staff')
+
+@auth_bp.route('/reset-password/staff/<token>', methods=['GET', 'POST'])
+def reset_password_staff(token):
+    email = verify_reset_token(token)
+    if not email:
+        flash('Invalid or expired link.', 'error')
+        return redirect(url_for('auth.forgot_password_staff'))
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if not password:
+            flash('Password is required.', 'error')
+            return redirect(url_for('auth.reset_password_staff', token=token))
+        staff = StaffMember.query.filter_by(email=email).first()
+        if not staff:
+            flash('Invalid user.', 'error')
+            return redirect(url_for('auth.login_staff'))
+        staff.set_password(password)
+        db.session.commit()
+        flash('Password updated successfully. Please log in.', 'success')
+        return redirect(url_for('auth.login_staff'))
+    return render_template('auth/reset_password.html')

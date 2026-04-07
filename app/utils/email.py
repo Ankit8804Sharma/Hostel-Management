@@ -45,3 +45,14 @@ def send_attendance_marked(student_email, student_name, date, status):
         mail.send(msg)
     except Exception as e:
         current_app.logger.error(f"Failed to send attendance marked email: {e}")
+
+def send_password_reset(email, name, reset_url):
+    try:
+        msg = Message(
+            subject="Reset Your Password",
+            recipients=[email],
+            body=f"Dear {name}, click the link below to reset your password. This link expires in 30 minutes: {reset_url}"
+        )
+        mail.send(msg)
+    except Exception as e:
+        current_app.logger.error(f"Failed to send password reset email: {e}")

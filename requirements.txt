@@ -10,3 +10,4 @@ flask-limiter
 pytest
 pytest-flask
 Flask-Mail
+itsdangerous

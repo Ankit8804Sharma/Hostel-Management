@@ -1,5 +1,5 @@
 import os
-from flask import Flask, g, redirect, render_template, request, url_for
+from flask import Flask, g, redirect, render_template, request, url_for, current_app
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -18,6 +18,18 @@ login_manager.login_message_category = 'info'
 csrf = CSRFProtect()
 limiter = Limiter(get_remote_address, default_limits=["200 per day", "50 per hour"])
 mail = Mail()
+from itsdangerous import URLSafeTimedSerializer
+
+def generate_reset_token(email):
+    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    return s.dumps(email, salt='password-reset-salt')
+
+def verify_reset_token(token, expiration=1800):
+    s = URLSafeTimedSerializer(current_app.config['SECRET_KEY'])
+    try: 
+        return s.loads(token, salt='password-reset-salt', max_age=expiration)
+    except: 
+        return None
 
 
 @login_manager.user_loader
