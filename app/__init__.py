@@ -3,6 +3,7 @@ from flask import Flask, redirect, render_template, request, url_for
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from werkzeug.exceptions import HTTPException
 
 from config import config_by_name
 
@@ -77,6 +78,14 @@ def create_app(config_name=None):
 
     @app.errorhandler(500)
     def internal_server_error(e):
+        return render_template('500.html'), 500
+
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        # pass through HTTP errors
+        if isinstance(e, HTTPException):
+            return e
+        # now you're handling non-HTTP exceptions only
         return render_template('500.html'), 500
 
     @app.context_processor

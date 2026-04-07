@@ -1,3 +1,4 @@
+import re
 from urllib.parse import urljoin, urlparse
 
 from flask import Blueprint, flash, redirect, render_template, request, url_for
@@ -27,6 +28,9 @@ def register_student():
         if not all([name, email, phone, password]):
             flash('All fields are required.', 'error')
             return render_template('auth/register_student.html')
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            flash('Invalid email format.', 'error')
+            return render_template('auth/register_student.html')
         if Student.query.filter_by(email=email).first():
             flash('Email already registered.', 'error')
             return render_template('auth/register_student.html')
@@ -45,6 +49,12 @@ def login_student():
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         next_url = request.form.get('next')
+        if not email or not password:
+            flash('Email and password are required.', 'error')
+            return render_template('auth/login_student.html', next=next_url)
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            flash('Invalid email format.', 'error')
+            return render_template('auth/login_student.html', next=next_url)
         user = Student.query.filter_by(email=email).first()
         if user is None or not user.check_password(password):
             flash('Invalid email or password.', 'error')
@@ -66,6 +76,9 @@ def register_staff():
         password = request.form.get('password', '')
         if not all([name, email, contact_no, designation, password]):
             flash('All fields are required.', 'error')
+            return render_template('auth/register_staff.html')
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            flash('Invalid email format.', 'error')
             return render_template('auth/register_staff.html')
         if StaffMember.query.filter_by(email=email).first():
             flash('Email already registered.', 'error')
@@ -91,6 +104,12 @@ def login_staff():
         email = request.form.get('email', '').strip().lower()
         password = request.form.get('password', '')
         next_url = request.form.get('next')
+        if not email or not password:
+            flash('Email and password are required.', 'error')
+            return render_template('auth/login_staff.html', next=next_url)
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", email):
+            flash('Invalid email format.', 'error')
+            return render_template('auth/login_staff.html', next=next_url)
         user = StaffMember.query.filter_by(email=email).first()
         if user is None or not user.check_password(password):
             flash('Invalid email or password.', 'error')
