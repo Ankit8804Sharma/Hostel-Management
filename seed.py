@@ -7,7 +7,7 @@ Run directly:
 Or import and call seed_db() inside an existing app context.
 """
 
-from datetime import date
+from datetime import date, timedelta
 
 from app import db
 from app.models import (
@@ -19,6 +19,7 @@ from app.models import (
     Hostel,
     Laundry,
     Non_AC_Room,
+    Room,
     RoomType,
     StaffMember,
     Student,
@@ -80,16 +81,11 @@ def _seed_rooms(hostels):
     ]
 
     created = {}
+    from sqlalchemy import and_
     for data in rooms_data:
-        from sqlalchemy import and_
-        existing = (
-            data["cls"]
-            .query.filter(
-                data["cls"].hostel_id == block_a.hostel_id,
-                data["cls"].room_no == data["room_no"],
-            )
-            .first()
-        )
+        existing = Room.query.filter(
+            and_(Room.hostel_id == block_a.hostel_id, Room.room_no == data["room_no"])
+        ).first()
         if existing:
             print(f"  [SKIP] Room {data['room_no']} already exists.")
             created[data["room_no"]] = existing
@@ -245,6 +241,7 @@ def _seed_complaints(students, staff):
             type="Electrical",
             description="Fan not working in room 101",
             status="Open",
+            issue_date=today - timedelta(days=5),
             staff=None,
         ),
         dict(
@@ -252,6 +249,7 @@ def _seed_complaints(students, staff):
             type="Plumbing",
             description="Tap leaking in bathroom",
             status="In Progress",
+            issue_date=today - timedelta(days=4),
             staff=rajesh,
         ),
         dict(
@@ -259,6 +257,7 @@ def _seed_complaints(students, staff):
             type="Internet",
             description="WiFi not working since 2 days",
             status="Resolved",
+            issue_date=today - timedelta(days=3),
             staff=priya_s,
         ),
         dict(
@@ -266,6 +265,7 @@ def _seed_complaints(students, staff):
             type="Cleanliness",
             description="Room not cleaned for 3 days",
             status="Open",
+            issue_date=today - timedelta(days=2),
             staff=None,
         ),
         dict(
@@ -273,6 +273,7 @@ def _seed_complaints(students, staff):
             type="Furniture",
             description="Chair broken in room",
             status="In Progress",
+            issue_date=today - timedelta(days=1),
             staff=rajesh,
         ),
     ]
@@ -292,7 +293,7 @@ def _seed_complaints(students, staff):
                 type=data["type"],
                 description=data["description"],
                 status=data["status"],
-                issue_date=today,
+                issue_date=data["issue_date"],
                 student_id=data["student"].student_id,
                 staff_id=data["staff"].staff_id if data["staff"] else None,
             )
@@ -307,10 +308,10 @@ def _seed_laundry(students):
     today = date.today()
 
     laundry_data = [
-        dict(student=students["Ankit Sharma"], weight=2.5, items="Shirts, Jeans",            status="Pending"),
-        dict(student=students["Priya Patel"],  weight=1.8, items="Kurtas, Dupattas",          status="Delivered"),
-        dict(student=students["Rahul Verma"],  weight=3.0, items="Bedsheets, Pillow covers",  status="In Progress"),
-        dict(student=students["Sneha Gupta"],  weight=2.0, items="Tops, Trousers",            status="Pending"),
+        dict(student=students["Ankit Sharma"], weight=2.5, items="Shirts, Jeans",            status="Pending",     days_ago=1),
+        dict(student=students["Priya Patel"],  weight=1.8, items="Kurtas, Dupattas",         status="Delivered",   days_ago=3),
+        dict(student=students["Rahul Verma"],  weight=3.0, items="Bedsheets, Pillow covers", status="In Progress", days_ago=2),
+        dict(student=students["Sneha Gupta"],  weight=2.0, items="Tops, Trousers",           status="Pending",     days_ago=1),
     ]
 
     for data in laundry_data:
@@ -322,7 +323,7 @@ def _seed_laundry(students):
             print(f"  [SKIP] Laundry entry for {data['student'].name} ({data['items']}) already exists.")
         else:
             order = Laundry(
-                date=today,
+                date=today - timedelta(days=data["days_ago"]),
                 weight=data["weight"],
                 status=data["status"],
                 items=data["items"],
@@ -338,9 +339,9 @@ def _seed_task_allocations(staff):
     today   = date.today()
 
     tasks_data = [
-        dict(description="Fix electrical wiring in Block A",  staff=rajesh,  status="Pending",   completed_date=None),
-        dict(description="Clean common areas daily",          staff=priya_s, status="Completed",  completed_date=today),
-        dict(description="Check plumbing in bathrooms",       staff=rajesh,  status="Pending",    completed_date=None),
+        dict(description="Fix electrical wiring in Block A", staff=rajesh,  assigned_date=today - timedelta(days=3), status="Pending",   completed_date=None),
+        dict(description="Clean common areas daily",         staff=priya_s, assigned_date=today - timedelta(days=5), status="Completed", completed_date=today - timedelta(days=1)),
+        dict(description="Check plumbing in bathrooms",      staff=rajesh,  assigned_date=today - timedelta(days=2), status="Pending",   completed_date=None),
     ]
 
     for data in tasks_data:
@@ -354,7 +355,7 @@ def _seed_task_allocations(staff):
             task = TaskAllocation(
                 description=data["description"],
                 staff_id=data["staff"].staff_id,
-                assigned_date=today,
+                assigned_date=data["assigned_date"],
                 completed_date=data["completed_date"],
                 status=data["status"],
             )
