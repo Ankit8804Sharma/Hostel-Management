@@ -18,6 +18,8 @@ login_manager.login_message_category = 'info'
 csrf = CSRFProtect()
 limiter = Limiter(get_remote_address, default_limits=["200 per day", "50 per hour"])
 mail = Mail()
+from flask_jwt_extended import JWTManager
+jwt = JWTManager()
 from itsdangerous import URLSafeTimedSerializer
 
 def generate_reset_token(email):
@@ -67,6 +69,7 @@ def create_app(config_name=None):
     csrf.init_app(app)
     limiter.init_app(app)
     mail.init_app(app)
+    jwt.init_app(app)
 
     from app import models  # noqa: F401
 
@@ -79,6 +82,10 @@ def create_app(config_name=None):
     app.register_blueprint(student_bp, url_prefix='/student')
     app.register_blueprint(warden_bp, url_prefix='/warden')
     app.register_blueprint(staff_bp, url_prefix='/staff')
+    
+    from app.routes.api import api_bp
+    csrf.exempt(api_bp)
+    app.register_blueprint(api_bp, url_prefix='/api/v1')
 
     @app.route('/')
     def index():

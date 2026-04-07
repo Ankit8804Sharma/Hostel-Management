@@ -28,6 +28,11 @@ class Config:
     MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
     MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
     MAIL_DEFAULT_SENDER = os.environ.get('MAIL_DEFAULT_SENDER')
+
+    # JWT Config
+    JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-fallback-key'
+    JWT_ACCESS_TOKEN_EXPIRES = 3600
+
 class DevelopmentConfig(Config):
     """Development settings."""
     DEBUG = True
