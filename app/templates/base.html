@@ -83,6 +83,9 @@
           <a class="nav-link {% if request.endpoint == 'warden.attendance' %}active{% endif %}" href="{{ url_for('warden.attendance') }}">
             <i class="bi bi-calendar-check"></i>Attendance
           </a>
+          <a class="nav-link {% if request.endpoint == 'warden.room_management' %}active{% endif %}" href="{{ url_for('warden.room_management') }}">
+            <i class="bi bi-door-open"></i>Room Management
+          </a>
 
         {% elif current_user.get_id().startswith('staff_') and current_user.role == 'staff' %}
           <a class="nav-link {% if request.endpoint == 'staff.dashboard' %}active{% endif %}" href="{{ url_for('staff.dashboard') }}">

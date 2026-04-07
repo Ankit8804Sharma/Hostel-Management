@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+{% block title %}Room Management{% endblock %}
+
+{% block content %}
+<div class="hms-welcome-header mb-4">
+  <h2 class="fw-bold mb-1">Room Management</h2>
+  <p class="text-muted mb-0">Manage student room allocations and unassigned students.</p>
+</div>
+
+<section class="mb-5">
+  <div class="card hms-card">
+    <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
+      <h5 class="fw-bold mb-0"><i class="bi bi-door-open me-2 text-primary"></i>Room Allocations</h5>
+      <button type="button" class="btn btn-primary btn-sm rounded-pill px-3 shadow-none" data-bs-toggle="modal" data-bs-target="#allocateModal">
+        <i class="bi bi-plus-lg me-1"></i>Allocate Room
+      </button>
+    </div>
+    
+    <div class="card-body p-0">
+      {% if rows %}
+      <div class="table-responsive">
+        <table class="table hms-table table-hover align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Student Name</th>
+              <th>Roll No (ID)</th>
+              <th>Room Number</th>
+              <th>Room Type</th>
+              <th>Allocated On</th>
+              <th class="text-end">Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for student, allocation, room in rows %}
+            <tr>
+              <td class="fw-medium small">{{ student.name }}</td>
+              <td><span class="badge badge-role-student px-2">#{{ student.student_id }}</span></td>
+              
+              {% if allocation and room %}
+              <td><span class="fw-medium small">{{ room.room_no }}</span></td>
+              <td><span class="small">{{ room.room_type.value if room.room_type else room.type }}</span></td>
+              <td><span class="text-muted small">{{ allocation.alloc_date.strftime('%Y-%m-%d') if allocation.alloc_date else '' }}</span></td>
+              <td class="text-end">
+                <form method="post" action="{{ url_for('warden.vacate_room', allocation_id=allocation.alloc_id) }}" class="d-inline">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-none" onclick="return confirm('Are you sure you want to vacate this room?');">Vacate</button>
+                </form>
+              </td>
+              {% else %}
+              <td><span class="badge bg-light text-muted fw-normal">Unassigned</span></td>
+              <td><span class="badge bg-light text-muted fw-normal">—</span></td>
+              <td><span class="badge bg-light text-muted fw-normal">—</span></td>
+              <td class="text-end text-muted small">
+                <!-- Action for unassigned... can be done via the top button -->
+                —
+              </td>
+              {% endif %}
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="hms-empty-state">
+        <i class="bi bi-people text-muted"></i>
+        <p class="mb-0">No students found.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- Allocate Room Modal -->
+<div class="modal fade" id="allocateModal" tabindex="-1" aria-labelledby="allocateModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content border-0 shadow">
+      <div class="modal-header bg-light border-bottom-0">
+        <h5 class="modal-title fw-bold" id="allocateModalLabel"><i class="bi bi-plus-circle text-primary me-2"></i>Allocate Room</h5>
+        <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <form method="post" action="{{ url_for('warden.allocate_room') }}" class="needs-validation">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <div class="modal-body py-4">
+          
+          <div class="mb-4">
+            <label for="student_id" class="form-label fw-medium small">Select Student</label>
+            <select class="form-select shadow-none" id="student_id" name="student_id" required>
+              <option value="" selected disabled>Choose a student without a room...</option>
+              {% for student in unallocated_students %}
+              <option value="{{ student.student_id }}">{{ student.name }} (ID: {{ student.student_id }})</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label for="room_id" class="form-label fw-medium small">Select Room</label>
+            <select class="form-select shadow-none" id="room_id" name="room_id" required>
+              <option value="" selected disabled>Choose an available room...</option>
+              {% for room in available_rooms %}
+              <option value="{{ room.id }}">Room {{ room.room_no }} ({{ room.room_type.value if room.room_type else room.type }}) - Capacity: {{ room.capacity }}</option>
+              {% endfor %}
+            </select>
+            <div class="form-text">Only unoccupied rooms are shown here.</div>
+          </div>
+
+        </div>
+        <div class="modal-footer border-top-0 bg-light">
+          <button type="button" class="btn btn-outline-secondary rounded-pill px-4 shadow-none" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-none">Allocate</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

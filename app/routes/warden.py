@@ -425,3 +425,105 @@ def new_task():
     # GET: show form
     staff_members = StaffMember.query.order_by(StaffMember.name).all()
     return render_template('warden/new_task.html', staff_members=staff_members)
+
+
+@warden_bp.route('/room-management')
+@login_required
+@warden_only
+def room_management():
+    """Show all students with their current active room allocation."""
+    # Left outer join: every student, with their active allocation (if any)
+    rows = (
+        db.session.query(Student, RoomAllocation, Room)
+        .outerjoin(
+            RoomAllocation,
+            (RoomAllocation.student_id == Student.student_id) &
+            (RoomAllocation.vacate_date.is_(None))
+        )
+        .outerjoin(Room, Room.id == RoomAllocation.room_id)
+        .order_by(Student.name)
+        .all()
+    )
+
+    # Unoccupied rooms only (no active allocation)
+    occupied_room_ids = db.session.query(RoomAllocation.room_id).filter(
+        RoomAllocation.vacate_date.is_(None)
+    ).subquery()
+    available_rooms = (
+        Room.query
+        .filter(~Room.id.in_(occupied_room_ids))
+        .order_by(Room.room_no)
+        .all()
+    )
+
+    # Students with no active allocation (eligible to be allocated)
+    allocated_student_ids = db.session.query(RoomAllocation.student_id).filter(
+        RoomAllocation.vacate_date.is_(None)
+    ).subquery()
+    unallocated_students = (
+        Student.query
+        .filter(~Student.student_id.in_(allocated_student_ids))
+        .order_by(Student.name)
+        .all()
+    )
+
+    return render_template(
+        'warden/room_management.html',
+        rows=rows,
+        available_rooms=available_rooms,
+        unallocated_students=unallocated_students,
+    )
+
+
+@warden_bp.route('/room/allocate', methods=['POST'])
+@login_required
+@warden_only
+def allocate_room():
+    """Allocate an available room to an unallocated student."""
+    student_id = request.form.get('student_id', type=int)
+    room_id = request.form.get('room_id', type=int)
+
+    if not student_id or not room_id:
+        flash('Student and room are required.', 'danger')
+        return redirect(url_for('warden.room_management'))
+
+    # Guard: room must not already be actively occupied
+    existing = RoomAllocation.query.filter_by(
+        room_id=room_id, vacate_date=None
+    ).first()
+    if existing:
+        flash('That room is already occupied.', 'danger')
+        return redirect(url_for('warden.room_management'))
+
+    # Guard: student must not already have an active allocation
+    student_alloc = RoomAllocation.query.filter_by(
+        student_id=student_id, vacate_date=None
+    ).first()
+    if student_alloc:
+        flash('That student already has an active room allocation.', 'danger')
+        return redirect(url_for('warden.room_management'))
+
+    allocation = RoomAllocation(
+        student_id=student_id,
+        room_id=room_id,
+        alloc_date=date.today(),
+    )
+    db.session.add(allocation)
+    db.session.commit()
+    flash('Room allocated successfully.', 'success')
+    return redirect(url_for('warden.room_management'))
+
+
+@warden_bp.route('/room/vacate/<int:allocation_id>', methods=['POST'])
+@login_required
+@warden_only
+def vacate_room(allocation_id):
+    """Mark an active room allocation as vacated."""
+    allocation = db.get_or_404(RoomAllocation, allocation_id)
+    if allocation.vacate_date is not None:
+        flash('This allocation is already vacated.', 'warning')
+        return redirect(url_for('warden.room_management'))
+    allocation.vacate_date = date.today()
+    db.session.commit()
+    flash('Room vacated successfully.', 'success')
+    return redirect(url_for('warden.room_management'))
