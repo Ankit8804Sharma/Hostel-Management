@@ -58,25 +58,27 @@ def warden_only(view):
 @login_required
 @warden_only
 def dashboard():
-    # 1. Get stats for summary cards (Unfiltered)
-    all_complaints = Complaint.query.all()
-    total_complaints = len(all_complaints)
-    open_complaints = sum(1 for c in all_complaints if c.status == 'Open')
-    in_progress_complaints = sum(1 for c in all_complaints if c.status == 'In Progress')
-    resolved_complaints = sum(1 for c in all_complaints if c.status == 'Resolved')
+    # 1. Aggregate counts via SQL — no full table scan
+    total_complaints = db.session.query(func.count(Complaint.complaint_id)).scalar() or 0
+    open_complaints = db.session.query(func.count(Complaint.complaint_id)).filter(Complaint.status == 'Open').scalar() or 0
+    in_progress_complaints = db.session.query(func.count(Complaint.complaint_id)).filter(Complaint.status == 'In Progress').scalar() or 0
+    resolved_complaints = db.session.query(func.count(Complaint.complaint_id)).filter(Complaint.status == 'Resolved').scalar() or 0
 
-    # Status Data for Chart
+    # Status Data for Chart (from the counts already computed)
     status_data = {
         'labels': ['Open', 'In Progress', 'Resolved'],
         'counts': [open_complaints, in_progress_complaints, resolved_complaints]
     }
 
-    # Type Data for Chart
+    # Type Data for Chart — single GROUP BY query
     complaint_types = ['Electrical', 'Plumbing', 'Internet', 'Cleanliness', 'Furniture', 'Other']
-    type_counts = []
-    for t in complaint_types:
-        type_counts.append(sum(1 for c in all_complaints if c.type == t))
-    
+    type_count_rows = (
+        db.session.query(Complaint.type, func.count(Complaint.complaint_id))
+        .group_by(Complaint.type)
+        .all()
+    )
+    type_count_map = {t: c for t, c in type_count_rows}
+    type_counts = [type_count_map.get(t, 0) for t in complaint_types]
     type_data = {
         'labels': complaint_types,
         'counts': type_counts
@@ -86,6 +88,7 @@ def dashboard():
     search = request.args.get('search', '').strip()
     status_filter = request.args.get('status', 'All')
     type_filter = request.args.get('type', 'All')
+    page = request.args.get('page', 1, type=int)
 
     query = Complaint.query.options(joinedload(Complaint.student), joinedload(Complaint.staff))
 
@@ -96,14 +99,15 @@ def dashboard():
                 Complaint.description.ilike(f'%{search}%')
             )
         )
-    
+
     if status_filter != 'All':
         query = query.filter(Complaint.status == status_filter)
-    
+
     if type_filter != 'All':
         query = query.filter(Complaint.type == type_filter)
 
-    filtered_complaints = query.order_by(Complaint.issue_date.desc()).all()
+    # Paginate instead of loading all rows
+    complaints = query.order_by(Complaint.complaint_id.desc()).paginate(page=page, per_page=20, error_out=False)
 
     # Generic dashboard data
     tasks = (
@@ -117,7 +121,7 @@ def dashboard():
 
     return render_template(
         'warden/dashboard.html',
-        complaints=filtered_complaints,
+        complaints=complaints,
         total_complaints=total_complaints,
         open_complaints=open_complaints,
         in_progress_complaints=in_progress_complaints,
@@ -195,18 +199,24 @@ def overview():
 @warden_only
 def students():
     search = request.args.get('search', '').strip()
-    query = Student.query
-    
+
+    # Eager-load active allocations and their rooms in a single query (avoids N+1)
+    query = Student.query.options(
+        joinedload(Student.room_allocations).joinedload(RoomAllocation.room)
+    )
+
     if search:
         query = query.filter(or_(
             Student.name.ilike(f'%{search}%'),
             Student.email.ilike(f'%{search}%')
         ))
-    
+
     all_students = query.all()
     student_data = []
     for s in all_students:
-        alloc = s.room_allocations.filter(RoomAllocation.vacate_date == None).first()
+        # Filter in Python — allocations already loaded, no extra queries
+        active_allocs = [a for a in s.room_allocations if a.vacate_date is None]
+        alloc = active_allocs[0] if active_allocs else None
         student_data.append({
             'name': s.name,
             'email': s.email,
@@ -216,8 +226,8 @@ def students():
             'alloc_date': alloc.alloc_date if alloc else '—'
         })
 
-    return render_template('warden/students.html', 
-        students=student_data, 
+    return render_template('warden/students.html',
+        students=student_data,
         search=search,
         total_count=len(student_data))
 

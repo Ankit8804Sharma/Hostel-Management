@@ -211,12 +211,12 @@
       </form>
       {% if filters.search or filters.status != 'All' or filters.type != 'All' %}
       <div class="mt-2 smallest text-primary fw-medium">
-        <i class="bi bi-filter me-1"></i>Found {{ complaints|length }} results for current filters.
+        <i class="bi bi-filter me-1"></i>Found {{ complaints.total }} results for current filters.
       </div>
       {% endif %}
     </div>
     <div class="card-body p-0">
-      {% if complaints %}
+      {% if complaints.items %}
       <div class="table-responsive">
         <table class="table hms-table table-hover align-middle mb-0">
           <thead>
@@ -230,7 +230,7 @@
             </tr>
           </thead>
           <tbody>
-            {% for c in complaints %}
+            {% for c in complaints.items %}
             <tr>
               <td class="fw-medium small">{{ c.student.name if c.student else '—' }}</td>
               <td><span class="small">{{ c.type }}</span></td>
@@ -275,6 +275,27 @@
       </div>
       {% endif %}
     </div>
+    {% if complaints.pages > 1 %}
+    <div class="card-footer bg-white border-0 py-3">
+      <nav aria-label="Complaints pagination">
+        <ul class="pagination pagination-sm justify-content-end mb-0">
+          {% if complaints.has_prev %}
+          <li class="page-item">
+            <a class="page-link rounded-pill me-1" href="?page={{ complaints.prev_num }}&search={{ filters.search }}&status={{ filters.status }}&type={{ filters.type }}">&#8592; Previous</a>
+          </li>
+          {% endif %}
+          <li class="page-item disabled">
+            <span class="page-link">Page {{ complaints.page }} of {{ complaints.pages }}</span>
+          </li>
+          {% if complaints.has_next %}
+          <li class="page-item">
+            <a class="page-link rounded-pill ms-1" href="?page={{ complaints.next_num }}&search={{ filters.search }}&status={{ filters.status }}&type={{ filters.type }}">Next &#8594;</a>
+          </li>
+          {% endif %}
+        </ul>
+      </nav>
+    </div>
+    {% endif %}
   </div>
 </section>
 

@@ -1,5 +1,5 @@
 import os
-from flask import Flask, redirect, render_template, request, url_for
+from flask import Flask, g, redirect, render_template, request, url_for
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
@@ -101,8 +101,9 @@ def create_app(config_name=None):
         from app.models import Complaint, StaffMember
         if current_user.is_authenticated and isinstance(current_user, StaffMember):
             if current_user.role in ('warden', 'chief_warden'):
-                count = Complaint.query.filter_by(status='Open').count()
-                return dict(open_complaints_count=count)
+                if 'open_complaints_count' not in g:
+                    g.open_complaints_count = Complaint.query.filter_by(status='Open').count()
+                return dict(open_complaints_count=g.open_complaints_count)
         return dict(open_complaints_count=0)
 
     return app
