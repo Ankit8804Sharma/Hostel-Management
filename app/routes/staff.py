@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
 
 from app import db
-from app.models import Complaint, StaffMember, TaskAllocation
+from app.models import Complaint, StaffMember, Student, TaskAllocation
 
 staff_bp = Blueprint('staff', __name__)
 
@@ -36,7 +36,7 @@ def staff_only(view):
 @login_required
 @staff_only
 def dashboard():
-    staff = StaffMember.query.get_or_404(current_user.staff_id)
+    staff = db.get_or_404(StaffMember, current_user.staff_id)
     tasks = (
         TaskAllocation.query.filter_by(staff_id=staff.staff_id)
         .order_by(TaskAllocation.assigned_date.desc())
@@ -90,7 +90,7 @@ def complete_task(task_id):
 @staff_only
 def update_complaint_status(complaint_id):
     """Update the status of an assigned complaint."""
-    complaint = Complaint.query.get_or_404(complaint_id)
+    complaint = db.get_or_404(Complaint, complaint_id)
     if complaint.staff_id != current_user.staff_id:
         flash('You can only update complaints assigned to you.', 'error')
         return redirect(url_for('staff.dashboard'))

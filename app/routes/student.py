@@ -55,7 +55,7 @@ def student_only(view):
 @login_required
 @student_only
 def dashboard():
-    student = Student.query.get_or_404(current_user.student_id)
+    student = db.get_or_404(Student, current_user.student_id)
     complaints = (
         Complaint.query.filter_by(student_id=student.student_id)
         .order_by(Complaint.issue_date.desc())
@@ -242,7 +242,7 @@ def gaming():
 def gaming_book(serial_no):
     """Issue gaming equipment to student."""
     from datetime import datetime
-    equipment = GamingFacilities.query.get_or_404(serial_no)
+    equipment = db.get_or_404(GamingFacilities, serial_no)
     if equipment.availability_status != 'Available':
         flash('This equipment is not available right now.', 'error')
         return redirect(url_for('student.gaming'))
@@ -291,7 +291,7 @@ def gaming_return(serial_no):
 @student_only
 def profile():
     """View and update student profile."""
-    student = Student.query.get_or_404(current_user.student_id)
+    student = db.get_or_404(Student, current_user.student_id)
     if request.method == 'POST':
         name = request.form.get('name', '').strip()
         phone = request.form.get('phone_number', '').strip()
@@ -316,7 +316,7 @@ def profile():
 @student_only
 def complaints_history():
     """View all complaints submitted by the student."""
-    student = Student.query.get_or_404(current_user.student_id)
+    student = db.get_or_404(Student, current_user.student_id)
     complaints = (
         Complaint.query.filter_by(student_id=student.student_id)
         .order_by(Complaint.issue_date.desc())
@@ -330,7 +330,7 @@ def complaints_history():
 @student_only
 def laundry_history():
     """View all laundry orders submitted by the student."""
-    student = Student.query.get_or_404(current_user.student_id)
+    student = db.get_or_404(Student, current_user.student_id)
     laundry_orders = (
         Laundry.query.filter_by(student_id=student.student_id)
         .order_by(Laundry.date.desc())
@@ -345,7 +345,7 @@ def laundry_history():
 def complaint_feedback(complaint_id):
     """Submit feedback for a resolved complaint."""
     from app.models import Feedback
-    complaint = Complaint.query.get_or_404(complaint_id)
+    complaint = db.get_or_404(Complaint, complaint_id)
 
     # Ownership check — must come first, before any status check
     if complaint.student_id != current_user.student_id:
@@ -359,18 +359,26 @@ def complaint_feedback(complaint_id):
         if not comments:
             flash('Please enter your feedback comments.', 'error')
             return redirect(url_for('student.complaint_feedback', complaint_id=complaint_id))
-        
-        # Calculate serial_no (weak entity relative to Complaint)
+
         from sqlalchemy import func
-        max_serial = db.session.query(func.max(Feedback.serial_no)).filter_by(complaint_id=complaint_id).scalar() or 0
-        
-        feedback = Feedback(
-            complaint_id=complaint_id,
-            serial_no=max_serial + 1,
-            comments=comments,
-        )
-        db.session.add(feedback)
-        db.session.commit()
+        from sqlalchemy.exc import IntegrityError
+
+        def _insert_feedback():
+            max_serial = db.session.query(func.max(Feedback.serial_no)).scalar() or 0
+            fb = Feedback(
+                complaint_id=complaint_id,
+                serial_no=max_serial + 1,
+                comments=comments,
+            )
+            db.session.add(fb)
+            db.session.commit()
+
+        try:
+            _insert_feedback()
+        except IntegrityError:
+            db.session.rollback()
+            _insert_feedback()  # retry once on collision
+
         flash('Thank you for your feedback!', 'success')
         return redirect(url_for('student.dashboard'))
 
@@ -382,7 +390,7 @@ def complaint_feedback(complaint_id):
 @student_only
 def track_complaint(complaint_id):
     """View the tracking timeline for a specific complaint."""
-    complaint = Complaint.query.options(joinedload(Complaint.student), joinedload(Complaint.staff)).get_or_404(complaint_id)
+    complaint = db.get_or_404(Complaint, complaint_id)
     if complaint.student_id != current_user.student_id:
         flash('Access denied.', 'danger')
         return redirect(url_for('student.dashboard'))

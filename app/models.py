@@ -94,8 +94,6 @@ class Warden(db.Model):
     __tablename__ = 'warden'
 
     warden_id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(200), nullable=False)
-    email = db.Column(db.String(120), nullable=False)
     contact_no = db.Column(db.String(20), nullable=False)
     hostel_id = db.Column(db.Integer, db.ForeignKey('hostel.hostel_id'), nullable=False)
     staff_id = db.Column(db.Integer, db.ForeignKey('staff_members.staff_id'), nullable=False)
@@ -199,7 +197,7 @@ class Complaint(db.Model):
     status = db.Column(db.String(50), nullable=False)
     issue_date = db.Column(db.Date, nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'), nullable=False)
-    staff_id = db.Column(db.Integer, db.ForeignKey('staff_members.staff_id'), nullable=True)
+    staff_id = db.Column(db.Integer, db.ForeignKey('staff_members.staff_id', ondelete='SET NULL'), nullable=True)
 
     student = db.relationship('Student', back_populates='complaints')
     staff = db.relationship('StaffMember', back_populates='complaints_handled')
