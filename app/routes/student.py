@@ -19,6 +19,8 @@ from app.models import (
 )
 from sqlalchemy.orm import joinedload
 
+from app.utils.email import send_complaint_received
+
 COMPLAINT_CATEGORIES = frozenset(
     {
         'Electrical',
@@ -171,6 +173,7 @@ def new_complaint():
         )
         db.session.add(row)
         db.session.commit()
+        send_complaint_received(current_user.email, current_user.name, row.complaint_id, row.type)
         flash('Your complaint was submitted successfully.', 'success')
         return redirect(url_for('student.dashboard'))
 

@@ -22,6 +22,7 @@ from app.models import (
     TaskAllocation,
     Warden,
 )
+from app.utils.email import send_task_assigned
 
 COMPLAINT_STATUSES = ('Open', 'In Progress', 'Resolved')
 
@@ -419,6 +420,9 @@ def new_task():
         )
         db.session.add(task)
         db.session.commit()
+        assigned_staff = db.session.get(StaffMember, staff_id)
+        if assigned_staff:
+            send_task_assigned(assigned_staff.email, assigned_staff.name, task.description, current_user.name)
         flash('Task created and assigned successfully.', 'success')
         return redirect(url_for('warden.dashboard'))
 

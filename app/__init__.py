@@ -7,7 +7,7 @@ from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from werkzeug.exceptions import HTTPException
-
+from flask_mail import Mail
 from config import config_by_name
 
 db = SQLAlchemy()
@@ -17,6 +17,7 @@ login_manager.login_view = 'auth.login_student'
 login_manager.login_message_category = 'info'
 csrf = CSRFProtect()
 limiter = Limiter(get_remote_address, default_limits=["200 per day", "50 per hour"])
+mail = Mail()
 
 
 @login_manager.user_loader
@@ -53,6 +54,7 @@ def create_app(config_name=None):
     login_manager.init_app(app)
     csrf.init_app(app)
     limiter.init_app(app)
+    mail.init_app(app)
 
     from app import models  # noqa: F401
 

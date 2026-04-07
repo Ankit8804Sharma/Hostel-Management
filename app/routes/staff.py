@@ -7,6 +7,7 @@ from sqlalchemy.orm import joinedload
 
 from app import db
 from app.models import Complaint, StaffMember, Student, TaskAllocation
+from app.utils.email import send_complaint_status_update
 
 staff_bp = Blueprint('staff', __name__)
 
@@ -99,6 +100,7 @@ def update_complaint_status(complaint_id):
     if new_status in ['In Progress', 'Resolved']:
         complaint.status = new_status
         db.session.commit()
+        send_complaint_status_update(complaint.student.email, complaint.student.name, complaint.complaint_id, new_status, current_user.name)
         flash(f'Complaint status updated to {new_status}.', 'success')
     else:
         flash('Invalid status selected.', 'error')
