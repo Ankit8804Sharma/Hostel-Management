@@ -3,6 +3,9 @@ from flask import Flask, redirect, render_template, request, url_for
 from flask_login import LoginManager
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 from werkzeug.exceptions import HTTPException
 
 from config import config_by_name
@@ -12,6 +15,8 @@ migrate = Migrate()
 login_manager = LoginManager()
 login_manager.login_view = 'auth.login_student'
 login_manager.login_message_category = 'info'
+csrf = CSRFProtect()
+limiter = Limiter(get_remote_address, default_limits=["200 per day", "50 per hour"])
 
 
 @login_manager.user_loader
@@ -46,6 +51,8 @@ def create_app(config_name=None):
     db.init_app(app)
     migrate.init_app(app, db)
     login_manager.init_app(app)
+    csrf.init_app(app)
+    limiter.init_app(app)
 
     from app import models  # noqa: F401
 

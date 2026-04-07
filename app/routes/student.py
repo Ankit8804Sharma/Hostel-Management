@@ -346,11 +346,10 @@ def complaint_feedback(complaint_id):
     """Submit feedback for a resolved complaint."""
     from app.models import Feedback
     complaint = Complaint.query.get_or_404(complaint_id)
-    
-    # Ensure complaint belongs to student and is resolved
+
+    # Ownership check — must come first, before any status check
     if complaint.student_id != current_user.student_id:
-        flash('You can only give feedback for your own complaints.', 'error')
-        return redirect(url_for('student.dashboard'))
+        abort(403)
     if complaint.status != 'Resolved':
         flash('Feedback can only be provided for resolved complaints.', 'error')
         return redirect(url_for('student.dashboard'))

@@ -1,11 +1,13 @@
+import os
 import re
 from urllib.parse import urljoin, urlparse
 
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 from flask_login import login_user, logout_user
 
 from app import db
 from app.models import StaffMember, Student
+from app import limiter
 
 auth_bp = Blueprint('auth', __name__)
 
@@ -44,6 +46,7 @@ def register_student():
 
 
 @auth_bp.route('/login/student', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def login_student():
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
@@ -69,6 +72,8 @@ def login_student():
 @auth_bp.route('/register/staff', methods=['GET', 'POST'])
 def register_staff():
     if request.method == 'POST':
+        if request.form.get('invite_code') != os.environ.get('STAFF_INVITE_CODE'):
+            abort(403)
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip().lower()
         contact_no = request.form.get('contact_no', '').strip()
@@ -99,6 +104,7 @@ def register_staff():
 
 
 @auth_bp.route('/login/staff', methods=['GET', 'POST'])
+@limiter.limit("5 per minute")
 def login_staff():
     if request.method == 'POST':
         email = request.form.get('email', '').strip().lower()
