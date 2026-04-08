@@ -1,65 +1,107 @@
 {% extends "base.html" %}
-{% block title %}Laundry History{% endblock %}
-
-{% macro status_badge(status) %}
-  {% set s = (status|string)|lower|trim %}
-  {% if s == 'pending' %}
-    <span class="badge rounded-pill bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10">Pending</span>
-  {% elif s == 'in progress' %}
-    <span class="badge rounded-pill bg-info bg-opacity-10 text-info border border-info border-opacity-10">In Progress</span>
-  {% elif s == 'delivered' %}
-    <span class="badge rounded-pill bg-success bg-opacity-10 text-success border border-success border-opacity-10">Delivered</span>
-  {% else %}
-    <span class="badge rounded-pill bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-10">{{ status }}</span>
-  {% endif %}
-{% endmacro %}
+{% block title %}Laundry System{% endblock %}
 
 {% block content %}
-<div class="hms-welcome-header">
-  <h2 class="fw-bold mb-1">Your Laundry History</h2>
-  <p class="text-muted mb-0">Track all your laundry orders and their current status.</p>
-</div>
-
-<div class="card hms-card">
-  <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
-    <h5 class="fw-bold mb-0">Total Orders: {{ laundry_orders|length }}</h5>
-    <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-       <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
+<div class="hms-welcome-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+  <div>
+    <h2 class="fw-bold mb-1">My Laundry</h2>
+    <p class="text-muted mb-0">Track and manage your laundry orders.</p>
+  </div>
+  <div class="mt-3 mt-md-0">
+    <a href="{{ url_for('student.new_laundry') }}" class="btn btn-primary rounded-pill px-4 shadow-sm">
+      <i class="bi bi-plus-lg me-2"></i>Place New Order
     </a>
   </div>
+</div>
+
+<!-- Fast Stats Row -->
+<div class="row g-4 mb-4">
+  <div class="col-6 col-md-3">
+    <div class="card hms-card text-center border-0 bg-warning bg-opacity-10 py-3">
+      <h3 class="fw-bold text-warning mb-0">{{ status_counts.Pending }}</h3>
+      <span class="smallest text-warning fw-bold text-uppercase mt-1">Pending</span>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card hms-card text-center border-0 bg-info bg-opacity-10 py-3">
+      <h3 class="fw-bold text-info mb-0">{{ status_counts.Washing }}</h3>
+      <span class="smallest text-info fw-bold text-uppercase mt-1">Washing</span>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card hms-card text-center border-0 bg-success bg-opacity-10 py-3">
+      <h3 class="fw-bold text-success mb-0">{{ status_counts.Ready }}</h3>
+      <span class="smallest text-success fw-bold text-uppercase mt-1">Ready</span>
+    </div>
+  </div>
+  <div class="col-6 col-md-3">
+    <div class="card hms-card text-center border-0 bg-secondary bg-opacity-10 py-3">
+      <h3 class="fw-bold text-secondary mb-0">{{ status_counts.Collected }}</h3>
+      <span class="smallest text-secondary fw-bold text-uppercase mt-1">Collected</span>
+    </div>
+  </div>
+</div>
+
+<!-- Orders Table -->
+<div class="card hms-card border-0 mb-5">
+  <div class="card-header bg-white border-0 py-3">
+    <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-list-ul me-2"></i>Order History</h6>
+  </div>
   <div class="card-body p-0">
-    {% if laundry_orders %}
-      <div class="table-responsive">
-        <table class="table hms-table table-hover align-middle mb-0">
-          <thead>
-            <tr>
-              <th>Order Date</th>
-              <th>Items</th>
-              <th>Weight (kg)</th>
-              <th>Status</th>
-              <th class="text-end">Details</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for l in laundry_orders %}
-            <tr>
-              <td><span class="fw-bold text-dark"><i class="bi bi-calendar3 me-2 text-primary"></i>{{ l.date }}</span></td>
-              <td style="max-width: 300px;"><div class="small text-muted">{{ l.items or '—' }}</div></td>
-              <td><span class="badge bg-light text-dark border px-3">{{ l.weight }} kg</span></td>
-              <td>{{ status_badge(l.status) }}</td>
-              <td class="text-end small text-muted">Order ID: #{{ l.laundry_id }}</td>
-            </tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
-    {% else %}
-      <div class="hms-empty-state">
-        <i class="bi bi-basket"></i>
-        <p class="mb-0">You have no laundry history.</p>
-        <a href="{{ url_for('student.new_laundry') }}" class="btn btn-primary btn-sm rounded-pill px-4 mt-3">Start Your First Request</a>
-      </div>
-    {% endif %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4 text-muted small fw-bold text-uppercase">Submission Date</th>
+            <th class="text-muted small fw-bold text-uppercase">Weight (kg)</th>
+            <th class="text-muted small fw-bold text-uppercase">Pickup Date</th>
+            <th class="text-muted small fw-bold text-uppercase w-25">Items & Instructions</th>
+            <th class="pe-4 text-end text-muted small fw-bold text-uppercase">Status</th>
+          </tr>
+        </thead>
+        <tbody class="border-top-0">
+          {% for order in laundry_orders %}
+          <tr>
+            <td class="ps-4 fw-medium text-dark">{{ order.date.strftime('%Y-%m-%d') }}</td>
+            <td class="fw-bold">{{ order.weight }}</td>
+            <td>
+              {% if order.pickup_date %}
+                <span class="badge bg-light text-dark border">{{ order.pickup_date.strftime('%Y-%m-%d') }}</span>
+              {% else %}
+                <span class="text-muted small">—</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="small fw-medium">{{ order.items or '—' }}</div>
+              {% if order.special_instructions %}
+              <div class="smallest text-muted mt-1 fst-italic">
+                <i class="bi bi-info-circle me-1"></i>{{ order.special_instructions }}
+              </div>
+              {% endif %}
+            </td>
+            <td class="pe-4 text-end">
+              {% if order.status == 'Pending' %}
+                <span class="badge bg-warning rounded-pill px-3 py-2 fw-medium">Pending</span>
+              {% elif order.status == 'Washing' %}
+                <span class="badge bg-info rounded-pill px-3 py-2 fw-medium">Washing</span>
+              {% elif order.status == 'Ready' %}
+                <span class="badge bg-success rounded-pill px-3 py-2 fw-medium">Ready</span>
+              {% else %}
+                <span class="badge bg-secondary rounded-pill px-3 py-2 fw-medium">Collected</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="5" class="text-center py-5 text-muted">
+              <i class="bi bi-basket2 text-muted opacity-50 display-6 mb-3 d-block"></i>
+              No laundry orders found.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
   </div>
 </div>
 {% endblock %}

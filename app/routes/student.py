@@ -315,31 +315,7 @@ def gaming_return(serial_no):
     db.session.commit()
     flash('Equipment returned successfully.', 'success')
     return redirect(url_for('student.gaming'))
-@student_bp.route('/profile', methods=['GET', 'POST'])
-@login_required
-@student_only
-def profile():
-    """View and update student profile."""
-    student = db.get_or_404(Student, current_user.student_id)
-    if request.method == 'POST':
-        name = request.form.get('name', '').strip()
-        phone = request.form.get('phone_number', '').strip()
-        if not name or not phone:
-            flash('Name and phone number are required.', 'error')
-            return redirect(url_for('student.profile'))
-        student.name = name
-        student.phone_number = phone
-        db.session.commit()
-        flash('Profile updated successfully!', 'success')
-        return redirect(url_for('student.profile'))
 
-    # Statistics for the student
-    stats = {
-        'complaints': Complaint.query.filter_by(student_id=student.student_id).count(),
-        'laundry': Laundry.query.filter_by(student_id=student.student_id).count(),
-        'gaming': EquipmentUsage.query.filter_by(student_id=student.student_id).count(),
-    }
-    return render_template('student/profile.html', student=student, stats=stats)
 @student_bp.route('/complaints')
 @login_required
 @student_only
@@ -365,7 +341,65 @@ def laundry_history():
         .order_by(Laundry.date.desc())
         .all()
     )
-    return render_template('student/laundry.html', student=student, laundry_orders=laundry_orders)
+    
+    status_counts = {
+        'Pending': sum(1 for o in laundry_orders if o.status == 'Pending'),
+        'Washing': sum(1 for o in laundry_orders if o.status == 'Washing'),
+        'Ready': sum(1 for o in laundry_orders if o.status == 'Ready'),
+        'Collected': sum(1 for o in laundry_orders if o.status == 'Collected')
+    }
+    
+    return render_template('student/laundry.html', student=student, laundry_orders=laundry_orders, status_counts=status_counts)
+
+
+@student_bp.route('/laundry/new', methods=['GET', 'POST'])
+@login_required
+@student_only
+def new_laundry():
+    """Place a new laundry order."""
+    from datetime import date, datetime
+    today_date = date.today()
+    
+    if request.method == 'POST':
+        weight_str = request.form.get('weight', '')
+        items = request.form.get('items', '').strip()
+        pickup_date_str = request.form.get('pickup_date', '').strip()
+        special_instructions = request.form.get('special_instructions', '').strip()
+
+        try:
+            weight = float(weight_str)
+            if weight <= 0 or weight > 20:
+                raise ValueError
+        except ValueError:
+            flash('Invalid weight. Must be greater than 0 and up to 20 kg.', 'danger')
+            return redirect(url_for('student.new_laundry'))
+            
+        pickup_date = None
+        if pickup_date_str:
+            try:
+                pickup_date = datetime.strptime(pickup_date_str, '%Y-%m-%d').date()
+                if pickup_date < today_date:
+                    flash('Pickup date cannot be in the past.', 'danger')
+                    return redirect(url_for('student.new_laundry'))
+            except ValueError:
+                flash('Invalid date format.', 'danger')
+                return redirect(url_for('student.new_laundry'))
+
+        laundry = Laundry(
+            student_id=current_user.student_id,
+            date=today_date,
+            weight=weight,
+            items=items,
+            status='Pending',
+            pickup_date=pickup_date,
+            special_instructions=special_instructions if special_instructions else None
+        )
+        db.session.add(laundry)
+        db.session.commit()
+        flash('Laundry order placed successfully.', 'success')
+        return redirect(url_for('student.laundry_history'))
+
+    return render_template('student/new_laundry.html', today=today_date.strftime('%Y-%m-%d'))
 
 
 @student_bp.route('/complaint/<int:complaint_id>/feedback', methods=['GET', 'POST'])

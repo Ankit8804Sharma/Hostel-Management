@@ -1,67 +1,51 @@
 {% extends "base.html" %}
-{% block title %}New Laundry Request{% endblock %}
+{% block title %}Place Laundry Order{% endblock %}
 
 {% block content %}
-<div class="container py-5">
-  <div class="row justify-content-center">
-    <div class="col-md-8 col-lg-6">
-      <!-- Breadcrumb -->
-      <nav aria-label="breadcrumb" class="mb-4">
-        <ol class="breadcrumb">
-          <li class="breadcrumb-item"><a href="{{ url_for('student.dashboard') }}" class="text-decoration-none">Dashboard</a></li>
-          <li class="breadcrumb-item active" aria-current="page">New Laundry Order</li>
-        </ol>
-      </nav>
+<div class="hms-welcome-header">
+  <h2 class="fw-bold mb-1">New Laundry Order</h2>
+  <p class="text-muted mb-0">Fill in the details for your new laundry order.</p>
+</div>
 
-      <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
-        <div class="card-header bg-info py-4 text-center">
-          <h1 class="h4 text-white mb-0 fw-bold">
-            <i class="bi bi-droplet-fill me-2"></i>New Laundry Order
-          </h1>
-          <p class="text-white-50 small mb-0 mt-1">Submit your laundry for cleaning</p>
-        </div>
-        <div class="card-body p-4 p-md-5">
-          <form method="post" action="{{ url_for('student.new_laundry') }}" class="needs-validation" novalidate>
-    {{ form.hidden_tag() if form else '' }}
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <!-- Items -->
-            <div class="mb-4">
-              <label for="laundry_items" class="form-label fw-semibold text-dark">Items List</label>
-              <textarea class="form-control shadow-none" id="laundry_items" name="items" rows="3" required placeholder="e.g. 2 Shirts, 1 Jeans, 3 Pairs of Socks"></textarea>
-              <div class="invalid-feedback">Please list the items you're submitting.</div>
-              <div class="valid-feedback">Got it!</div>
-              <div class="form-text">Briefly list the items you're submitting.</div>
+<div class="row justify-content-center">
+  <div class="col-md-8 col-lg-6">
+    <div class="card hms-card border-0 shadow-sm mt-3 mb-5">
+      <div class="card-body p-4 p-md-5">
+        <form method="post" action="{{ url_for('student.new_laundry') }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+          
+          <div class="mb-4">
+            <label class="form-label fw-bold small text-muted">Weight (kg) <span class="text-danger">*</span></label>
+            <div class="input-group">
+              <input type="number" step="0.1" name="weight" class="form-control bg-light border-0 shadow-none" placeholder="e.g. 2.5" min="0.1" max="20" required>
+              <span class="input-group-text bg-light border-0 text-muted">kg</span>
             </div>
+            <div class="form-text smallest">Maximum limit is 20 kg per order.</div>
+          </div>
 
-            <!-- Weight -->
-            <div class="mb-4">
-              <label for="laundry_weight" class="form-label fw-semibold text-dark">Estimated Weight (kg)</label>
-              <div class="input-group">
-                <span class="input-group-text bg-light border-end-0"><i class="bi bi-speedometer2 text-muted"></i></span>
-                <input type="number" step="0.1" min="0.5" max="20" class="form-control border-start-0 ps-0 shadow-none" id="laundry_weight" name="weight" required placeholder="0.0">
-                <div class="invalid-feedback">Weight must be between 0.5kg and 20kg.</div>
-                <div class="valid-feedback">Weight looks reasonable.</div>
-              </div>
-              <div class="form-text">Enter the estimated weight in kilograms.</div>
-            </div>
+          <div class="mb-4">
+            <label class="form-label fw-bold small text-muted">Items Overview <span class="text-danger">*</span></label>
+            <textarea name="items" class="form-control bg-light border-0 shadow-none" rows="3" placeholder="e.g. 5 Shirts, 2 Jeans, 1 Bedsheet" required></textarea>
+          </div>
 
-            <!-- Notice -->
-            <div class="alert alert-light border-0 rounded-3 mb-4 small text-muted">
-              <i class="bi bi-info-circle me-2"></i>
-              Your request will be marked as <strong>Pending</strong> until the laundry staff confirms the items.
-            </div>
+          <div class="mb-4">
+            <label class="form-label fw-bold small text-muted">Pickup Date</label>
+            <input type="date" name="pickup_date" class="form-control bg-light border-0 shadow-none" min="{{ today }}">
+            <div class="form-text smallest">Leave blank if submitting today.</div>
+          </div>
 
-            <!-- Actions -->
-            <div class="d-grid gap-2">
-              <button type="submit" class="btn btn-info text-white btn-lg fw-bold rounded-3 py-3">
-                <i class="bi bi-check2-circle me-2"></i>Submit Laundry Order
-              </button>
-              <a href="{{ url_for('student.dashboard') }}" class="btn btn-link text-muted text-decoration-none">
-                Cancel
-              </a>
-            </div>
-          </form>
-        </div>
+          <div class="mb-5">
+            <label class="form-label fw-bold small text-muted">Special Instructions</label>
+            <textarea name="special_instructions" class="form-control bg-light border-0 shadow-none" rows="2" maxlength="500" placeholder="e.g. Wash white clothes separately..."></textarea>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center">
+            <a href="{{ url_for('student.laundry_history') }}" class="btn btn-light rounded-pill px-4 shadow-sm text-secondary fw-medium">Cancel</a>
+            <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
+              <i class="bi bi-send-fill me-2"></i>Place Order
+            </button>
+          </div>
+        </form>
       </div>
     </div>
   </div>

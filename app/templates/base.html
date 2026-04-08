@@ -86,6 +86,9 @@
           <a class="nav-link {% if request.endpoint == 'warden.room_management' %}active{% endif %}" href="{{ url_for('warden.room_management') }}">
             <i class="bi bi-door-open"></i>Room Management
           </a>
+          <a class="nav-link {% if request.endpoint == 'warden.laundry_management' %}active{% endif %}" href="{{ url_for('warden.laundry_management') }}">
+            <i class="bi bi-droplet-half"></i>Laundry
+          </a>
 
         {% elif current_user.get_id().startswith('staff_') and current_user.role == 'staff' %}
           <a class="nav-link {% if request.endpoint == 'staff.dashboard' %}active{% endif %}" href="{{ url_for('staff.dashboard') }}">

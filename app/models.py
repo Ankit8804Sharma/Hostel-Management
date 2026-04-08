@@ -189,6 +189,8 @@ class Laundry(db.Model):
     weight = db.Column(db.Float, nullable=False)
     status = db.Column(db.String(50), nullable=False)
     items = db.Column(db.Text, nullable=True)
+    pickup_date = db.Column(db.Date, nullable=True)
+    special_instructions = db.Column(db.String(500), nullable=True)
     student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'), nullable=False)
 
     student = db.relationship('Student', back_populates='laundry_orders')

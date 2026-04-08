@@ -1,0 +1,128 @@
+{% extends "base.html" %}
+{% block title %}Laundry Management{% endblock %}
+
+{% block content %}
+<div class="hms-welcome-header d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+  <div>
+    <h2 class="fw-bold mb-1">Laundry Operations</h2>
+    <p class="text-muted mb-0">Manage and track student laundry orders.</p>
+  </div>
+</div>
+
+<div class="card hms-card border-0 mb-5">
+  <div class="card-header bg-white border-0 py-3 d-flex flex-wrap align-items-center justify-content-between">
+    <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-droplet-half me-2"></i>All Laundry Orders</h6>
+    <div class="mt-2 mt-sm-0">
+      <form method="get" action="{{ url_for('warden.laundry_management') }}" class="d-flex align-items-center">
+        <label for="statusFilter" class="form-label fs-sm fw-medium mb-0 me-2 text-muted">Filter:</label>
+        <select name="status" id="statusFilter" class="form-select form-select-sm bg-light border-0 shadow-none" onchange="this.form.submit()">
+          <option value="All" {% if status_filter == 'All' %}selected{% endif %}>All Orders</option>
+          <option value="Pending" {% if status_filter == 'Pending' %}selected{% endif %}>Pending</option>
+          <option value="Washing" {% if status_filter == 'Washing' %}selected{% endif %}>Washing</option>
+          <option value="Ready" {% if status_filter == 'Ready' %}selected{% endif %}>Ready to Collect</option>
+          <option value="Collected" {% if status_filter == 'Collected' %}selected{% endif %}>Collected</option>
+        </select>
+      </form>
+    </div>
+  </div>
+  
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4 text-muted small fw-bold text-uppercase w-15">Student</th>
+            <th class="text-muted small fw-bold text-uppercase w-10">Date</th>
+            <th class="text-muted small fw-bold text-uppercase w-10">Weight</th>
+            <th class="text-muted small fw-bold text-uppercase w-10">Pickup</th>
+            <th class="text-muted small fw-bold text-uppercase w-20">Items & Instructions</th>
+            <th class="text-muted small fw-bold text-uppercase w-10">Status</th>
+            <th class="pe-4 text-end text-muted small fw-bold text-uppercase w-25">Action</th>
+          </tr>
+        </thead>
+        <tbody class="border-top-0">
+          {% for order in laundry_orders.items %}
+          <tr>
+            <td class="ps-4">
+              <div class="fw-bold text-dark">{{ order.student.name }}</div>
+              <div class="smallest text-muted">{{ order.student.email }}</div>
+            </td>
+            <td class="fw-medium text-dark">{{ order.date.strftime('%Y-%m-%d') }}</td>
+            <td class="fw-bold text-info">{{ order.weight }} kg</td>
+            <td>
+              {% if order.pickup_date %}
+                <span class="badge bg-light text-dark border">{{ order.pickup_date.strftime('%Y-%m-%d') }}</span>
+              {% else %}
+                <span class="text-muted small">—</span>
+              {% endif %}
+            </td>
+            <td>
+              <div class="small fw-medium">{{ order.items or '—' }}</div>
+              {% if order.special_instructions %}
+              <div class="smallest text-muted mt-1 fst-italic">
+                <i class="bi bi-info-circle me-1"></i>{{ order.special_instructions }}
+              </div>
+              {% endif %}
+            </td>
+            <td>
+              {% if order.status == 'Pending' %}
+                <span class="badge bg-warning rounded-pill px-3 py-2 fw-medium">Pending</span>
+              {% elif order.status == 'Washing' %}
+                <span class="badge bg-info rounded-pill px-3 py-2 fw-medium">Washing</span>
+              {% elif order.status == 'Ready' %}
+                <span class="badge bg-success rounded-pill px-3 py-2 fw-medium">Ready</span>
+              {% else %}
+                <span class="badge bg-secondary rounded-pill px-3 py-2 fw-medium">Collected</span>
+              {% endif %}
+            </td>
+            <td class="pe-4 text-end">
+              <form method="post" action="{{ url_for('warden.update_laundry_status', laundry_id=order.laundry_id) }}" class="d-flex align-items-center justify-content-end gap-2">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <select name="new_status" class="form-select form-select-sm border-0 bg-light shadow-none" style="width: auto;">
+                  <option value="Pending" {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
+                  <option value="Washing" {% if order.status == 'Washing' %}selected{% endif %}>Washing</option>
+                  <option value="Ready" {% if order.status == 'Ready' %}selected{% endif %}>Ready</option>
+                  <option value="Collected" {% if order.status == 'Collected' %}selected{% endif %}>Collected</option>
+                </select>
+                <button type="submit" class="btn btn-sm btn-primary rounded-pill px-3 py-1 shadow-sm fs-xs fw-medium">Update</button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr>
+            <td colspan="7" class="text-center py-5 text-muted">
+              <i class="bi bi-droplet-half text-muted opacity-50 display-6 mb-3 d-block"></i>
+              No laundry orders found for the current filter.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  {% if laundry_orders.pages > 1 %}
+  <div class="card-footer bg-white border-0 py-3 d-flex justify-content-center">
+    <nav>
+      <ul class="pagination pagination-sm mb-0 shadow-sm">
+        <li class="page-item {% if not laundry_orders.has_prev %}disabled{% endif %}">
+          <a class="page-link border-0 text-dark" href="{{ url_for('warden.laundry_management', page=laundry_orders.prev_num, status=status_filter) if laundry_orders.has_prev else '#' }}">Previous</a>
+        </li>
+        {% for page_num in laundry_orders.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+          {% if page_num %}
+            <li class="page-item {% if page_num == laundry_orders.page %}active{% endif %}">
+              <a class="page-link border-0 {% if page_num == laundry_orders.page %}bg-primary text-white{% else %}text-dark bg-light{% endif %}" href="{{ url_for('warden.laundry_management', page=page_num, status=status_filter) }}">{{ page_num }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link border-0 bg-light text-muted">...</span></li>
+          {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not laundry_orders.has_next %}disabled{% endif %}">
+          <a class="page-link border-0 text-dark" href="{{ url_for('warden.laundry_management', page=laundry_orders.next_num, status=status_filter) if laundry_orders.has_next else '#' }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

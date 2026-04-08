@@ -621,3 +621,38 @@ def vacate_room(allocation_id):
     notify_student(allocation.student_id, "Your room allocation has been vacated.")
     flash('Room vacated successfully.', 'success')
     return redirect(url_for('warden.room_management'))
+
+
+@warden_bp.route('/laundry')
+@login_required
+@warden_only
+def laundry_management():
+    status_filter = request.args.get('status', 'All')
+    page = request.args.get('page', 1, type=int)
+
+    query = Laundry.query.options(joinedload(Laundry.student))
+    if status_filter != 'All':
+        query = query.filter(Laundry.status == status_filter)
+
+    laundry_orders = query.order_by(Laundry.date.desc()).paginate(page=page, per_page=25, error_out=False)
+
+    return render_template('warden/laundry.html', laundry_orders=laundry_orders, status_filter=status_filter)
+
+
+@warden_bp.route('/laundry/<int:laundry_id>/status', methods=['POST'])
+@login_required
+@warden_only
+def update_laundry_status(laundry_id):
+    laundry = db.get_or_404(Laundry, laundry_id)
+    new_status = request.form.get('new_status', '').strip()
+    
+    valid_statuses = ['Pending', 'Washing', 'Ready', 'Collected']
+    if new_status not in valid_statuses:
+        flash('Invalid status provided.', 'danger')
+        return redirect(url_for('warden.laundry_management'))
+        
+    laundry.status = new_status
+    db.session.commit()
+    notify_student(laundry.student_id, f"Your laundry order status has been updated to {new_status}.")
+    flash('Laundry status updated successfully.', 'success')
+    return redirect(url_for('warden.laundry_management'))
