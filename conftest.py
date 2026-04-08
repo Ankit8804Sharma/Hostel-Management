@@ -51,3 +51,17 @@ def warden_user(db):
     db.session.add(warden)
     db.session.commit()
     return warden
+
+@pytest.fixture
+def staff_user(db):
+    staff = StaffMember(
+        name='Test Staff',
+        contact_no='1122334455',
+        designation='Maintenance',
+        email='staff@test.com',
+        role='staff',
+        password_hash=generate_password_hash('password123')
+    )
+    db.session.add(staff)
+    db.session.commit()
+    return staff
