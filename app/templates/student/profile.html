@@ -2,136 +2,177 @@
 {% block title %}My Profile{% endblock %}
 
 {% block content %}
-<!-- Header -->
-<div class="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-4">
-    <div>
-      <h1 class="h3 mb-0 fw-semibold"><i class="bi bi-person-circle text-primary me-2"></i>My Profile</h1>
-      <p class="text-muted small mb-0">View your details and activity statistics.</p>
+<div class="hms-welcome-header">
+  <h2 class="fw-bold mb-1">My Profile</h2>
+  <p class="text-muted mb-0">View and update your personal information.</p>
+</div>
+
+<div class="row g-4 mb-5">
+  <!-- Left Column -->
+  <div class="col-md-4">
+    <!-- Profile Card -->
+    <div class="card hms-card mb-4 text-center">
+      <div class="card-body py-5">
+        <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-primary text-white fw-bold fs-1 mb-3" style="width: 80px; height: 80px;">
+          {{ student.name[0]|upper }}
+        </div>
+        <h4 class="fw-bold mb-1">{{ student.name }}</h4>
+        <p class="text-muted small mb-2">{{ student.email }}</p>
+        
+        {% if student.roll_number %}
+        <span class="badge bg-secondary rounded-pill px-3 py-2 fw-medium">
+          <i class="bi bi-hash me-1"></i>{{ student.roll_number }}
+        </span>
+        {% endif %}
+      </div>
     </div>
-    <a href="{{ url_for('student.dashboard') }}" class="btn btn-sm btn-outline-secondary">
-      <i class="bi bi-arrow-left me-1"></i>Back to dashboard
-    </a>
+
+    <!-- Room Info Card -->
+    <div class="card hms-card">
+      <div class="card-header bg-white border-0 py-3">
+        <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-house-door me-2"></i>Accommodation</h6>
+      </div>
+      <div class="card-body p-0">
+        {% if active_allocation %}
+        <div class="list-group list-group-flush rounded-bottom">
+          <div class="list-group-item px-4 border-0 d-flex justify-content-between align-items-center">
+            <span class="text-muted small fw-medium">Room No</span>
+            <span class="fw-bold">{{ active_allocation.room.room_no }}</span>
+          </div>
+          <div class="list-group-item px-4 border-0 d-flex justify-content-between align-items-center">
+            <span class="text-muted small fw-medium">Hostel Type</span>
+            <span class="badge bg-info bg-opacity-10 text-info border border-info border-opacity-10">{{ active_allocation.room.hostel.type|capitalize }}</span>
+          </div>
+          <div class="list-group-item px-4 border-0 d-flex justify-content-between align-items-center">
+            <span class="text-muted small fw-medium">Allocated Since</span>
+            <span class="small">{{ active_allocation.alloc_date.strftime('%d %b %Y') }}</span>
+          </div>
+        </div>
+        {% else %}
+        <div class="px-4 py-3 text-center text-muted small">
+          <i class="bi bi-x-circle me-1"></i>Not allocated to any room.
+        </div>
+        {% endif %}
+      </div>
+    </div>
   </div>
 
-  <div class="row g-4">
-    <!-- Profile Card & Edit Form -->
-    <div class="col-lg-8">
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white border-0 py-3">
-          <h5 class="card-title mb-0 fw-semibold">Personal Information</h5>
-        </div>
-        <div class="card-body">
-          <div class="row g-4 mb-4">
-            <div class="col-md-4">
-              <div class="p-3 rounded-3 bg-light border h-100 text-center">
-                <div class="bg-primary bg-opacity-10 text-primary mx-auto mb-3 d-flex align-items-center justify-content-center rounded-circle" style="width: 80px; height: 80px;">
-                  <i class="bi bi-person-fill fs-1"></i>
+  <!-- Right Column -->
+  <div class="col-md-8">
+    <div class="card hms-card h-100">
+      <div class="card-header bg-white border-bottom-0 pb-0 pt-4 px-4">
+        <ul class="nav nav-tabs border-bottom" id="profileTabs" role="tablist">
+          <li class="nav-item" role="presentation">
+            <button class="nav-link active fw-medium px-4 text-dark" id="details-tab" data-bs-toggle="tab" data-bs-target="#details" type="button" role="tab">Overview Details</button>
+          </li>
+          <li class="nav-item" role="presentation">
+            <button class="nav-link fw-medium px-4 text-dark" id="edit-tab" data-bs-toggle="tab" data-bs-target="#edit" type="button" role="tab">Edit Profile</button>
+          </li>
+        </ul>
+      </div>
+      <div class="card-body p-4 p-md-5">
+        <div class="tab-content" id="profileTabsContent">
+          
+          <!-- Details Tab -->
+          <div class="tab-pane fade show active" id="details" role="tabpanel">
+            <h6 class="fw-bold text-uppercase smallest text-muted mb-3"><i class="bi bi-person-lines-fill me-2"></i>Personal Information</h6>
+            <dl class="row mb-5">
+              <dt class="col-sm-3 text-muted fw-medium small mb-2">Phone</dt>
+              <dd class="col-sm-9 fw-medium mb-3">{{ student.phone_number }}</dd>
+              
+              <dt class="col-sm-3 text-muted fw-medium small mb-2">Gender</dt>
+              <dd class="col-sm-9 fw-medium mb-3">{{ student.gender or '—' }}</dd>
+              
+              <dt class="col-sm-3 text-muted fw-medium small mb-2">Date of Birth</dt>
+              <dd class="col-sm-9 fw-medium mb-3">{{ student.date_of_birth.strftime('%d %b %Y') if student.date_of_birth else '—' }}</dd>
+              
+              <dt class="col-sm-3 text-muted fw-medium small mb-2">Address</dt>
+              <dd class="col-sm-9 fw-medium mb-3">{{ student.address or '—' }}</dd>
+            </dl>
+
+            <div class="row g-4 mt-2">
+              <div class="col-md-6">
+                <h6 class="fw-bold text-uppercase smallest text-muted mb-3"><i class="bi bi-calendar-check me-2"></i>Attendance Summary</h6>
+                <div class="d-flex gap-2">
+                  <div class="flex-grow-1 bg-success bg-opacity-10 rounded-3 p-3 text-center border border-success border-opacity-10">
+                    <div class="h4 fw-bold text-success mb-0">{{ attendance_summary.present }}</div>
+                    <div class="smallest text-success fw-medium text-uppercase mt-1">Present</div>
+                  </div>
+                  <div class="flex-grow-1 bg-danger bg-opacity-10 rounded-3 p-3 text-center border border-danger border-opacity-10">
+                    <div class="h4 fw-bold text-danger mb-0">{{ attendance_summary.absent }}</div>
+                    <div class="smallest text-danger fw-medium text-uppercase mt-1">Absent</div>
+                  </div>
+                  <div class="flex-grow-1 bg-warning bg-opacity-10 rounded-3 p-3 text-center border border-warning border-opacity-10">
+                    <div class="h4 fw-bold text-warning mb-0">{{ attendance_summary.leave }}</div>
+                    <div class="smallest text-warning fw-medium text-uppercase mt-1">Leave</div>
+                  </div>
                 </div>
-                <h6 class="fw-bold mb-1">{{ student.name }}</h6>
-                <p class="text-muted small mb-0">Student</p>
               </div>
-            </div>
-            <div class="col-md-8">
-              <div class="row g-3">
-                <div class="col-sm-6">
-                  <div class="small text-muted mb-1"><i class="bi bi-envelope me-1"></i>Email Address</div>
-                  <div class="fw-medium">{{ student.email }}</div>
-                </div>
-                <div class="col-sm-6">
-                  <div class="small text-muted mb-1"><i class="bi bi-telephone me-1"></i>Phone Number</div>
-                  <div class="fw-medium">{{ student.phone_number }}</div>
-                </div>
-                <div class="col-sm-12">
-                   <div class="small text-muted mb-1"><i class="bi bi-hash me-1"></i>Student ID</div>
-                   <div class="fw-medium">#{{ student.student_id }}</div>
+              <div class="col-md-6">
+                <h6 class="fw-bold text-uppercase smallest text-muted mb-3"><i class="bi bi-chat-left-text me-2"></i>Complaints Overview</h6>
+                <div class="d-flex gap-2 h-100">
+                  <div class="col bg-light rounded-3 p-3 d-flex flex-column justify-content-center border">
+                    <h2 class="fw-bold mb-0 text-dark">{{ total_complaints }}</h2>
+                    <span class="smallest text-muted fw-medium text-uppercase mt-1">Submitted</span>
+                  </div>
+                  <div class="col bg-primary bg-opacity-10 text-primary border border-primary border-opacity-10 rounded-3 p-3 d-flex flex-column justify-content-center">
+                    <h2 class="fw-bold mb-0">{{ open_complaints }}</h2>
+                    <span class="smallest fw-medium text-uppercase mt-1">Currently Open</span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <hr class="my-4 opacity-25">
+          <!-- Edit Profile Tab -->
+          <div class="tab-pane fade" id="edit" role="tabpanel">
+            <h6 class="fw-bold text-uppercase smallest text-muted mb-4"><i class="bi bi-pencil-square me-2"></i>Update Details</h6>
+            
+            <form method="post" action="{{ url_for('student.edit_profile') }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+              
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Full Name <span class="text-danger">*</span></label>
+                <input type="text" class="form-control bg-light border-0 shadow-none" name="name" value="{{ student.name }}" required>
+              </div>
 
-          <h5 class="card-title mb-3 fw-semibold">Edit Profile</h5>
-          <form method="post" action="{{ url_for('student.profile') }}" class="needs-validation" novalidate>
-    {{ form.hidden_tag() if form else '' }}
-    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            <div class="row g-3">
-              <div class="col-md-6">
-                <label for="name" class="form-label small fw-medium text-muted">Full Name</label>
-                <div class="input-group has-validation">
-                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
-                  <input type="text" class="form-control border-start-0 ps-0 shadow-none" id="name" name="name" value="{{ student.name }}" required>
-                  <div class="invalid-feedback">Please enter your full name.</div>
+              <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-muted">Phone Number <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control bg-light border-0 shadow-none" name="phone_number" value="{{ student.phone_number }}" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold text-muted">Gender</label>
+                  <select name="gender" class="form-select bg-light border-0 shadow-none">
+                    <option value="" {% if not student.gender %}selected{% endif %}>Select Gender...</option>
+                    <option value="Male" {% if student.gender == 'Male' %}selected{% endif %}>Male</option>
+                    <option value="Female" {% if student.gender == 'Female' %}selected{% endif %}>Female</option>
+                    <option value="Other" {% if student.gender == 'Other' %}selected{% endif %}>Other</option>
+                  </select>
                 </div>
               </div>
-              <div class="col-md-6">
-                <label for="phone_number" class="form-label small fw-medium text-muted">Phone Number</label>
-                <div class="input-group has-validation">
-                  <span class="input-group-text bg-light border-end-0"><i class="bi bi-telephone text-muted"></i></span>
-                  <input type="tel" class="form-control border-start-0 ps-0 shadow-none" id="phone_number" name="phone_number" value="{{ student.phone_number }}" required pattern="[0-9]{10}" maxlength="10">
-                  <div class="invalid-feedback">Please enter a valid 10-digit phone number.</div>
-                </div>
+
+              <div class="mb-3">
+                <label class="form-label small fw-bold text-muted">Date of Birth</label>
+                <input type="date" class="form-control bg-light border-0 shadow-none" name="date_of_birth" value="{{ student.date_of_birth.strftime('%Y-%m-%d') if student.date_of_birth else '' }}">
               </div>
-              <div class="col-12 text-end mt-4">
-                <button type="submit" class="btn btn-primary px-4 rounded-pill shadow-sm">
-                  <i class="bi bi-check2-circle me-1"></i>Save Changes
+
+              <div class="mb-4">
+                <label class="form-label small fw-bold text-muted">Home Address</label>
+                <textarea class="form-control bg-light border-0 shadow-none" name="address" rows="3">{{ student.address or '' }}</textarea>
+              </div>
+
+              <div class="d-flex justify-content-end border-top pt-4">
+                <button type="submit" class="btn btn-primary rounded-pill px-4 shadow-sm">
+                  <i class="bi bi-floppy me-2"></i>Save Changes
                 </button>
               </div>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-
-    <!-- Statistics -->
-    <div class="col-lg-4">
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white border-0 py-3">
-          <h5 class="card-title mb-0 fw-semibold">Activity Statistics</h5>
-        </div>
-        <div class="card-body">
-          <div class="d-flex flex-column gap-3">
-            <div class="d-flex align-items-center gap-3 p-3 rounded-4 bg-primary bg-opacity-10 border border-primary border-opacity-25">
-              <div class="bg-primary text-white p-3 rounded-3 shadow-sm">
-                <i class="bi bi-chat-left-text fs-4"></i>
-              </div>
-              <div>
-                <div class="h3 fw-bold mb-0 text-primary">{{ stats.complaints }}</div>
-                <div class="text-primary small fw-medium">Complaints Filed</div>
-              </div>
-            </div>
-
-            <div class="d-flex align-items-center gap-3 p-3 rounded-4 bg-warning bg-opacity-10 border border-warning border-opacity-25">
-              <div class="bg-warning text-dark p-3 rounded-3 shadow-sm">
-                <i class="bi bi-droplet fs-4"></i>
-              </div>
-              <div>
-                <div class="h3 fw-bold mb-0 text-warning">{{ stats.laundry }}</div>
-                <div class="text-warning small fw-medium">Laundry Orders</div>
-              </div>
-            </div>
-
-            <div class="d-flex align-items-center gap-3 p-3 rounded-4 bg-info bg-opacity-10 border border-info border-opacity-25">
-              <div class="bg-info text-white p-3 rounded-3 shadow-sm">
-                <i class="bi bi-controller fs-4"></i>
-              </div>
-              <div>
-                <div class="h3 fw-bold mb-0 text-info">{{ stats.gaming }}</div>
-                <div class="text-info small fw-medium">Gaming Sessions</div>
-              </div>
-            </div>
+            </form>
           </div>
-        </div>
-      </div>
-
-      <div class="card border-0 shadow-sm bg-dark text-white overflow-hidden">
-        <div class="card-body p-4 position-relative">
-          <i class="bi bi-shield-check position-absolute top-0 end-0 m-3 opacity-25" style="font-size: 5rem;"></i>
-          <h6 class="fw-bold mb-3">Security Tip</h6>
-          <p class="small mb-0 opacity-75">Keep your account secure by using a strong password. If you need to change your password, please contact the hostel administration.</p>
+          
         </div>
       </div>
     </div>
   </div>
-
+</div>
 {% endblock %}

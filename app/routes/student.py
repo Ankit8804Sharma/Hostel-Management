@@ -425,3 +425,78 @@ def track_complaint(complaint_id):
         return redirect(url_for('student.dashboard'))
     
     return render_template('student/complaint_track.html', complaint=complaint)
+
+
+@student_bp.route('/profile')
+@login_required
+@student_only
+def profile():
+    student = db.session.get(Student, current_user.student_id)
+    
+    active_allocation = RoomAllocation.query.options(
+        db.joinedload(RoomAllocation.room).joinedload(Room.hostel)
+    ).filter_by(
+        student_id=student.student_id, vacate_date=None
+    ).first()
+    
+    from sqlalchemy import func
+    att_counts = db.session.query(Attendance.status, func.count(Attendance.student_id)).filter_by(
+        student_id=student.student_id
+    ).group_by(Attendance.status).all()
+    
+    attendance_summary = {'present': 0, 'absent': 0, 'leave': 0}
+    for status, count in att_counts:
+        st = status.value.lower()
+        if st in attendance_summary:
+            attendance_summary[st] = count
+            
+    total_complaints = Complaint.query.filter_by(student_id=student.student_id).count()
+    open_complaints = Complaint.query.filter_by(student_id=student.student_id, status='Open').count()
+    
+    return render_template('student/profile.html', 
+                          student=student, 
+                          active_allocation=active_allocation, 
+                          attendance_summary=attendance_summary, 
+                          total_complaints=total_complaints, 
+                          open_complaints=open_complaints)
+
+
+@student_bp.route('/profile/edit', methods=['POST'])
+@login_required
+@student_only
+def edit_profile():
+    from datetime import datetime
+    student = db.session.get(Student, current_user.student_id)
+    
+    name = request.form.get('name', '').strip()
+    phone_number = request.form.get('phone_number', '').strip()
+    gender = request.form.get('gender', '').strip()
+    dob_raw = request.form.get('date_of_birth', '').strip()
+    address = request.form.get('address', '').strip()
+    
+    if not name or not phone_number:
+        flash('Name and Phone Number are required.', 'danger')
+        return redirect(url_for('student.profile'))
+        
+    student.name = name
+    student.phone_number = phone_number
+    student.gender = gender if gender else None
+    
+    if dob_raw:
+        try:
+            student.date_of_birth = datetime.strptime(dob_raw, '%Y-%m-%d').date()
+        except ValueError:
+            pass
+    else:
+        student.date_of_birth = None
+    
+    student.address = address if address else None
+    
+    try:
+        db.session.commit()
+        flash('Profile updated successfully.', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash('An error occurred while updating the profile.', 'danger')
+        
+    return redirect(url_for('student.profile'))
