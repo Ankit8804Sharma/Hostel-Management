@@ -321,13 +321,27 @@ def gaming_return(serial_no):
 @student_only
 def complaints_history():
     """View all complaints submitted by the student."""
-    student = db.get_or_404(Student, current_user.student_id)
-    complaints = (
-        Complaint.query.filter_by(student_id=student.student_id)
-        .order_by(Complaint.issue_date.desc())
-        .all()
-    )
-    return render_template('student/complaints.html', student=student, complaints=complaints)
+    search = request.args.get('search', '').strip()
+    status_filter = request.args.get('status', 'All')
+    type_filter = request.args.get('type', 'All')
+    page = request.args.get('page', 1, type=int)
+
+    query = Complaint.query.filter_by(student_id=current_user.student_id)
+    if status_filter != 'All':
+        query = query.filter(Complaint.status == status_filter)
+    if type_filter != 'All':
+        query = query.filter(Complaint.type == type_filter)
+    if search:
+        query = query.filter(Complaint.description.ilike(f'%{search}%'))
+
+    complaints = query.order_by(Complaint.issue_date.desc()).paginate(page=page, per_page=10, error_out=False)
+    COMPLAINT_STATUSES = ['Open', 'In Progress', 'Resolved']
+    
+    return render_template('student/complaints.html', 
+                          complaints=complaints,
+                          filters={'search': search, 'status': status_filter, 'type': type_filter},
+                          COMPLAINT_CATEGORIES=sorted(list(COMPLAINT_CATEGORIES)),
+                          complaint_statuses=COMPLAINT_STATUSES)
 
 
 @student_bp.route('/laundry')
@@ -335,21 +349,27 @@ def complaints_history():
 @student_only
 def laundry_history():
     """View all laundry orders submitted by the student."""
-    student = db.get_or_404(Student, current_user.student_id)
-    laundry_orders = (
-        Laundry.query.filter_by(student_id=student.student_id)
-        .order_by(Laundry.date.desc())
-        .all()
-    )
+    status_filter = request.args.get('status', 'All')
+    page = request.args.get('page', 1, type=int)
     
-    status_counts = {
-        'Pending': sum(1 for o in laundry_orders if o.status == 'Pending'),
-        'Washing': sum(1 for o in laundry_orders if o.status == 'Washing'),
-        'Ready': sum(1 for o in laundry_orders if o.status == 'Ready'),
-        'Collected': sum(1 for o in laundry_orders if o.status == 'Collected')
-    }
+    query = Laundry.query.filter_by(student_id=current_user.student_id)
+    if status_filter != 'All':
+        query = query.filter(Laundry.status == status_filter)
+        
+    laundry_orders = query.order_by(Laundry.date.desc()).paginate(page=page, per_page=10, error_out=False)
     
-    return render_template('student/laundry.html', student=student, laundry_orders=laundry_orders, status_counts=status_counts)
+    from sqlalchemy import func
+    counts = db.session.query(Laundry.status, func.count(Laundry.laundry_id)).filter_by(student_id=current_user.student_id).group_by(Laundry.status).all()
+    status_counts = {'All': 0, 'Pending': 0, 'Washing': 0, 'Ready': 0, 'Collected': 0}
+    for status, count in counts:
+        if status in status_counts:
+            status_counts[status] = count
+            status_counts['All'] += count
+            
+    return render_template('student/laundry.html', 
+                          laundry_orders=laundry_orders, 
+                          status_counts=status_counts,
+                          current_status=status_filter)
 
 
 @student_bp.route('/laundry/new', methods=['GET', 'POST'])

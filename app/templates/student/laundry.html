@@ -14,40 +14,42 @@
   </div>
 </div>
 
-<!-- Fast Stats Row -->
-<div class="row g-4 mb-4">
-  <div class="col-6 col-md-3">
-    <div class="card hms-card text-center border-0 bg-warning bg-opacity-10 py-3">
-      <h3 class="fw-bold text-warning mb-0">{{ status_counts.Pending }}</h3>
-      <span class="smallest text-warning fw-bold text-uppercase mt-1">Pending</span>
-    </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="card hms-card text-center border-0 bg-info bg-opacity-10 py-3">
-      <h3 class="fw-bold text-info mb-0">{{ status_counts.Washing }}</h3>
-      <span class="smallest text-info fw-bold text-uppercase mt-1">Washing</span>
-    </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="card hms-card text-center border-0 bg-success bg-opacity-10 py-3">
-      <h3 class="fw-bold text-success mb-0">{{ status_counts.Ready }}</h3>
-      <span class="smallest text-success fw-bold text-uppercase mt-1">Ready</span>
-    </div>
-  </div>
-  <div class="col-6 col-md-3">
-    <div class="card hms-card text-center border-0 bg-secondary bg-opacity-10 py-3">
-      <h3 class="fw-bold text-secondary mb-0">{{ status_counts.Collected }}</h3>
-      <span class="smallest text-secondary fw-bold text-uppercase mt-1">Collected</span>
-    </div>
-  </div>
+<!-- Status Filters -->
+<div class="d-flex flex-wrap gap-2 mb-4">
+  <a href="{{ url_for('student.laundry_history', status='All') }}" 
+     class="btn rounded-pill px-3 {% if current_status == 'All' %}btn-primary{% else %}btn-outline-secondary{% endif %} fw-medium small">
+    All Orders <span class="badge {% if current_status == 'All' %}bg-white text-primary{% else %}bg-secondary{% endif %} ms-1">{{ status_counts.All }}</span>
+  </a>
+  <a href="{{ url_for('student.laundry_history', status='Pending') }}" 
+     class="btn rounded-pill px-3 {% if current_status == 'Pending' %}btn-warning text-white{% else %}btn-outline-warning{% endif %} fw-medium small">
+    Pending <span class="badge {% if current_status == 'Pending' %}bg-white text-warning{% else %}bg-warning{% endif %} ms-1">{{ status_counts.Pending }}</span>
+  </a>
+  <a href="{{ url_for('student.laundry_history', status='Washing') }}" 
+     class="btn rounded-pill px-3 {% if current_status == 'Washing' %}btn-info text-white{% else %}btn-outline-info{% endif %} fw-medium small">
+    Washing <span class="badge {% if current_status == 'Washing' %}bg-white text-info{% else %}bg-info{% endif %} ms-1">{{ status_counts.Washing }}</span>
+  </a>
+  <a href="{{ url_for('student.laundry_history', status='Ready') }}" 
+     class="btn rounded-pill px-3 {% if current_status == 'Ready' %}btn-success text-white{% else %}btn-outline-success{% endif %} fw-medium small">
+    Ready <span class="badge {% if current_status == 'Ready' %}bg-white text-success{% else %}bg-success{% endif %} ms-1">{{ status_counts.Ready }}</span>
+  </a>
+  <a href="{{ url_for('student.laundry_history', status='Collected') }}" 
+     class="btn rounded-pill px-3 {% if current_status == 'Collected' %}btn-secondary text-white{% else %}btn-outline-secondary{% endif %} fw-medium small">
+    Collected <span class="badge {% if current_status == 'Collected' %}bg-white text-secondary{% else %}bg-secondary{% endif %} ms-1">{{ status_counts.Collected }}</span>
+  </a>
 </div>
 
 <!-- Orders Table -->
 <div class="card hms-card border-0 mb-5">
-  <div class="card-header bg-white border-0 py-3">
+  <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
     <h6 class="fw-bold mb-0 text-primary"><i class="bi bi-list-ul me-2"></i>Order History</h6>
   </div>
+  
   <div class="card-body p-0">
+    <div class="bg-light px-4 py-2 border-top border-bottom">
+      <small class="text-muted fw-bold text-uppercase">Showing {{ laundry_orders.items|length }} of {{ laundry_orders.total }} orders</small>
+    </div>
+
+    {% if laundry_orders.items %}
     <div class="table-responsive">
       <table class="table table-hover align-middle mb-0">
         <thead class="table-light">
@@ -60,7 +62,7 @@
           </tr>
         </thead>
         <tbody class="border-top-0">
-          {% for order in laundry_orders %}
+          {% for order in laundry_orders.items %}
           <tr>
             <td class="ps-4 fw-medium text-dark">{{ order.date.strftime('%Y-%m-%d') }}</td>
             <td class="fw-bold">{{ order.weight }}</td>
@@ -91,17 +93,40 @@
               {% endif %}
             </td>
           </tr>
-          {% else %}
-          <tr>
-            <td colspan="5" class="text-center py-5 text-muted">
-              <i class="bi bi-basket2 text-muted opacity-50 display-6 mb-3 d-block"></i>
-              No laundry orders found.
-            </td>
-          </tr>
           {% endfor %}
         </tbody>
       </table>
     </div>
+    {% else %}
+    <div class="text-center py-5 text-muted">
+      <i class="bi bi-basket2 text-muted opacity-50 display-6 mb-3 d-block"></i>
+      No laundry orders found matching your filter.
+    </div>
+    {% endif %}
   </div>
+  
+  {% if laundry_orders.pages > 1 %}
+  <div class="card-footer bg-white border-0 py-3 d-flex justify-content-center">
+    <nav>
+      <ul class="pagination pagination-sm mb-0 shadow-sm">
+        <li class="page-item {% if not laundry_orders.has_prev %}disabled{% endif %}">
+          <a class="page-link border-0 text-dark" href="{{ url_for('student.laundry_history', page=laundry_orders.prev_num, status=current_status) if laundry_orders.has_prev else '#' }}">Previous</a>
+        </li>
+        {% for page_num in laundry_orders.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+          {% if page_num %}
+            <li class="page-item {% if page_num == laundry_orders.page %}active{% endif %}">
+              <a class="page-link border-0 {% if page_num == laundry_orders.page %}bg-primary text-white{% else %}text-dark bg-light{% endif %}" href="{{ url_for('student.laundry_history', page=page_num, status=current_status) }}">{{ page_num }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link border-0 bg-light text-muted">...</span></li>
+          {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not laundry_orders.has_next %}disabled{% endif %}">
+          <a class="page-link border-0 text-dark" href="{{ url_for('student.laundry_history', page=laundry_orders.next_num, status=current_status) if laundry_orders.has_next else '#' }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}

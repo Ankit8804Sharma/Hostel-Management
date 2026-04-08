@@ -16,43 +16,79 @@
 
 {% block content %}
 <div class="hms-welcome-header">
-  <h2 class="fw-bold mb-1">Your Complaint History</h2>
-  <p class="text-muted mb-0">Overview of all maintenance and service requests you've submitted.</p>
-</div>
-
-<div class="card hms-card">
-  <div class="card-header bg-white border-0 py-3 d-flex align-items-center justify-content-between">
-    <h5 class="fw-bold mb-0">Total Complaints: {{ complaints|length }}</h5>
+  <div class="d-flex justify-content-between align-items-center">
+    <div>
+      <h2 class="fw-bold mb-1">Your Complaint History</h2>
+      <p class="text-muted mb-0">Overview of all maintenance and service requests you've submitted.</p>
+    </div>
     <a href="{{ url_for('student.dashboard') }}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
        <i class="bi bi-arrow-left me-1"></i>Back to Dashboard
     </a>
   </div>
+</div>
+
+<div class="card hms-card border-0 mb-5">
+  <!-- Filter Bar -->
+  <div class="card-header bg-white border-0 py-3">
+    <form method="get" action="{{ url_for('student.complaints_history') }}" class="row g-2 align-items-center">
+      <div class="col-12 col-md-4">
+        <div class="input-group input-group-sm">
+          <span class="input-group-text bg-light border-0"><i class="bi bi-search text-muted"></i></span>
+          <input type="text" name="search" class="form-control bg-light border-0 shadow-none" placeholder="Search description..." value="{{ filters.search }}">
+        </div>
+      </div>
+      <div class="col-6 col-md-3">
+        <select name="status" class="form-select form-select-sm bg-light border-0 shadow-none">
+          <option value="All" {% if filters.status == 'All' %}selected{% endif %}>All Statuses</option>
+          {% for st in complaint_statuses %}
+            <option value="{{ st }}" {% if filters.status == st %}selected{% endif %}>{{ st }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-6 col-md-3">
+        <select name="type" class="form-select form-select-sm bg-light border-0 shadow-none">
+          <option value="All" {% if filters.type == 'All' %}selected{% endif %}>All Types</option>
+          {% for ct in COMPLAINT_CATEGORIES %}
+            <option value="{{ ct }}" {% if filters.type == ct %}selected{% endif %}>{{ ct }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-12 col-md-2 text-md-end">
+        <button type="submit" class="btn btn-sm btn-primary rounded-pill px-4 w-100 shadow-sm fw-medium">Filter</button>
+      </div>
+    </form>
+  </div>
+  
   <div class="card-body p-0">
-    {% if complaints %}
+    <div class="bg-light px-4 py-2 border-top border-bottom">
+      <small class="text-muted fw-bold text-uppercase">Showing {{ complaints.items|length }} of {{ complaints.total }} complaints</small>
+    </div>
+
+    {% if complaints.items %}
       <div class="table-responsive">
         <table class="table hms-table table-hover align-middle mb-0">
           <thead>
             <tr>
-              <th>Type</th>
+              <th class="ps-4">Type</th>
               <th>Description</th>
               <th>Status</th>
               <th>Date Submitted</th>
               <th>Assigned Staff</th>
               <th>Attachment</th>
-              <th class="text-end">Actions</th>
+              <th class="text-end pe-4">Actions</th>
             </tr>
           </thead>
           <tbody>
-            {% for c in complaints %}
+            {% for c in complaints.items %}
             <tr>
-              <td><span class="fw-bold text-dark">{{ c.type }}</span></td>
-              <td style="max-width: 300px;"><div class="small text-muted">{{ c.description }}</div></td>
+              <td class="ps-4"><span class="fw-bold text-dark">{{ c.type }}</span></td>
+              <td style="max-width: 250px;"><div class="small text-muted text-truncate" title="{{ c.description }}">{{ c.description }}</div></td>
               <td>{{ status_badge(c.status) }}</td>
-              <td><span class="small text-muted"><i class="bi bi-calendar3 me-1"></i>{{ c.issue_date }}</span></td>
+              <td><span class="small text-muted"><i class="bi bi-calendar3 me-1"></i>{{ c.issue_date.strftime('%Y-%m-%d') }}</span></td>
               <td>
                 {% if c.staff %}
                   <div class="d-flex align-items-center gap-2">
-                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center" style="width: 24px; height: 24px; font-size: 0.75rem;">
+                    <div class="bg-primary bg-opacity-10 text-primary rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 24px; height: 24px; font-size: 0.75rem;">
                       {{ c.staff.name[0]|upper }}
                     </div>
                     <span class="small">{{ c.staff.name }}</span>
@@ -70,7 +106,7 @@
                   <span class="text-muted small">—</span>
                 {% endif %}
               </td>
-              <td class="text-end">
+              <td class="text-end pe-4">
                 <div class="d-flex align-items-center justify-content-end gap-2">
                   <a href="{{ url_for('student.track_complaint', complaint_id=c.complaint_id) }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 shadow-none">
                     <i class="bi bi-geo-alt me-1"></i>Track
@@ -93,12 +129,36 @@
         </table>
       </div>
     {% else %}
-      <div class="hms-empty-state">
+      <div class="hms-empty-state border-0 mt-4 mb-4">
         <i class="bi bi-chat-left-dots"></i>
-        <p class="mb-0">You haven't submitted any complaints yet.</p>
-        <a href="{{ url_for('student.new_complaint') }}" class="btn btn-primary btn-sm rounded-pill px-4 mt-3">Submit Your First Complaint</a>
+        <p class="mb-0">No complaints match your filters.</p>
+        <a href="{{ url_for('student.new_complaint') }}" class="btn btn-primary btn-sm rounded-pill px-4 mt-3">Submit a New Complaint</a>
       </div>
     {% endif %}
   </div>
+  
+  {% if complaints.pages > 1 %}
+  <div class="card-footer bg-white border-0 py-3 d-flex justify-content-center">
+    <nav>
+      <ul class="pagination pagination-sm mb-0 shadow-sm">
+        <li class="page-item {% if not complaints.has_prev %}disabled{% endif %}">
+          <a class="page-link border-0 text-dark" href="{{ url_for('student.complaints_history', page=complaints.prev_num, search=filters.search, status=filters.status, type=filters.type) if complaints.has_prev else '#' }}">Previous</a>
+        </li>
+        {% for page_num in complaints.iter_pages(left_edge=1, right_edge=1, left_current=2, right_current=2) %}
+          {% if page_num %}
+            <li class="page-item {% if page_num == complaints.page %}active{% endif %}">
+              <a class="page-link border-0 {% if page_num == complaints.page %}bg-primary text-white{% else %}text-dark bg-light{% endif %}" href="{{ url_for('student.complaints_history', page=page_num, search=filters.search, status=filters.status, type=filters.type) }}">{{ page_num }}</a>
+            </li>
+          {% else %}
+            <li class="page-item disabled"><span class="page-link border-0 bg-light text-muted">...</span></li>
+          {% endif %}
+        {% endfor %}
+        <li class="page-item {% if not complaints.has_next %}disabled{% endif %}">
+          <a class="page-link border-0 text-dark" href="{{ url_for('student.complaints_history', page=complaints.next_num, search=filters.search, status=filters.status, type=filters.type) if complaints.has_next else '#' }}">Next</a>
+        </li>
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
 </div>
 {% endblock %}
