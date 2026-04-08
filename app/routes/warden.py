@@ -22,6 +22,8 @@ from app.models import (
     TaskAllocation,
     Warden,
     Notification,
+    GamingFacilities,
+    EquipmentUsage
 )
 from app.utils.email import send_task_assigned
 from app.utils.notify import notify_student, notify_staff
@@ -656,3 +658,79 @@ def update_laundry_status(laundry_id):
     notify_student(laundry.student_id, f"Your laundry order status has been updated to {new_status}.")
     flash('Laundry status updated successfully.', 'success')
     return redirect(url_for('warden.laundry_management'))
+
+
+@warden_bp.route('/gaming')
+@login_required
+@warden_only
+def gaming_management():
+    equipment_list = []
+    facilities = GamingFacilities.query.order_by(GamingFacilities.equipment_name).all()
+    for eq in facilities:
+        active_count = db.session.query(func.count(EquipmentUsage.usage_id)).filter_by(
+            serial_no=eq.serial_no, submission_time=None
+        ).scalar() or 0
+        equipment_list.append({
+            'equipment': eq,
+            'active_count': active_count
+        })
+        
+    usage_history = EquipmentUsage.query.options(
+        joinedload(EquipmentUsage.student),
+        joinedload(EquipmentUsage.equipment)
+    ).order_by(EquipmentUsage.issued_time.desc()).limit(20).all()
+    
+    return render_template('warden/gaming.html', equipment_list=equipment_list, usage_history=usage_history)
+
+@warden_bp.route('/gaming/add', methods=['POST'])
+@login_required
+@warden_only
+def add_gaming_equipment():
+    equipment_name = request.form.get('equipment_name', '').strip()
+    if not equipment_name:
+        flash('Equipment name is required.', 'danger')
+        return redirect(url_for('warden.gaming_management'))
+        
+    new_equipment = GamingFacilities(
+        equipment_name=equipment_name,
+        availability_status='Available'
+    )
+    db.session.add(new_equipment)
+    db.session.commit()
+    flash('Equipment added.', 'success')
+    return redirect(url_for('warden.gaming_management'))
+
+@warden_bp.route('/gaming/<int:serial_no>/delete', methods=['POST'])
+@login_required
+@warden_only
+def delete_gaming_equipment(serial_no):
+    equipment = db.get_or_404(GamingFacilities, serial_no)
+    active_usage = EquipmentUsage.query.filter_by(serial_no=serial_no, submission_time=None).first()
+    
+    if active_usage:
+        flash('Cannot delete equipment that is currently in use.', 'danger')
+        return redirect(url_for('warden.gaming_management'))
+        
+    db.session.delete(equipment)
+    db.session.commit()
+    flash('Equipment removed.', 'success')
+    return redirect(url_for('warden.gaming_management'))
+
+@warden_bp.route('/gaming/<int:serial_no>/toggle', methods=['POST'])
+@login_required
+@warden_only
+def toggle_gaming_equipment(serial_no):
+    equipment = db.get_or_404(GamingFacilities, serial_no)
+    
+    if equipment.availability_status == 'In Use':
+        flash('Cannot change status of equipment that is in use.', 'danger')
+        return redirect(url_for('warden.gaming_management'))
+        
+    if equipment.availability_status == 'Available':
+        equipment.availability_status = 'Maintenance'
+    else:
+        equipment.availability_status = 'Available'
+        
+    db.session.commit()
+    flash('Status updated.', 'success')
+    return redirect(url_for('warden.gaming_management'))
