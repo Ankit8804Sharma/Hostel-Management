@@ -97,6 +97,17 @@
           <a class="nav-link" href="{{ url_for('staff.dashboard') }}#section-complaints">
             <i class="bi bi-chat-left-text"></i>My Complaints
           </a>
+
+        {% elif current_user.get_id().startswith('staff_') and current_user.role == 'admin' %}
+          <a class="nav-link {% if request.endpoint == 'admin.dashboard' %}active{% endif %}" href="{{ url_for('admin.dashboard') }}">
+            <i class="bi bi-speedometer2"></i>Admin Panel
+          </a>
+          <a class="nav-link {% if request.endpoint == 'admin.new_hostel' %}active{% endif %}" href="{{ url_for('admin.new_hostel') }}">
+            <i class="bi bi-building-add"></i>Add Hostel
+          </a>
+          <a class="nav-link {% if request.endpoint == 'admin.new_room' %}active{% endif %}" href="{{ url_for('admin.new_room') }}">
+            <i class="bi bi-door-open-fill"></i>Add Room
+          </a>
         {% endif %}
 
         <hr class="mx-3 opacity-25 text-white">

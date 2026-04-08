@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}New Room{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+  <div class="col-12 col-md-8 col-lg-6">
+    <div class="card border-0 shadow-sm rounded-4">
+      <div class="card-body p-5">
+
+        <div class="mb-4">
+          <a href="{{ url_for('admin.dashboard') }}" class="text-decoration-none text-muted small">
+            <i class="bi bi-arrow-left me-1"></i>Back to Admin Panel
+          </a>
+        </div>
+
+        <div class="text-center mb-4">
+          <div class="bg-info bg-opacity-10 text-info d-inline-flex p-3 rounded-circle mb-3">
+            <i class="bi bi-door-open-fill fs-2"></i>
+          </div>
+          <h2 class="fw-bold">New Room</h2>
+          <p class="text-muted">Add a new room to a hostel</p>
+        </div>
+
+        <form method="post" class="needs-validation" novalidate>
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="mb-3">
+            <label for="hostel_id" class="form-label fw-medium">Hostel</label>
+            <select class="form-select form-select-lg bg-light border-0 shadow-none"
+                    id="hostel_id" name="hostel_id" required>
+              <option value="" disabled selected>— Select a hostel —</option>
+              {% for h in hostels %}
+                <option value="{{ h.hostel_id }}">{{ h.type }}</option>
+              {% endfor %}
+            </select>
+            <div class="invalid-feedback">Please select a hostel.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="room_no" class="form-label fw-medium">Room Number</label>
+            <input type="text" class="form-control form-control-lg bg-light border-0 shadow-none"
+                   id="room_no" name="room_no" required
+                   placeholder="e.g. 101 or A-201">
+            <div class="invalid-feedback">Please enter a room number.</div>
+          </div>
+
+          <div class="mb-3">
+            <label for="room_type" class="form-label fw-medium">Room Type</label>
+            <select class="form-select form-select-lg bg-light border-0 shadow-none"
+                    id="room_type" name="room_type" required>
+              <option value="" disabled selected>— Select room type —</option>
+              <option value="AC">AC</option>
+              <option value="Non-AC">Non-AC</option>
+            </select>
+            <div class="invalid-feedback">Please select a room type.</div>
+          </div>
+
+          <div class="mb-4">
+            <label for="capacity" class="form-label fw-medium">Capacity</label>
+            <input type="number" class="form-control form-control-lg bg-light border-0 shadow-none"
+                   id="capacity" name="capacity" required min="1" max="20"
+                   placeholder="e.g. 2">
+            <div class="invalid-feedback">Please enter a valid capacity (1–20).</div>
+          </div>
+
+          <button type="submit" class="btn btn-info text-white btn-lg w-100 rounded-pill shadow-sm fw-bold">
+            <i class="bi bi-plus-circle me-2"></i>Create Room
+          </button>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+{% block extra_scripts %}
+<script>
+  (function () {
+    'use strict';
+    document.querySelectorAll('.needs-validation').forEach(function (form) {
+      form.addEventListener('submit', function (event) {
+        if (!form.checkValidity()) {
+          event.preventDefault();
+          event.stopPropagation();
+        }
+        form.classList.add('was-validated');
+      }, false);
+    });
+  })();
+</script>
+{% endblock %}
+{% endblock %}

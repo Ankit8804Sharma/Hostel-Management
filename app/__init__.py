@@ -84,7 +84,11 @@ def create_app(config_name=None):
     app.register_blueprint(staff_bp, url_prefix='/staff')
     
     from app.routes.api import api_bp
+    csrf.exempt(api_bp)
     app.register_blueprint(api_bp, url_prefix='/api/v1')
+
+    from app.routes.admin import admin_bp
+    app.register_blueprint(admin_bp, url_prefix='/admin')
 
     @app.route('/')
     def index():

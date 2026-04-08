@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Admin Panel{% endblock %}
+
+{% block content %}
+<div class="d-flex align-items-center justify-content-between mb-4">
+  <div>
+    <h1 class="fw-bold mb-0">Admin Panel</h1>
+    <p class="text-muted mb-0">Manage hostels, rooms, students, and staff</p>
+  </div>
+  <div class="d-flex gap-2">
+    <a href="{{ url_for('admin.new_hostel') }}" class="btn btn-primary rounded-pill px-4 shadow-sm">
+      <i class="bi bi-building-add me-2"></i>New Hostel
+    </a>
+    <a href="{{ url_for('admin.new_room') }}" class="btn btn-outline-primary rounded-pill px-4">
+      <i class="bi bi-door-open-fill me-2"></i>New Room
+    </a>
+  </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-4 mb-5">
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="card border-0 shadow-sm rounded-4 h-100" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+      <div class="card-body text-white p-4">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <p class="small fw-semibold text-white-50 mb-1 text-uppercase">Total Hostels</p>
+            <h2 class="fw-bold mb-0">{{ total_hostels }}</h2>
+          </div>
+          <div class="bg-white bg-opacity-25 rounded-3 p-3">
+            <i class="bi bi-building fs-2"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="card border-0 shadow-sm rounded-4 h-100" style="background: linear-gradient(135deg, #0ea5e9, #38bdf8);">
+      <div class="card-body text-white p-4">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <p class="small fw-semibold text-white-50 mb-1 text-uppercase">Total Rooms</p>
+            <h2 class="fw-bold mb-0">{{ total_rooms }}</h2>
+          </div>
+          <div class="bg-white bg-opacity-25 rounded-3 p-3">
+            <i class="bi bi-door-open-fill fs-2"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="card border-0 shadow-sm rounded-4 h-100" style="background: linear-gradient(135deg, #10b981, #34d399);">
+      <div class="card-body text-white p-4">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <p class="small fw-semibold text-white-50 mb-1 text-uppercase">Total Students</p>
+            <h2 class="fw-bold mb-0">{{ total_students }}</h2>
+          </div>
+          <div class="bg-white bg-opacity-25 rounded-3 p-3">
+            <i class="bi bi-people-fill fs-2"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-6 col-xl-3">
+    <div class="card border-0 shadow-sm rounded-4 h-100" style="background: linear-gradient(135deg, #f59e0b, #fbbf24);">
+      <div class="card-body text-white p-4">
+        <div class="d-flex align-items-center justify-content-between">
+          <div>
+            <p class="small fw-semibold text-white-50 mb-1 text-uppercase">Total Staff</p>
+            <h2 class="fw-bold mb-0">{{ total_staff }}</h2>
+          </div>
+          <div class="bg-white bg-opacity-25 rounded-3 p-3">
+            <i class="bi bi-person-badge-fill fs-2"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Hostels Table -->
+<div class="card border-0 shadow-sm rounded-4 mb-4">
+  <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2 d-flex align-items-center justify-content-between">
+    <h5 class="fw-bold mb-0"><i class="bi bi-building me-2 text-primary"></i>Hostels</h5>
+    <a href="{{ url_for('admin.new_hostel') }}" class="btn btn-sm btn-primary rounded-pill px-3">
+      <i class="bi bi-plus-lg me-1"></i>Add
+    </a>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4">ID</th>
+            <th>Type</th>
+            <th>Rooms</th>
+            <th>Contact</th>
+            <th class="text-end pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for h in hostels %}
+          <tr>
+            <td class="ps-4 text-muted small">{{ h.hostel_id }}</td>
+            <td class="fw-medium">{{ h.type }}</td>
+            <td>{{ h.no_of_rooms }}</td>
+            <td>{{ h.hostel_contact }}</td>
+            <td class="text-end pe-4">
+              <a href="{{ url_for('admin.edit_hostel', hostel_id=h.hostel_id) }}" class="btn btn-sm btn-outline-secondary rounded-pill me-1">
+                <i class="bi bi-pencil"></i>
+              </a>
+              <form action="{{ url_for('admin.delete_hostel', hostel_id=h.hostel_id) }}" method="post" class="d-inline"
+                    onsubmit="return confirm('Delete this hostel? This cannot be undone.')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-center text-muted py-4">No hostels found. <a href="{{ url_for('admin.new_hostel') }}">Add one</a>.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- Rooms Table -->
+<div class="card border-0 shadow-sm rounded-4">
+  <div class="card-header bg-transparent border-0 pt-4 px-4 pb-2 d-flex align-items-center justify-content-between">
+    <h5 class="fw-bold mb-0"><i class="bi bi-door-open me-2 text-info"></i>Rooms</h5>
+    <a href="{{ url_for('admin.new_room') }}" class="btn btn-sm btn-info text-white rounded-pill px-3">
+      <i class="bi bi-plus-lg me-1"></i>Add
+    </a>
+  </div>
+  <div class="card-body p-0">
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead class="table-light">
+          <tr>
+            <th class="ps-4">Room No</th>
+            <th>Hostel</th>
+            <th>Type</th>
+            <th>Capacity</th>
+            <th class="text-end pe-4">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rooms %}
+          <tr>
+            <td class="ps-4 fw-medium">{{ r.room_no }}</td>
+            <td class="text-muted small">{{ r.hostel.type if r.hostel else '—' }}</td>
+            <td>
+              <span class="badge {% if r.room_type.value == 'AC' %}bg-info{% else %}bg-secondary{% endif %} rounded-pill">
+                {{ r.room_type.value }}
+              </span>
+            </td>
+            <td>{{ r.capacity }}</td>
+            <td class="text-end pe-4">
+              <form action="{{ url_for('admin.delete_room', room_id=r.id) }}" method="post" class="d-inline"
+                    onsubmit="return confirm('Delete this room?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
+                  <i class="bi bi-trash"></i>
+                </button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-center text-muted py-4">No rooms found. <a href="{{ url_for('admin.new_room') }}">Add one</a>.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
