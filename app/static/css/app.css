@@ -1,27 +1,87 @@
-/* HMS UI Overhaul Styles */
-
 :root {
-  --hms-primary: #3b82f6;
-  --hms-primary-dark: #2563eb;
-  --hms-sidebar-bg: #1e293b;
-  --hms-sidebar-hover: #334155;
-  --hms-sidebar-active: #3b82f6;
-  --hms-light-bg: #f8fafc;
-  --hms-card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --hms-radius: 12px;
+  --primary: #4f46e5;
+  --primary-dark: #3730a3;
+  --success: #16a34a;
+  --danger: #dc2626;
+  --warning: #d97706;
+  --surface: #f8fafc;
+  --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 body {
-  background-color: var(--hms-light-bg);
+  background-color: var(--surface);
   color: #1e293b;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   overflow-x: hidden;
 }
 
-/* Sidebar Navigation */
+/* Base Components */
+.card, .hms-card {
+  border-radius: 12px;
+  box-shadow: var(--card-shadow);
+  border: none;
+  background: white;
+}
+
+.btn-primary {
+  background: var(--primary) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  padding: 0.5rem 1.25rem !important;
+}
+
+.btn-primary:hover {
+  background: var(--primary-dark) !important;
+}
+
+.badge {
+  border-radius: 6px !important;
+}
+
+/* Stat Cards component */
+.stat-card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  background: white;
+  box-shadow: var(--card-shadow);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card i {
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  color: var(--primary);
+}
+
+.stat-card .stat-number {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary);
+  line-height: 1;
+}
+
+.stat-card .stat-label {
+  font-size: 0.875rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+}
+
+/* Tables */
+.table-responsive {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  background: white;
+}
+
+/* Layout overrides to ensure layout works with basic HTML */
 .hms-sidebar {
   width: 260px;
-  background-color: var(--hms-sidebar-bg);
+  background-color: #1e293b;
   min-height: 100vh;
   position: fixed;
   left: 0;
@@ -38,30 +98,18 @@ body {
   gap: 0.75rem;
   border-radius: 8px;
   margin: 0.25rem 0.75rem;
-  transition: all 0.2s ease;
 }
 
-.hms-sidebar .nav-link:hover {
-  background-color: var(--hms-sidebar-hover);
+.hms-sidebar .nav-link:hover, .hms-sidebar .nav-link.active {
+  background-color: #334155;
   color: #f8fafc;
 }
 
-.hms-sidebar .nav-link.active {
-  background-color: var(--hms-sidebar-active);
-  color: #fff;
-  font-weight: 500;
-}
-
-.hms-sidebar .sidebar-logo {
-  padding: 1.5rem;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
-}
-
-/* Top Navbar */
 .hms-navbar {
   height: 64px;
-  background-color: #fff;
+  background: white;
   border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
   position: fixed;
   top: 0;
   right: 0;
@@ -70,232 +118,28 @@ body {
   display: flex;
   align-items: center;
   padding: 0 1.5rem;
-  transition: all 0.3s ease;
 }
 
-/* Main Content Area */
 .hms-main-content {
   margin-left: 260px;
   padding-top: 64px;
   min-height: 100vh;
-  transition: all 0.3s ease;
 }
 
-@media (max-width: 991.98px) {
-  .hms-sidebar {
-    left: -260px;
+/* Mobile Breakpoint overrides */
+@media (max-width: 768px) {
+  .hms-sidebar { left: -260px; }
+  .hms-sidebar.show { left: 0; }
+  .hms-navbar { left: 0; }
+  .hms-main-content { margin-left: 0; }
+  
+  .col-lg-3, .col-6 {
+    width: 100% !important; /* Stack stat cards in 1 column */
   }
-  .hms-sidebar.show {
-    left: 0;
+
+  .btn {
+    width: 100% !important;
+    display: block;
+    margin-bottom: 0.5rem;
   }
-  .hms-navbar {
-    left: 0;
-  }
-  .hms-main-content {
-    margin-left: 0;
-  }
-}
-
-/* UI Components */
-.hms-card {
-  background: #fff;
-  border-radius: var(--hms-radius);
-  border: none;
-  box-shadow: var(--hms-card-shadow);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.hms-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
-}
-
-.hms-welcome-header {
-  margin: 2rem 0;
-}
-
-.hms-table {
-  border-radius: var(--hms-radius);
-  overflow: hidden;
-}
-
-.hms-table thead th {
-  background-color: #f8fafc;
-  color: #64748b;
-  font-weight: 600;
-  text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
-  padding: 1rem;
-}
-
-.hms-table tbody td {
-  padding: 1rem;
-  vertical-align: middle;
-}
-
-.hms-empty-state {
-  padding: 3rem 1rem;
-  text-align: center;
-  color: #94a3b8;
-}
-
-.hms-empty-state i {
-  font-size: 3.5rem;
-  opacity: 0.3;
-  margin-bottom: 1rem;
-  display: block;
-}
-
-/* Role Badges */
-.badge-role-student { background-color: #e0f2fe; color: #0369a1; }
-.badge-role-warden { background-color: #fef3c7; color: #92400e; }
-.badge-role-staff { background-color: #f0fdf4; color: #166534; }
-
-/* Landing Page Hero */
-.hms-hero {
-  min-height: 100vh;
-  background: radial-gradient(circle at top right, #3b82f6, #1d4ed8);
-  display: flex;
-  align-items: center;
-  color: white;
-  position: relative;
-  overflow: hidden;
-}
-
-.hms-hero::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
-}
-/* Vertical Timeline for Tracking */
-.hms-timeline {
-    position: relative;
-    padding-left: 3rem;
-    list-style: none;
-}
-
-.hms-timeline::before {
-    content: '';
-    position: absolute;
-    left: 0.95rem;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: #e2e8f0;
-}
-
-.hms-timeline-item {
-    position: relative;
-    margin-bottom: 2.5rem;
-}
-
-.hms-timeline-icon {
-    position: absolute;
-    left: -2.05rem;
-    width: 1.5rem;
-    height: 1.5rem;
-    background: #fff;
-    border: 2px solid #cbd5e1;
-    border-radius: 50%;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.75rem;
-}
-
-.hms-timeline-item.active .hms-timeline-icon {
-    background: var(--hms-primary);
-    border-color: var(--hms-primary);
-    color: #fff;
-}
-
-.hms-timeline-item.completed .hms-timeline-icon {
-    background: #10b981;
-    border-color: #10b981;
-    color: #fff;
-}
-
-.hms-timeline-item.completed::after {
-    content: '';
-    position: absolute;
-    left: -2.05rem;
-    top: 1.5rem;
-    bottom: -2.5rem;
-    width: 2px;
-    background: #10b981;
-    z-index: 0;
-}
-
-/* Print Media Query */
-@media print {
-    .hms-sidebar, 
-    .hms-navbar, 
-    .btn, 
-    .hms-welcome-header,
-    nav[aria-label="breadcrumb"],
-    footer {
-        display: none !important;
-    }
-    .hms-main-content {
-        margin-left: 0 !important;
-        padding-top: 0 !important;
-    }
-    body {
-        background-color: white !important;
-    }
-    .card {
-        border: 1px solid #dee2e6 !important;
-        box-shadow: none !important;
-    }
-    .print-only {
-        display: block !important;
-    }
-}
-
-.print-only {
-    display: none;
-}
-
-/* Back to Top Button */
-#back-to-top {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  display: none;
-  z-index: 1050;
-  width: 45px;
-  height: 45px;
-  transition: all 0.3s ease;
-  padding: 0;
-  align-items: center;
-  justify-content: center;
-}
-
-#back-to-top:hover {
-  transform: translateY(-5px);
-  background-color: #1a1d20 !important;
-  color: #fff !important;
-}
-
-/* Global Page Loader */
-#loader-wrapper {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: #f8f9fa;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: opacity 0.4s ease-out, visibility 0.4s ease-out;
-}
-
-#loader-wrapper.fade-out {
-  opacity: 0;
-  visibility: hidden;
 }

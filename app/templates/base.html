@@ -42,7 +42,7 @@
       <nav class="mt-4">
         {% if current_user.get_id().startswith('student_') %}
           <a class="nav-link {% if request.endpoint == 'student.dashboard' %}active{% endif %}" href="{{ url_for('student.dashboard') }}">
-            <i class="bi bi-house"></i>Dashboard
+            <i class="bi bi-speedometer2"></i>Dashboard
           </a>
           <a class="nav-link {% if request.endpoint == 'student.room' %}active{% endif %}" href="{{ url_for('student.room') }}">
             <i class="bi bi-door-open"></i>My Room
@@ -68,7 +68,7 @@
 
         {% elif current_user.get_id().startswith('staff_') and current_user.role in ('warden', 'chief_warden') %}
           <a class="nav-link {% if request.endpoint == 'warden.dashboard' %}active{% endif %} d-flex align-items-center" href="{{ url_for('warden.dashboard') }}">
-            <i class="bi bi-house"></i>
+            <i class="bi bi-speedometer2"></i>
             <span>Dashboard</span>
             {% if open_complaints_count > 0 %}
               <span class="badge bg-danger rounded-pill ms-auto smallest px-2" style="font-size: 0.65rem;">{{ open_complaints_count }}</span>
@@ -89,10 +89,10 @@
 
         {% elif current_user.get_id().startswith('staff_') and current_user.role == 'staff' %}
           <a class="nav-link {% if request.endpoint == 'staff.dashboard' %}active{% endif %}" href="{{ url_for('staff.dashboard') }}">
-            <i class="bi bi-house"></i>Dashboard
+            <i class="bi bi-speedometer2"></i>Dashboard
           </a>
           <a class="nav-link" href="{{ url_for('staff.dashboard') }}#section-tasks">
-            <i class="bi bi-list-check"></i>My Tasks
+            <i class="bi bi-list-task"></i>My Tasks
           </a>
           <a class="nav-link" href="{{ url_for('staff.dashboard') }}#section-complaints">
             <i class="bi bi-chat-left-text"></i>My Complaints
