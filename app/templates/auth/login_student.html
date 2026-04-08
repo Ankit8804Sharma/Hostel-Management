@@ -15,6 +15,8 @@
               <p class="text-muted small mb-0">Sign in to your hostel account</p>
             </div>
             <form method="post" class="needs-validation" novalidate id="loginForm">
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
               {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
               <div class="mb-3">
                 <label class="form-label fw-medium text-muted small" for="email">Email Address</label>

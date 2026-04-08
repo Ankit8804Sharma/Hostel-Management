@@ -22,6 +22,8 @@
         </div>
         <div class="card-body p-4 p-md-5">
           <form method="post" action="{{ url_for('student.new_laundry') }}" class="needs-validation" novalidate>
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <!-- Items -->
             <div class="mb-4">
               <label for="laundry_items" class="form-label fw-semibold text-dark">Items List</label>

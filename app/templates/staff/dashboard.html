@@ -110,6 +110,8 @@
                 <td class="text-end">
                   {% if task.status|lower != 'completed' %}
                   <form method="post" action="{{ url_for('staff.complete_task', task_id=task.task_id) }}">
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 shadow-none">
                       <i class="bi bi-check2-circle me-1"></i>Mark Complete
                     </button>
@@ -167,6 +169,8 @@
                 <td class="text-end">
                   {% if c.status|lower != 'resolved' %}
                   <form method="post" action="{{ url_for('staff.update_complaint_status', complaint_id=c.complaint_id) }}" class="d-flex align-items-center gap-2 justify-content-end">
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <select name="status" class="form-select form-select-sm bg-light border-0" style="width: auto;" required>
                       <option value="In Progress" {% if c.status == 'In Progress' %}selected{% endif %}>In Progress</option>
                       <option value="Resolved">Resolved</option>

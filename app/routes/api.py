@@ -174,3 +174,6 @@ def update_complaint_status(id):
     complaint.status = new_status
     db.session.commit()
     return jsonify({"message": "Updated"}), 200
+
+from app import csrf
+csrf.exempt(api_bp)

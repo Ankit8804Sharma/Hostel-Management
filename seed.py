@@ -163,8 +163,6 @@ def _seed_warden(hostels, staff):
         return existing
 
     warden = Warden(
-        name=amit.name,
-        email=amit.email,
         contact_no=amit.contact_no,
         hostel_id=block_a.hostel_id,
         staff_id=amit.staff_id,

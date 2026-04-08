@@ -29,6 +29,8 @@
 
   {% if students %}
   <form method="post" action="{{ url_for('warden.attendance') }}" id="attendanceForm">
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
     <div class="card border-0 shadow-sm mb-5">
       <div class="card-header bg-white border-bottom py-3 d-flex align-items-center justify-content-between flex-wrap gap-3">
         <div>

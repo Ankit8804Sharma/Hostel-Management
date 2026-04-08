@@ -179,6 +179,8 @@
     </div>
     <div class="px-4 py-3 border-bottom bg-light bg-opacity-50">
       <form method="get" class="row g-3 align-items-end">
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <div class="col-md-4">
           <label class="form-label smallest text-muted text-uppercase fw-bold">Search</label>
           <div class="input-group input-group-sm">
@@ -247,6 +249,8 @@
                 {% set t = (c.status|string)|lower|trim %}
                 {% if t == 'open' %}
                   <form method="post" action="{{ url_for('warden.assign_complaint', complaint_id=c.complaint_id) }}" class="d-flex align-items-center gap-2 justify-content-end">
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <select name="staff_id" class="form-select form-select-sm bg-light border-0" style="width: auto;" required>
                       <option value="" selected disabled>Select staff...</option>
                       {% for s in staff_members %}
@@ -257,6 +261,8 @@
                   </form>
                 {% elif t == 'in progress' %}
                   <form method="post" action="{{ url_for('warden.resolve_complaint', complaint_id=c.complaint_id) }}">
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                     <button type="submit" class="btn btn-sm btn-success rounded-pill px-3 shadow-none">Resolve</button>
                   </form>
                 {% else %}

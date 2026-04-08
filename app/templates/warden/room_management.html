@@ -42,6 +42,8 @@
               <td><span class="text-muted small">{{ allocation.alloc_date.strftime('%Y-%m-%d') if allocation.alloc_date else '' }}</span></td>
               <td class="text-end">
                 <form method="post" action="{{ url_for('warden.vacate_room', allocation_id=allocation.alloc_id) }}" class="d-inline">
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                   <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill px-3 shadow-none" onclick="return confirm('Are you sure you want to vacate this room?');">Vacate</button>
                 </form>
@@ -79,6 +81,8 @@
         <button type="button" class="btn-close shadow-none" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <form method="post" action="{{ url_for('warden.allocate_room') }}" class="needs-validation">
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="modal-body py-4">
           

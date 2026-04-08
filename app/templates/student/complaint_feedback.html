@@ -23,6 +23,8 @@
         </div>
 
         <form method="post" class="needs-validation" novalidate>
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
           <div class="mb-4">
             <label for="comments" class="form-label small fw-bold text-muted">Your Comments</label>
             <textarea class="form-control border-0 bg-light" id="comments" name="comments" rows="5" required minlength="10" placeholder="How was your experience with the resolution? Any suggestions for improvement?"></textarea>

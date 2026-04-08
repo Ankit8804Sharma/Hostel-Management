@@ -55,12 +55,16 @@
                 <td class="text-end">
                   {% if eq.availability_status == 'Available' %}
                     <form method="post" action="{{ url_for('student.gaming_book', serial_no=eq.serial_no) }}">
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                       <button type="submit" class="btn btn-primary btn-sm px-3 rounded-pill shadow-sm">
                         <i class="bi bi-plus-lg me-1"></i>Book Now
                       </button>
                     </form>
                   {% elif eq.serial_no in active_serials %}
                     <form method="post" action="{{ url_for('student.gaming_return', serial_no=eq.serial_no) }}">
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                       <button type="submit" class="btn btn-warning btn-sm px-3 rounded-pill shadow-sm">
                         <i class="bi bi-arrow-return-left me-1"></i>Return
                       </button>
@@ -117,6 +121,8 @@
                     </td>
                     <td class="text-end">
                       <form method="post" action="{{ url_for('student.gaming_return', serial_no=eq.serial_no) }}">
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                         <button type="submit" class="btn btn-outline-warning btn-sm px-3 rounded-pill">
                           <i class="bi bi-arrow-return-left me-1"></i>Return
                         </button>

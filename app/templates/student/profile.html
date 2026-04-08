@@ -53,6 +53,8 @@
 
           <h5 class="card-title mb-3 fw-semibold">Edit Profile</h5>
           <form method="post" action="{{ url_for('student.profile') }}" class="needs-validation" novalidate>
+    {{ form.hidden_tag() if form else '' }}
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <div class="row g-3">
               <div class="col-md-6">
                 <label for="name" class="form-label small fw-medium text-muted">Full Name</label>
