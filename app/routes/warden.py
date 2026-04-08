@@ -145,55 +145,117 @@ def dashboard():
 @login_required
 @warden_only
 def overview():
-    total_students = Student.query.count()
-    total_staff = StaffMember.query.count()
-    total_rooms = Room.query.count()
-    total_complaints = Complaint.query.count()
+    total_students = db.session.query(func.count(Student.student_id)).scalar() or 0
+    total_staff = db.session.query(func.count(StaffMember.staff_id)).scalar() or 0
+    total_rooms = db.session.query(func.count(Room.id)).scalar() or 0
+    total_complaints = db.session.query(func.count(Complaint.complaint_id)).scalar() or 0
+    total_hostels = db.session.query(func.count(Hostel.hostel_id)).scalar() or 0
 
     # Room Occupancy
-    occupied_room_ids = db.session.query(RoomAllocation.room_id).filter(RoomAllocation.vacate_date == None).distinct().all()
-    occupied_room_count = len(occupied_room_ids)
+    occupied_room_count = db.session.query(func.count(RoomAllocation.alloc_id)).filter(RoomAllocation.vacate_date == None).scalar() or 0
     occupancy_rate = (occupied_room_count / total_rooms * 100) if total_rooms > 0 else 0
 
-    # Staff Performance
-    staff_perf = []
+    # Attendance today
+    from sqlalchemy.sql import extract
+    today = date.today()
+    att_rows = db.session.query(Attendance.status, func.count(Attendance.student_id)).filter(Attendance.date == today).group_by(Attendance.status).all()
+    today_present = sum(c for s, c in att_rows if s.value.lower() == 'present')
+    today_absent = sum(c for s, c in att_rows if s.value.lower() == 'absent')
+    today_leave = sum(c for s, c in att_rows if s.value.lower() == 'leave')
+
+    # Complaint trend last 30 days
+    last_30_days = today - timedelta(days=30)
+    history = db.session.query(Complaint.issue_date, func.count(Complaint.complaint_id)).filter(Complaint.issue_date >= last_30_days).group_by(Complaint.issue_date).order_by(Complaint.issue_date).all()
+    trend_labels = [h[0].strftime('%b %d') if hasattr(h[0], 'strftime') else str(h[0]) for h in history]
+    trend_counts = [h[1] for h in history]
+
+    # Complaint breakdown by type
+    type_rows = db.session.query(Complaint.type, func.count(Complaint.complaint_id)).group_by(Complaint.type).all()
+    type_labels = [r[0] for r in type_rows]
+    type_counts = [r[1] for r in type_rows]
+
+    # Staff Workload
+    staff_workload = []
     all_staff = StaffMember.query.all()
     for s in all_staff:
         total = s.tasks.count()
         completed = s.tasks.filter(TaskAllocation.completed_date != None).count()
         pending = total - completed
-        rate = (completed / total * 100) if total > 0 else 0
-        staff_perf.append({
+        assigned_complaints = Complaint.query.filter_by(staff_id=s.staff_id, status='Open').count()
+        staff_workload.append({
             'name': s.name,
             'total': total,
             'completed': completed,
             'pending': pending,
-            'rate': round(rate, 1)
+            'assigned_complaints': assigned_complaints
         })
 
-    # Top 3 Complaints
-    top_complaints = db.session.query(Complaint.type, func.count(Complaint.complaint_id).label('count'))\
-        .group_by(Complaint.type).order_by(func.count(Complaint.complaint_id).desc()).limit(3).all()
-
-    # Monthly Trend (Last 30 days)
-    last_30_days = date.today() - timedelta(days=30)
-    history = db.session.query(Complaint.issue_date, func.count(Complaint.complaint_id))\
-        .filter(Complaint.issue_date >= last_30_days)\
-        .group_by(Complaint.issue_date).order_by(Complaint.issue_date).all()
-    
-    trend_labels = [h[0].strftime('%b %d') for h in history]
-    trend_counts = [h[1] for h in history]
+    # Monthly laundry volume (last 6 months)
+    import datetime
+    from app.models import Laundry
+    six_months_ago = today - timedelta(days=180)
+    laundry_rows = db.session.query(func.strftime('%Y-%m', Laundry.date), func.sum(Laundry.weight)).filter(Laundry.date >= six_months_ago).group_by(func.strftime('%Y-%m', Laundry.date)).order_by(func.strftime('%Y-%m', Laundry.date)).all()
+    laundry_labels = [r[0] for r in laundry_rows]
+    laundry_weights = [round(r[1], 1) for r in laundry_rows]
 
     return render_template('warden/overview.html',
         total_students=total_students,
         total_staff=total_staff,
         total_rooms=total_rooms,
         total_complaints=total_complaints,
+        total_hostels=total_hostels,
         occupied_room_count=occupied_room_count,
         occupancy_rate=round(occupancy_rate, 1),
-        staff_performance=staff_perf,
-        top_complaints=top_complaints,
-        trend_json=json.dumps({'labels': trend_labels, 'counts': trend_counts})
+        today_present=today_present,
+        today_absent=today_absent,
+        today_leave=today_leave,
+        status_chart_data=json.dumps({'labels': type_labels, 'counts': type_counts}),
+        trend_json=json.dumps({'labels': trend_labels, 'counts': trend_counts}),
+        staff_workload=staff_workload,
+        staff_workload_json=json.dumps({'labels': [s['name'] for s in staff_workload], 'total': [s['total'] for s in staff_workload], 'completed': [s['completed'] for s in staff_workload], 'pending': [s['pending'] for s in staff_workload]}),
+        laundry_json=json.dumps({'labels': laundry_labels, 'weights': laundry_weights})
+    )
+
+
+@warden_bp.route('/overview/export')
+@login_required
+@warden_only
+def export_overview():
+    total_students = db.session.query(func.count(Student.student_id)).scalar() or 0
+    total_staff = db.session.query(func.count(StaffMember.staff_id)).scalar() or 0
+    total_rooms = db.session.query(func.count(Room.id)).scalar() or 0
+    total_complaints = db.session.query(func.count(Complaint.complaint_id)).scalar() or 0
+    open_complaints = db.session.query(func.count(Complaint.complaint_id)).filter(Complaint.status == 'Open').scalar() or 0
+    resolved_complaints = db.session.query(func.count(Complaint.complaint_id)).filter(Complaint.status == 'Resolved').scalar() or 0
+
+    occupied_room_count = db.session.query(func.count(RoomAllocation.alloc_id)).filter(RoomAllocation.vacate_date == None).scalar() or 0
+    occupancy_rate = (occupied_room_count / total_rooms * 100) if total_rooms > 0 else 0
+
+    today = date.today()
+    att_rows = db.session.query(Attendance.status, func.count(Attendance.student_id)).filter(Attendance.date == today).group_by(Attendance.status).all()
+    today_present = sum(c for s, c in att_rows if s.value.lower() == 'present')
+    today_absent = sum(c for s, c in att_rows if s.value.lower() == 'absent')
+    today_leave = sum(c for s, c in att_rows if s.value.lower() == 'leave')
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['Metric', 'Value'])
+    writer.writerow(['Total Students', total_students])
+    writer.writerow(['Total Staff', total_staff])
+    writer.writerow(['Total Rooms', total_rooms])
+    writer.writerow(['Occupied Rooms', occupied_room_count])
+    writer.writerow(['Occupancy Rate %', round(occupancy_rate, 2)])
+    writer.writerow(['Total Complaints', total_complaints])
+    writer.writerow(['Open Complaints', open_complaints])
+    writer.writerow(['Resolved Complaints', resolved_complaints])
+    writer.writerow(['Today Present', today_present])
+    writer.writerow(['Today Absent', today_absent])
+    writer.writerow(['Today Leave', today_leave])
+
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-Disposition": f"attachment;filename=hostel_overview_{today}.csv"}
     )
 
 
