@@ -38,6 +38,7 @@
               <th>Status</th>
               <th>Date Submitted</th>
               <th>Assigned Staff</th>
+              <th>Attachment</th>
               <th class="text-end">Actions</th>
             </tr>
           </thead>
@@ -58,6 +59,15 @@
                   </div>
                 {% else %}
                   <span class="text-muted small">Not assigned yet</span>
+                {% endif %}
+              </td>
+              <td>
+                {% if c.attachment_filename %}
+                  <a href="{{ url_for('static', filename='uploads/' + c.attachment_filename) }}" target="_blank" class="btn btn-sm btn-outline-secondary rounded-pill px-3 shadow-none">
+                    <i class="bi bi-paperclip me-1"></i>View
+                  </a>
+                {% else %}
+                  <span class="text-muted small">—</span>
                 {% endif %}
               </td>
               <td class="text-end">

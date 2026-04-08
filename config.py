@@ -33,6 +33,11 @@ class Config:
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY') or 'jwt-fallback-key'
     JWT_ACCESS_TOKEN_EXPIRES = 3600
 
+    # File upload config
+    UPLOAD_FOLDER = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'app', 'static', 'uploads')
+    MAX_CONTENT_LENGTH = 5 * 1024 * 1024  # 5MB limit
+    ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'gif', 'webp'}
+
 class DevelopmentConfig(Config):
     """Development settings."""
     DEBUG = True

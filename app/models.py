@@ -199,6 +199,7 @@ class Complaint(db.Model):
     issue_date = db.Column(db.Date, nullable=False)
     student_id = db.Column(db.Integer, db.ForeignKey('student.student_id'), nullable=False)
     staff_id = db.Column(db.Integer, db.ForeignKey('staff_members.staff_id', ondelete='SET NULL'), nullable=True)
+    attachment_filename = db.Column(db.String(255), nullable=True)
 
     student = db.relationship('Student', back_populates='complaints')
     staff = db.relationship('StaffMember', back_populates='complaints_handled')

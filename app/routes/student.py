@@ -20,6 +20,7 @@ from app.models import (
 from sqlalchemy.orm import joinedload
 
 from app.utils.email import send_complaint_received
+from app.utils.uploads import save_complaint_attachment
 
 COMPLAINT_CATEGORIES = frozenset(
     {
@@ -164,12 +165,14 @@ def new_complaint():
         if complaint_type not in COMPLAINT_CATEGORIES or not description:
             flash('Please choose a category and enter a description.', 'error')
             return redirect(url_for('student.new_complaint'))
+        attachment_filename = save_complaint_attachment(request.files.get('attachment'))
         row = Complaint(
             type=complaint_type,
             description=description,
             status='Open',
             issue_date=date.today(),
             student_id=current_user.student_id,
+            attachment_filename=attachment_filename,
         )
         db.session.add(row)
         db.session.commit()

@@ -71,6 +71,9 @@ def create_app(config_name=None):
     mail.init_app(app)
     jwt.init_app(app)
 
+    import os as _os
+    _os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
     from app import models  # noqa: F401
 
     from app.routes.auth import auth_bp

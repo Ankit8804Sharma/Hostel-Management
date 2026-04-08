@@ -21,7 +21,7 @@
           <p class="text-white-50 small mb-0 mt-1">Provide details about the issue you are facing</p>
         </div>
         <div class="card-body p-4 p-md-5">
-          <form method="post" action="{{ url_for('student.new_complaint') }}" class="needs-validation" novalidate>
+          <form method="post" action="{{ url_for('student.new_complaint') }}" class="needs-validation" novalidate enctype="multipart/form-data">
     {{ form.hidden_tag() if form else '' }}
     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             <!-- Type -->
@@ -48,6 +48,13 @@
               <div class="invalid-feedback">Please describe your issue in at least 10 characters.</div>
               <div class="valid-feedback">Looks good!</div>
               <div class="form-text">Please be as specific as possible to help our staff resolve it quickly.</div>
+            </div>
+
+            <!-- Attachment -->
+            <div class="mb-4">
+              <label for="attachment" class="form-label fw-semibold text-dark">Attachment <span class="text-muted fw-normal">(Optional)</span></label>
+              <input type="file" class="form-control shadow-none" id="attachment" name="attachment" accept="image/*">
+              <div class="form-text text-muted"><i class="bi bi-info-circle me-1"></i>Optional. Max 5MB. PNG, JPG, GIF, WEBP only.</div>
             </div>
 
             <!-- Rules/Notice -->
