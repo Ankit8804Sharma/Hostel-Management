@@ -124,6 +124,12 @@
       </button>
 
       <div class="ms-auto d-flex align-items-center gap-3">
+        <a href="{{ url_for('student.notifications') if current_user.get_id().startswith('student_') else url_for('staff.notifications') }}" class="nav-link position-relative text-dark fs-5">
+          <i class="bi bi-bell"></i>
+          {% if unread_notifications and unread_notifications > 0 %}
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger border border-light p-1" style="font-size: 0.6rem;">{{ unread_notifications }}</span>
+          {% endif %}
+        </a>
         <div class="text-end d-none d-sm-block">
           <div class="fw-bold small">{{ current_user.name }}</div>
           <div class="text-muted smallest text-uppercase letter-spacing-wider">

@@ -6,8 +6,9 @@ from flask_login import current_user, login_required
 from sqlalchemy.orm import joinedload
 
 from app import db
-from app.models import Complaint, StaffMember, Student, TaskAllocation
+from app.models import Complaint, StaffMember, Student, TaskAllocation, Notification
 from app.utils.email import send_complaint_status_update
+from app.utils.notify import notify_student, notify_staff
 
 staff_bp = Blueprint('staff', __name__)
 
@@ -101,8 +102,27 @@ def update_complaint_status(complaint_id):
         complaint.status = new_status
         db.session.commit()
         send_complaint_status_update(complaint.student.email, complaint.student.name, complaint.complaint_id, new_status, current_user.name)
+        notify_student(complaint.student_id, f"Your complaint #{complaint.complaint_id} status changed to {new_status}.")
         flash(f'Complaint status updated to {new_status}.', 'success')
     else:
         flash('Invalid status selected.', 'error')
         
     return redirect(url_for('staff.dashboard'))
+
+
+@staff_bp.route('/notifications')
+@login_required
+@staff_only
+def notifications():
+    notifs = Notification.query.filter_by(
+        user_type='staff', 
+        user_id=current_user.staff_id
+    ).order_by(Notification.created_at.desc()).all()
+    
+    unread = [n for n in notifs if not n.is_read]
+    if unread:
+        for n in unread:
+            n.is_read = True
+        db.session.commit()
+        
+    return render_template('staff/notifications.html', notifications=notifs)

@@ -245,3 +245,14 @@ class TaskAllocation(db.Model):
     notes = db.Column(db.Text, nullable=True)
 
     staff = db.relationship('StaffMember', back_populates='tasks')
+
+
+class Notification(db.Model):
+    __tablename__ = 'notification'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_type = db.Column(db.String(20), nullable=False)  # 'student' or 'staff'
+    user_id = db.Column(db.Integer, nullable=False)
+    message = db.Column(db.String(500), nullable=False)
+    is_read = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)

@@ -125,12 +125,20 @@ def create_app(config_name=None):
     @app.context_processor
     def inject_warden_stats():
         from flask_login import current_user
-        from app.models import Complaint, StaffMember
-        if current_user.is_authenticated and isinstance(current_user, StaffMember):
-            if current_user.role in ('warden', 'chief_warden'):
-                if 'open_complaints_count' not in g:
-                    g.open_complaints_count = Complaint.query.filter_by(status='Open').count()
-                return dict(open_complaints_count=g.open_complaints_count)
-        return dict(open_complaints_count=0)
+        from app.models import Complaint, StaffMember, Student, Notification
+        
+        context = {'open_complaints_count': 0, 'unread_notifications': 0}
+        
+        if current_user.is_authenticated:
+            if isinstance(current_user, Student):
+                context['unread_notifications'] = Notification.query.filter_by(user_type='student', user_id=current_user.student_id, is_read=False).count()
+            elif isinstance(current_user, StaffMember):
+                context['unread_notifications'] = Notification.query.filter_by(user_type='staff', user_id=current_user.staff_id, is_read=False).count()
+                if current_user.role in ('warden', 'chief_warden'):
+                    if 'open_complaints_count' not in g:
+                        g.open_complaints_count = Complaint.query.filter_by(status='Open').count()
+                    context['open_complaints_count'] = g.open_complaints_count
+                    
+        return context
 
     return app

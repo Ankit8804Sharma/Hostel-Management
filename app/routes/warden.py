@@ -21,8 +21,10 @@ from app.models import (
     Student,
     TaskAllocation,
     Warden,
+    Notification,
 )
 from app.utils.email import send_task_assigned
+from app.utils.notify import notify_student, notify_staff
 
 COMPLAINT_STATUSES = ('Open', 'In Progress', 'Resolved')
 
@@ -314,6 +316,7 @@ def assign_complaint(complaint_id):
     c.staff_id = staff_id
     c.status = 'In Progress'
     db.session.commit()
+    notify_staff(c.staff_id, f"Complaint #{complaint_id} has been assigned to you.")
     flash(f'Complaint assigned to {staff.name}.', 'success')
     return redirect(url_for('warden.dashboard'))
 
@@ -426,6 +429,7 @@ def new_task():
         )
         db.session.add(task)
         db.session.commit()
+        notify_staff(staff_id, f"New task assigned: {task.description}")
         assigned_staff = db.session.get(StaffMember, staff_id)
         if assigned_staff:
             send_task_assigned(assigned_staff.email, assigned_staff.name, task.description, current_user.name)
@@ -536,6 +540,7 @@ def allocate_room():
     )
     db.session.add(allocation)
     db.session.commit()
+    notify_student(student_id, "A room has been allocated to you.")
     flash('Room allocated successfully.', 'success')
     return redirect(url_for('warden.room_management'))
 
@@ -551,5 +556,6 @@ def vacate_room(allocation_id):
         return redirect(url_for('warden.room_management'))
     allocation.vacate_date = date.today()
     db.session.commit()
+    notify_student(allocation.student_id, "Your room allocation has been vacated.")
     flash('Room vacated successfully.', 'success')
     return redirect(url_for('warden.room_management'))

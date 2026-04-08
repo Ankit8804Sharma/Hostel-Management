@@ -21,6 +21,8 @@ from sqlalchemy.orm import joinedload
 
 from app.utils.email import send_complaint_received
 from app.utils.uploads import save_complaint_attachment
+from app.utils.notify import notify_student
+from app.models import Notification
 
 COMPLAINT_CATEGORIES = frozenset(
     {
@@ -177,6 +179,7 @@ def new_complaint():
         db.session.add(row)
         db.session.commit()
         send_complaint_received(current_user.email, current_user.name, row.complaint_id, row.type)
+        notify_student(current_user.student_id, f"Your complaint #{row.complaint_id} has been submitted.")
         flash('Your complaint was submitted successfully.', 'success')
         return redirect(url_for('student.dashboard'))
 
@@ -185,6 +188,26 @@ def new_complaint():
         'student/new_complaint.html',
         complaint_categories=sorted(COMPLAINT_CATEGORIES),
     )
+
+
+@student_bp.route('/notifications')
+@login_required
+@student_only
+def notifications():
+    """View and clear unread notifications."""
+    notifs = Notification.query.filter_by(
+        user_type='student', 
+        user_id=current_user.student_id
+    ).order_by(Notification.created_at.desc()).all()
+    
+    # Mark as read
+    unread = [n for n in notifs if not n.is_read]
+    if unread:
+        for n in unread:
+            n.is_read = True
+        db.session.commit()
+        
+    return render_template('student/notifications.html', notifications=notifs)
 
 
 @student_bp.route('/laundry/new', methods=['GET', 'POST'])
