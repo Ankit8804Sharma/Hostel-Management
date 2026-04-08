@@ -32,7 +32,20 @@
               {% endfor %}
             </select>
             <div class="invalid-feedback">Please select a staff member to assign this task.</div>
-            <div class="valid-feedback">Staff selected.</div>
+          </div>
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <label for="priority" class="form-label small fw-bold text-muted">Priority</label>
+              <select class="form-select border-0 bg-light" id="priority" name="priority" required>
+                <option value="Low">Low</option>
+                <option value="Medium" selected>Medium</option>
+                <option value="High">High</option>
+              </select>
+            </div>
+            <div class="col-md-6 mb-4">
+              <label for="due_date" class="form-label small fw-bold text-muted">Due Date (Optional)</label>
+              <input type="date" class="form-control border-0 bg-light" id="due_date" name="due_date">
+            </div>
           </div>
           <div class="d-flex align-items-center justify-content-between">
             <a href="{{ url_for('warden.dashboard') }}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>

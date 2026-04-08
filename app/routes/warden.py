@@ -1,7 +1,7 @@
 import csv
 import io
 import json
-from datetime import date, timedelta
+from datetime import date, timedelta, datetime
 from functools import wraps
 
 from flask import Blueprint, Response, abort, flash, redirect, render_template, request, url_for
@@ -412,10 +412,16 @@ def new_task():
             flash('Invalid staff ID.', 'error')
             return redirect(url_for('warden.new_task'))
             
+        priority = request.form.get('priority', 'Medium').strip()
+        due_date_raw = request.form.get('due_date', '').strip()
+        due_date = datetime.strptime(due_date_raw, '%Y-%m-%d').date() if due_date_raw else None
+        
         task = TaskAllocation(
             description=description,
             staff_id=staff_id,
             assigned_date=date.today(),
+            due_date=due_date,
+            priority=priority,
             status='Pending'
         )
         db.session.add(task)
@@ -429,6 +435,22 @@ def new_task():
     # GET: show form
     staff_members = StaffMember.query.order_by(StaffMember.name).all()
     return render_template('warden/new_task.html', staff_members=staff_members)
+
+
+@warden_bp.route('/task/<int:task_id>/delete', methods=['POST'])
+@login_required
+@warden_only
+def delete_task(task_id):
+    """Delete a task."""
+    task = db.session.get(TaskAllocation, task_id)
+    if not task:
+        abort(404)
+        
+    db.session.delete(task)
+    db.session.commit()
+    flash('Task deleted.', 'success')
+    return redirect(url_for('warden.dashboard'))
+
 
 
 @warden_bp.route('/room-management')

@@ -238,7 +238,10 @@ class TaskAllocation(db.Model):
     description = db.Column(db.Text, nullable=False)
     staff_id = db.Column(db.Integer, db.ForeignKey('staff_members.staff_id'), nullable=False)
     assigned_date = db.Column(db.Date, nullable=False)
+    due_date = db.Column(db.Date, nullable=True)
     completed_date = db.Column(db.Date, nullable=True)
     status = db.Column(db.String(50), nullable=False)
+    priority = db.Column(db.String(20), nullable=False, default='Medium')
+    notes = db.Column(db.Text, nullable=True)
 
     staff = db.relationship('StaffMember', back_populates='tasks')

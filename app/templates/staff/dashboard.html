@@ -93,6 +93,8 @@
             <thead>
               <tr>
                 <th>Task Details</th>
+                <th>Priority</th>
+                <th>Due Date</th>
                 <th>Status</th>
                 <th>Assigned Date</th>
                 <th class="text-end">Actions</th>
@@ -105,6 +107,17 @@
                   <span class="small fw-medium text-dark d-block text-truncate" style="max-width: 250px;">{{ task.description }}</span>
                   <span class="text-muted smallest text-uppercase">Task #{{ task.task_id }}</span>
                 </td>
+                <td>
+                  {% set p = task.priority|lower %}
+                  {% if p == 'high' %}
+                    <span class="badge bg-danger bg-opacity-10 text-danger border border-danger border-opacity-10">{{ task.priority }}</span>
+                  {% elif p == 'medium' %}
+                    <span class="badge bg-warning bg-opacity-10 text-warning border border-warning border-opacity-10">{{ task.priority }}</span>
+                  {% else %}
+                    <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary border-opacity-10">{{ task.priority }}</span>
+                  {% endif %}
+                </td>
+                <td><span class="text-muted small">{{ task.due_date if task.due_date else '—' }}</span></td>
                 <td>{{ task_status_badge(task.status) }}</td>
                 <td><span class="text-muted small">{{ task.assigned_date }}</span></td>
                 <td class="text-end">
