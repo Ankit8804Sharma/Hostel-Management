@@ -1,18 +1,11 @@
 import pytest
-from app import create_app
-from app import db as _db
+from app import create_app, db as _db
 from app.models import Student, StaffMember
 from werkzeug.security import generate_password_hash
 
 @pytest.fixture
 def app():
-    app = create_app('development')
-    app.config.update({
-        'TESTING': True,
-        'SQLALCHEMY_DATABASE_URI': 'sqlite:///:memory:',
-        'WTF_CSRF_ENABLED': False
-    })
-    
+    app = create_app('testing')
     with app.app_context():
         yield app
 
@@ -24,6 +17,7 @@ def client(app):
 def db(app):
     _db.create_all()
     yield _db
+    _db.session.remove()
     _db.drop_all()
 
 @pytest.fixture
@@ -34,8 +28,8 @@ def student_user(db):
         phone_number='1234567890',
         password_hash=generate_password_hash('password123')
     )
-    db.session.add(student)
-    db.session.commit()
+    _db.session.add(student)
+    _db.session.commit()
     return student
 
 @pytest.fixture
@@ -48,8 +42,8 @@ def warden_user(db):
         role='warden',
         password_hash=generate_password_hash('password123')
     )
-    db.session.add(warden)
-    db.session.commit()
+    _db.session.add(warden)
+    _db.session.commit()
     return warden
 
 @pytest.fixture
@@ -62,6 +56,6 @@ def staff_user(db):
         role='staff',
         password_hash=generate_password_hash('password123')
     )
-    db.session.add(staff)
-    db.session.commit()
+    _db.session.add(staff)
+    _db.session.commit()
     return staff

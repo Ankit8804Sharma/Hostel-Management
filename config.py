@@ -43,6 +43,17 @@ class DevelopmentConfig(Config):
     DEBUG = True
     SQLALCHEMY_ECHO = True
 
+class TestingConfig(Config):
+    TESTING = True
+    DEBUG = True
+    SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+    WTF_CSRF_ENABLED = False
+    SECRET_KEY = 'testing-secret-key'
+    WTF_CSRF_SECRET_KEY = 'testing-csrf-key'
+    JWT_SECRET_KEY = 'testing-jwt-secret'
+    SESSION_COOKIE_SECURE = False
+    UPLOAD_FOLDER = '/tmp/test_uploads'
+
 class ProductionConfig(Config):
     """Production settings."""
     DEBUG = False
@@ -51,6 +62,7 @@ class ProductionConfig(Config):
 # Mapping for factory
 config_by_name = {
     'development': DevelopmentConfig,
+    'testing': TestingConfig,
     'production': ProductionConfig,
     'default': DevelopmentConfig
 }

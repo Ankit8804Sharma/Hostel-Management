@@ -210,36 +210,7 @@ def notifications():
     return render_template('student/notifications.html', notifications=notifs)
 
 
-@student_bp.route('/laundry/new', methods=['GET', 'POST'])
-@login_required
-@student_only
-def new_laundry():
-    """Submit a laundry request."""
-    if request.method == 'POST':
-        items = request.form.get('items', '').strip()
-        weight_raw = request.form.get('weight', '')
-        try:
-            weight = float(weight_raw)
-        except (TypeError, ValueError):
-            flash('Please enter a valid weight.', 'error')
-            return redirect(url_for('student.new_laundry'))
-        if weight <= 0:
-            flash('Weight must be greater than zero.', 'error')
-            return redirect(url_for('student.new_laundry'))
-        row = Laundry(
-            date=date.today(),
-            weight=weight,
-            status='Pending',
-            items=items or None,
-            student_id=current_user.student_id,
-        )
-        db.session.add(row)
-        db.session.commit()
-        flash('Laundry request submitted successfully.', 'success')
-        return redirect(url_for('student.dashboard'))
 
-    # GET: show form
-    return render_template('student/new_laundry.html')
 
 
 @student_bp.route('/gaming')
