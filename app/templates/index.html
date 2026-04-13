@@ -7,6 +7,7 @@
     position: relative;
     padding-top: 5rem;
     padding-bottom: 5rem;
+    background: linear-gradient(135deg, #ffffff 0%, #f1f5f9 100%);
   }
 
   .hms-hero-title {
@@ -14,12 +15,12 @@
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 1.5rem;
-    color: white;
+    color: #1e293b;
   }
 
   .hms-hero-subtitle {
      font-size: clamp(1.1rem, 2vw, 1.35rem);
-     color: rgba(255,255,255,0.85);
+     color: #475569;
      max-width: 650px;
      margin-bottom: 3rem;
   }
@@ -96,20 +97,20 @@
   <div class="container h-100">
     <div class="row align-items-center h-100">
       <div class="col-lg-8 py-5">
-        <div class="badge bg-white bg-opacity-20 text-white rounded-pill px-3 py-2 mb-4">
+        <div class="badge bg-primary bg-opacity-10 text-primary rounded-pill px-3 py-2 mb-4">
           <i class="bi bi-stars me-2"></i>Smart Hostel Management
         </div>
         <h1 class="hms-hero-title">
           Manage your<br>
-          <span style="color: #bfdbfe;">Hostel Life</span><br>
+          <span class="text-primary">Hostel Life</span><br>
           efficiently.
         </h1>
         <p class="hms-hero-subtitle">The ultimate platform to bridge the gap between students, wardens, and maintenance staff for a seamless living experience.</p>
         <div class="d-flex flex-wrap gap-3">
-          <a href="{{ url_for('auth.login_student') }}" class="btn btn-light btn-lg rounded-pill px-5 fw-bold text-primary shadow-lg">
+          <a href="{{ url_for('auth.login_student') }}" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-lg">
             Get Started
           </a>
-          <a href="#how-it-works" class="btn btn-outline-light btn-lg rounded-pill px-5 fw-bold border-2">
+          <a href="#how-it-works" class="btn btn-outline-secondary btn-lg rounded-pill px-5 fw-bold border-2">
             Learn More
           </a>
         </div>

@@ -106,6 +106,8 @@ def create_app(config_name=None):
             if isinstance(current_user, Student):
                 return redirect(url_for('student.dashboard'))
             elif isinstance(current_user, StaffMember):
+                if current_user.role == 'admin':
+                    return redirect(url_for('admin.dashboard'))
                 if current_user.role in ('warden', 'chief_warden'):
                     return redirect(url_for('warden.dashboard'))
                 return redirect(url_for('staff.dashboard'))

@@ -73,7 +73,8 @@ def login_student():
 def register_staff():
     if request.method == 'POST':
         if request.form.get('invite_code') != os.environ.get('STAFF_INVITE_CODE'):
-            abort(403)
+            flash('Invalid invite code. Please contact the hostel administrator.', 'danger')
+            return render_template('auth/register_staff.html')
         name = request.form.get('name', '').strip()
         email = request.form.get('email', '').strip().lower()
         contact_no = request.form.get('contact_no', '').strip()
