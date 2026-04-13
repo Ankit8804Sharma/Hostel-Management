@@ -50,7 +50,7 @@ class TestingConfig(Config):
     WTF_CSRF_ENABLED = False
     SECRET_KEY = 'testing-secret-key'
     WTF_CSRF_SECRET_KEY = 'testing-csrf-key'
-    JWT_SECRET_KEY = 'testing-jwt-secret'
+    JWT_SECRET_KEY = 'testing-jwt-secret-key-minimum-32-chars!!'
     SESSION_COOKIE_SECURE = False
     UPLOAD_FOLDER = '/tmp/test_uploads'
 

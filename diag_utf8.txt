@@ -1,0 +1,548 @@
+﻿=== 1. DUPLICATE ROUTE CHECK ===
+No duplicates in app/routes/student.py
+No duplicates in app/routes/warden.py
+No duplicates in app/routes/staff.py
+No duplicates in app/routes/auth.py
+No duplicates in app/routes/api.py
+No duplicates in app/routes/admin.py
+
+=== 2. IMPORT CHECK ===
+App import: OK
+
+C:\Users\Dell\Desktop\Hostel-Management\venv\lib\python3.14\site-packages\flask_limiter\_extension.py:364: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+
+
+=== 3. FLASK ROUTES CHECK ===
+Endpoint                        Methods    Rule                                          
+------------------------------  ---------  ----------------------------------------------
+admin.dashboard                 GET        /admin/dashboard                              
+admin.delete_hostel             POST       /admin/hostel/<int:hostel_id>/delete          
+admin.delete_room               POST       /admin/room/<int:room_id>/delete              
+admin.edit_hostel               GET, POST  /admin/hostel/<int:hostel_id>/edit            
+admin.new_hostel                GET, POST  /admin/hostel/new                             
+admin.new_room                  GET, POST  /admin/room/new                               
+api.login_staff                 POST       /api/v1/auth/login/staff                      
+api.login_student               POST       /api/v1/auth/login/student                    
+api.student_complaints          GET, POST  /api/v1/student/complaints                    
+api.student_profile             GET        /api/v1/student/profile                       
+api.update_complaint_status     PATCH      /api/v1/warden/complaints/<int:id>/status     
+api.warden_complaints           GET        /api/v1/warden/complaints                     
+auth.forgot_password_staff      GET, POST  /auth/forgot-password/staff                   
+auth.forgot_password_student    GET, POST  /auth/forgot-password/student                 
+auth.login_staff                GET, POST  /auth/login/staff                             
+auth.login_student              GET, POST  /auth/login/student                           
+auth.logout                     GET        /auth/logout                                  
+auth.register_staff             GET, POST  /auth/register/staff                          
+auth.register_student           GET, POST  /auth/register/student                        
+auth.reset_password_staff       GET, POST  /auth/reset-password/staff/<token>            
+auth.reset_password_student     GET, POST  /auth/reset-password/student/<token>          
+index                           GET        /                                             
+staff.complete_task             POST       /staff/task/<int:task_id>/complete            
+staff.dashboard                 GET        /staff/dashboard                              
+staff.notifications             GET        /staff/notifications                          
+staff.update_complaint_status   POST       /staff/complaint/<int:complaint_id>/update    
+static                          GET        /static/<path:filename>                       
+student.complaint_feedback      GET, POST  /student/complaint/<int:complaint_id>/feedback
+student.complaints_history      GET        /student/complaints                           
+student.dashboard               GET        /student/dashboard                            
+student.edit_profile            POST       /student/profile/edit                         
+student.gaming                  GET        /student/gaming                               
+student.gaming_book             POST       /student/gaming/book/<int:serial_no>          
+student.gaming_return           POST       /student/gaming/return/<int:serial_no>        
+student.laundry_history         GET        /student/laundry                              
+student.new_complaint           GET, POST  /student/complaint/new                        
+student.new_laundry             GET, POST  /student/laundry/new                          
+student.notifications           GET        /student/notifications                        
+student.profile                 GET        /student/profile                              
+student.room                    GET        /student/room                                 
+student.track_complaint         GET        /student/complaint/<int:complaint_id>/track   
+warden.add_gaming_equipment     POST       /warden/gaming/add                            
+warden.allocate_room            POST       /warden/room/allocate                         
+warden.assign_complaint         POST       /warden/complaint/<int:complaint_id>/assign   
+warden.attendance               GET, POST  /warden/attendance                            
+warden.dashboard                GET        /warden/dashboard                             
+warden.delete_gaming_equipment  POST       /warden/gaming/<int:serial_no>/delete         
+warden.delete_task              POST       /warden/task/<int:task_id>/delete             
+warden.export_complaints        GET        /warden/complaints/export                     
+warden.export_overview          GET        /warden/overview/export                       
+warden.gaming_management        GET        /warden/gaming                                
+warden.laundry_management       GET        /warden/laundry                               
+warden.new_task                 GET, POST  /warden/task/new                              
+warden.overview                 GET        /warden/overview                              
+warden.resolve_complaint        POST       /warden/complaint/<int:complaint_id>/resolve  
+warden.room_management          GET        /warden/room-management                       
+warden.students                 GET        /warden/students                              
+warden.toggle_gaming_equipment  POST       /warden/gaming/<int:serial_no>/toggle         
+warden.update_complaint         POST       /warden/complaint/<int:complaint_id>/update   
+warden.update_laundry_status    POST       /warden/laundry/<int:laundry_id>/status       
+warden.vacate_room              POST       /warden/room/vacate/<int:allocation_id>       
+
+C:\Users\Dell\Desktop\Hostel-Management\venv\lib\python3.14\site-packages\flask_limiter\_extension.py:364: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+
+
+=== 4. MISSING TEMPLATE CHECK ===
+Missing templates: None
+
+=== 5. UNDEFINED URL_FOR CHECK ===
+url_for calls found: ['admin.dashboard', 'admin.delete_hostel', 'admin.delete_room', 'admin.edit_hostel', 'admin.new_hostel', 'admin.new_room', 'auth.forgot_password_staff', 'auth.forgot_password_student', 'auth.login_staff', 'auth.login_student', 'auth.logout', 'auth.register_staff', 'auth.register_student', 'auth.reset_password_staff', 'auth.reset_password_student', 'index', 'staff.complete_task', 'staff.dashboard', 'staff.notifications', 'staff.update_complaint_status', 'static', 'student.complaint_feedback', 'student.complaints_history', 'student.dashboard', 'student.edit_profile', 'student.gaming', 'student.gaming_book', 'student.gaming_return', 'student.laundry_history', 'student.new_complaint', 'student.new_laundry', 'student.notifications', 'student.profile', 'student.room', 'student.track_complaint', 'warden.add_gaming_equipment', 'warden.allocate_room', 'warden.assign_complaint', 'warden.attendance', 'warden.dashboard', 'warden.delete_gaming_equipment', 'warden.delete_task', 'warden.export_complaints', 'warden.export_overview', 'warden.gaming_management', 'warden.laundry_management', 'warden.new_task', 'warden.overview', 'warden.resolve_complaint', 'warden.room_management', 'warden.students', 'warden.toggle_gaming_equipment', 'warden.update_laundry_status', 'warden.vacate_room']
+
+=== 6. PYTEST CHECK ===
+============================= test session starts =============================
+platform win32 -- Python 3.14.3, pytest-9.0.3, pluggy-1.6.0 -- C:\Users\Dell\Desktop\Hostel-Management\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\Dell\Desktop\Hostel-Management
+plugins: flask-1.3.0
+collecting ... collected 25 items
+
+tests/test_api.py::test_api_student_login_success PASSED                 [  4%]
+tests/test_api.py::test_api_student_login_wrong_password PASSED          [  8%]
+tests/test_api.py::test_api_complaints_without_token PASSED              [ 12%]
+tests/test_api.py::test_api_complaints_with_token PASSED                 [ 16%]
+tests/test_api.py::test_api_create_complaint PASSED                      [ 20%]
+tests/test_auth.py::test_student_register_success PASSED                 [ 24%]
+tests/test_auth.py::test_student_register_duplicate_email PASSED         [ 28%]
+tests/test_auth.py::test_student_login_success PASSED                    [ 32%]
+tests/test_auth.py::test_student_login_wrong_password PASSED             [ 36%]
+tests/test_auth.py::test_staff_register_without_invite_code PASSED       [ 40%]
+tests/test_auth.py::test_staff_register_with_invite_code PASSED          [ 44%]
+tests/test_staff.py::test_staff_dashboard_unauthenticated PASSED         [ 48%]
+tests/test_staff.py::test_staff_dashboard_as_student PASSED              [ 52%]
+tests/test_staff.py::test_staff_dashboard_as_staff PASSED                [ 56%]
+tests/test_student.py::test_student_dashboard_unauthenticated PASSED     [ 60%]
+tests/test_student.py::test_student_dashboard_authenticated PASSED       [ 64%]
+tests/test_student.py::test_student_dashboard_blocked_for_staff PASSED   [ 68%]
+tests/test_student.py::test_new_complaint_get PASSED                     [ 72%]
+tests/test_student.py::test_new_complaint_post_valid PASSED              [ 76%]
+tests/test_student.py::test_new_complaint_post_invalid_type PASSED       [ 80%]
+tests/test_student.py::test_complaints_list PASSED                       [ 84%]
+tests/test_student.py::test_student_profile_get PASSED                   [ 88%]
+tests/test_warden.py::test_warden_dashboard_unauthenticated PASSED       [ 92%]
+tests/test_warden.py::test_warden_dashboard_as_student PASSED            [ 96%]
+tests/test_warden.py::test_warden_dashboard_as_warden PASSED             [100%]
+
+============================== warnings summary ===============================
+tests/test_api.py: 5 warnings
+tests/test_auth.py: 6 warnings
+tests/test_staff.py: 3 warnings
+tests/test_student.py: 8 warnings
+tests/test_warden.py: 3 warnings
+  C:\Users\Dell\Desktop\Hostel-Management\venv\lib\python3.14\site-packages\flask_limiter\_extension.py:364: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+    warnings.warn(
+
+tests/test_api.py::test_api_student_login_success
+tests/test_api.py::test_api_complaints_with_token
+tests/test_api.py::test_api_create_complaint
+  C:\Users\Dell\Desktop\Hostel-Management\venv\lib\python3.14\site-packages\jwt\api_jwt.py:147: InsecureKeyLengthWarning: The HMAC key is 18 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+    return self._jws.encode(
+
+tests/test_api.py::test_api_complaints_with_token
+tests/test_api.py::test_api_create_complaint
+  C:\Users\Dell\Desktop\Hostel-Management\venv\lib\python3.14\site-packages\jwt\api_jwt.py:365: InsecureKeyLengthWarning: The HMAC key is 18 bytes long, which is below the minimum recommended length of 32 bytes for SHA256. See RFC 7518 Section 3.2.
+    decoded = self.decode_complete(
+
+tests/test_student.py::test_new_complaint_post_valid
+  C:\Users\Dell\Desktop\Hostel-Management\venv\lib\python3.14\site-packages\sqlalchemy\sql\schema.py:3624: DeprecationWarning: datetime.datetime.utcnow() is deprecated and scheduled for removal in a future version. Use timezone-aware objects to represent datetimes in UTC: datetime.datetime.now(datetime.UTC).
+    return util.wrap_callable(lambda ctx: fn(), fn)  # type: ignore
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+======================= 25 passed, 31 warnings in 6.08s =======================
+
+
+=== 7. MISSING MIGRATION CHECK ===
+No new upgrade operations detected.
+
+C:\Users\Dell\Desktop\Hostel-Management\venv\lib\python3.14\site-packages\flask_limiter\_extension.py:364: UserWarning: Using the in-memory storage for tracking rate limits as no storage was explicitly specified. This is not recommended for production use. See: https://flask-limiter.readthedocs.io#configuring-a-storage-backend for documentation about configuring the storage backend.
+  warnings.warn(
+INFO  [alembic.runtime.migration] Context impl SQLiteImpl.
+INFO  [alembic.runtime.migration] Will assume non-transactional DDL.
+INFO  [sqlalchemy.engine.Engine] BEGIN (implicit)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("alembic_version")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT alembic_version.version_num 
+FROM alembic_version
+INFO  [sqlalchemy.engine.Engine] [generated in 0.00020s] ()
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.schemas
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.tables
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.types
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.constraints
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.defaults
+INFO  [alembic.runtime.plugins] setting up autogenerate plugin alembic.autogenerate.comments
+INFO  [sqlalchemy.engine.Engine] SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite~_%' ESCAPE '~' ORDER BY name
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("attendance")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("chief_warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("complaint")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("equipment_usage")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("feedback")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("gaming_facilities")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("hostel")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("laundry")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("non_ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("notification")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("room_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("staff_members")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("student")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("task_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_xinfo("warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('ac_room',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('attendance',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('chief_warden',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('complaint',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('equipment_usage',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('feedback',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('gaming_facilities',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('hostel',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('laundry',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('non_ac_room',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('notification',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('room',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('room_allocation',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('staff_members',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('student',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('task_allocation',)
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('warden',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('ac_room',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("attendance")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('attendance',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("chief_warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('chief_warden',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("complaint")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('complaint',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("equipment_usage")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('equipment_usage',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("feedback")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('feedback',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("gaming_facilities")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.foreign_key_list("gaming_facilities")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('gaming_facilities',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("hostel")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.foreign_key_list("hostel")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('hostel',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("laundry")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('laundry',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("non_ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('non_ac_room',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("notification")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.foreign_key_list("notification")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('notification',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('room',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("room_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('room_allocation',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("staff_members")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.foreign_key_list("staff_members")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('staff_members',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("student")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.foreign_key_list("student")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('student',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("task_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('task_allocation',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.foreign_key_list("warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('warden',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("attendance")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("attendance")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("chief_warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("chief_warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("chief_warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("complaint")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("complaint")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("complaint")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("equipment_usage")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("equipment_usage")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("equipment_usage")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("feedback")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("feedback")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("gaming_facilities")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("gaming_facilities")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("gaming_facilities")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("hostel")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("hostel")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("hostel")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("laundry")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("laundry")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("laundry")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("non_ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("non_ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("non_ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("notification")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("notification")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("notification")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("room_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("room_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("room_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("staff_members")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_info("ix_staff_members_email")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("student")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_info("ix_student_email")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("task_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("task_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("task_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('ac_room',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("attendance")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_info("sqlite_autoindex_attendance_1")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('attendance',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("chief_warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("chief_warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("chief_warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('chief_warden',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("complaint")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("complaint")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("complaint")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('complaint',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("equipment_usage")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("equipment_usage")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("equipment_usage")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('equipment_usage',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("feedback")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_info("sqlite_autoindex_feedback_1")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('feedback',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("gaming_facilities")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("gaming_facilities")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("gaming_facilities")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('gaming_facilities',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("hostel")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("hostel")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("hostel")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('hostel',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("laundry")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("laundry")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("laundry")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('laundry',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("non_ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("non_ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("non_ac_room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('non_ac_room',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("notification")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("notification")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("notification")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('notification',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("room")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_info("sqlite_autoindex_room_1")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('room',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("room_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("room_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("room_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('room_allocation',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("staff_members")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_info("ix_staff_members_email")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('staff_members',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("student")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_info("ix_student_email")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_info("sqlite_autoindex_student_1")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('student',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("task_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("task_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("task_allocation")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('task_allocation',)
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.index_list("warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA temp.index_list("warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] PRAGMA main.table_info("warden")
+INFO  [sqlalchemy.engine.Engine] [raw sql] ()
+INFO  [sqlalchemy.engine.Engine] SELECT sql FROM  (SELECT * FROM sqlite_master UNION ALL   SELECT * FROM sqlite_temp_master) WHERE name = ? AND type in ('table', 'view')
+INFO  [sqlalchemy.engine.Engine] [raw sql] ('warden',)
+INFO  [sqlalchemy.engine.Engine] ROLLBACK
+
+
+=== 8. REQUIREMENTS CHECK ===
+No broken requirements found.
+
+
+=== 9. PYTHON SYNTAX CHECK ===
+
